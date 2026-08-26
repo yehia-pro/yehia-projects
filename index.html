@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='dark'){document.documentElement.classList.add('dark');}}catch(e){}}();</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>الرئيسية - Student Hub</title>
+  <meta name="theme-color" content="#4648d4">
+  <meta name="description" content="تطبيق تعليمي ذكي لإدارة المهام والمحاضرات والمدرسين ومواقيت الصلاة">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <!-- Google Fonts: Cairo & Tajawal / Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tailwind.css">
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="min-h-screen pb-28 md:pb-12 font-sans bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 antialiased transition-colors duration-300">
+  <div id="sh-header"></div>
+
+  <main class="max-w-6xl mx-auto px-4 py-6 md:py-8 space-y-6 md:space-y-8">
+    
+    <!-- Top Greeting & Action Header -->
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div class="space-y-1">
+        <h1 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight" id="dash-greeting">أهلاً 👋</h1>
+        <p class="text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400" id="dash-date"></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="sh-btn secondary text-xs !py-2.5 !px-4" onclick="location.href='resources.html'">📚 الملخصات والمنصات</button>
+        <button class="sh-btn secondary text-xs !py-2.5 !px-4" onclick="location.href='flashcards.html'">🎴 البطاقات الذكية</button>
+        <button class="sh-btn primary text-xs !py-2.5 !px-4 shadow-lg" onclick="location.href='tasks.html'">+ مهمة جديدة</button>
+      </div>
+    </div>
+
+    <!-- Daily Motivation & 10-Second Morning Briefing (بطاقة الإلهام وملخص الـ 10 ثوانٍ) -->
+    <section class="sh-card p-5 md:p-6 rounded-3xl bg-gradient-to-br from-indigo-900/10 via-purple-900/10 to-amber-500/10 border border-indigo-500/30 space-y-4 relative overflow-hidden shadow-sm">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-2xl shrink-0">
+            💡
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 font-mono">
+                إلهام اليوم ✨
+              </span>
+              <span class="text-xs font-bold text-slate-400" id="dash-motivation-author">حديث شريف</span>
+            </div>
+            <p class="text-xs md:text-sm font-bold text-slate-800 dark:text-slate-200 mt-1 leading-relaxed" id="dash-motivation-text">
+              «مَن سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا، سَهَّلَ اللَّهُ له به طَرِيقًا إلى الجَنَّةِ»
+            </p>
+          </div>
+        </div>
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-black shrink-0">
+          <span>🔥</span>
+          <span id="dash-daily-streak-lbl">ستريك اليوم: 1 أيام (+15 XP)</span>
+        </div>
+      </div>
+
+      <!-- 10-Second Quick Metric Strip -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+        <div class="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-800 flex items-center gap-2.5">
+          <span class="text-xl">📌</span>
+          <div class="min-w-0">
+            <span class="text-[10px] text-slate-400 font-bold block">مهام اليوم</span>
+            <strong class="text-xs font-black text-slate-900 dark:text-white truncate block" id="briefing-tasks-stat">0 مهام نشطة</strong>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-800 flex items-center gap-2.5">
+          <span class="text-xl">🕌</span>
+          <div class="min-w-0">
+            <span class="text-[10px] text-slate-400 font-bold block">الصلاة القادمة</span>
+            <strong class="text-xs font-black text-indigo-600 dark:text-indigo-400 truncate block" id="briefing-prayer-stat">الظهر</strong>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-800 flex items-center gap-2.5">
+          <span class="text-xl">📖</span>
+          <div class="min-w-0">
+            <span class="text-[10px] text-slate-400 font-bold block">الورد القرآني</span>
+            <strong class="text-xs font-black text-amber-600 dark:text-amber-400 truncate block" id="briefing-quran-stat">ص 293 (الكهف)</strong>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-800 flex items-center gap-2.5">
+          <span class="text-xl">⏱️</span>
+          <div class="min-w-0">
+            <span class="text-[10px] text-slate-400 font-bold block">المذاكرة المركزة</span>
+            <strong class="text-xs font-black text-emerald-600 dark:text-emerald-400 truncate block" id="briefing-pomo-stat">ابدأ جلسة ➔</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Student Level & XP Progress Banner -->
+    <section class="sh-card p-4 md:p-5 rounded-3xl bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-transparent border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5 w-full md:w-auto">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl font-black shrink-0" id="dash-rank-badge">
+          🎓
+        </div>
+        <div class="space-y-0.5 min-w-0 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-500">رتبتك الحالية:</span>
+            <span class="font-black text-slate-900 dark:text-white text-sm" id="dash-rank-title">طالب مبتدئ 🎓</span>
+          </div>
+          <p class="text-[11px] text-slate-500 truncate" id="dash-level-sub">
+            المستوى <strong class="font-mono text-slate-900 dark:text-white" id="dash-level-num">1</strong> • <span id="dash-xp-progress-text">0 / 100 XP</span> للترقية
+          </p>
+        </div>
+      </div>
+
+      <!-- XP Bar & Fast Launchers -->
+      <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+        <div class="w-36 sm:w-48 space-y-1">
+          <div class="flex justify-between text-[10px] font-bold text-slate-400 font-mono">
+            <span>التقدم</span>
+            <span id="dash-xp-pct">0%</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden p-0.5">
+            <div id="dash-xp-bar" class="h-full bg-gradient-to-r from-amber-500 to-indigo-600 rounded-full transition-all duration-700" style="width: 0%"></div>
+          </div>
+        </div>
+        <a href="stats.html" class="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 transition whitespace-nowrap">
+          لوحة الشرف 🏆
+        </a>
+      </div>
+    </section>
+
+    <!-- Live Sequential Prayer Widget (كارت الصلاة التتابعي الحي) -->
+    <section id="dash-prayer-widget" class="sh-card relative overflow-hidden rounded-3xl p-5 md:p-6 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white shadow-xl border border-indigo-500/20">
+      <div class="absolute -top-16 -right-16 w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-5">
+        <div class="flex-1 space-y-2 text-center md:text-right w-full">
+          <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-amber-300 border border-white/10">
+              <span class="animate-pulse">🟢</span>
+              <span id="dash-prayer-city">القاهرة</span>
+            </span>
+            <span class="text-xs text-indigo-200 font-bold" id="dash-prayer-status-lbl">الصلاة القادمة</span>
+          </div>
+          <div class="flex items-baseline justify-center md:justify-start gap-3">
+            <h2 class="text-xl md:text-3xl font-black text-white" id="dash-prayer-next-name">جاري الحساب...</h2>
+            <span class="text-sm font-bold text-amber-400" id="dash-prayer-next-time">--:--</span>
+          </div>
+          <!-- Progress bar in current prayer window -->
+          <div class="max-w-md mx-auto md:mx-0 pt-1">
+            <div class="flex justify-between text-[11px] text-indigo-300 font-bold mb-1">
+              <span id="dash-prayer-win-prev">السابقة</span>
+              <span id="dash-prayer-win-next">القادمة</span>
+            </div>
+            <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+              <div id="dash-prayer-progress" class="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Timer Box & Quick Link -->
+        <div class="flex items-center gap-4 bg-white/5 backdrop-blur-md px-5 py-4 rounded-2xl border border-white/10 w-full md:w-auto justify-between md:justify-center">
+          <div class="text-center">
+            <div class="text-[10px] uppercase font-extrabold text-indigo-300 tracking-wider">متبقي على الأذان</div>
+            <div class="text-2xl md:text-3xl font-black text-amber-400 font-mono tracking-wide" id="dash-prayer-timer">--:--:--</div>
+          </div>
+          <a href="prayer.html" class="sh-btn primary text-xs !py-2 !px-3 shrink-0">الأذكار والقبلة ←</a>
+        </div>
+      </div>
+
+      <!-- Quick 5 Prayers Checklist Row -->
+      <div class="mt-4 pt-3 border-t border-white/10 grid grid-cols-5 gap-2 text-center text-xs" id="dash-prayer-checklist">
+        <!-- Filled dynamically -->
+      </div>
+    </section>
+
+    <!-- Statistics Bento Grid -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      <div class="sh-card sh-stat-card p-5 rounded-2xl bg-white dark:bg-[#121826] border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl shrink-0">📋</div>
+        <div>
+          <div class="text-2xl font-black text-slate-900 dark:text-white" id="dash-tasks-open">0</div>
+          <div class="text-xs font-bold text-slate-500 dark:text-slate-400">مهام متبقية</div>
+        </div>
+      </div>
+      
+      <div class="sh-card sh-stat-card p-5 rounded-2xl bg-white dark:bg-[#121826] border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 border-r-4 border-r-amber-500">
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl shrink-0">📝</div>
+        <div>
+          <div class="text-2xl font-black text-slate-900 dark:text-white" id="dash-exams-7">0</div>
+          <div class="text-xs font-bold text-slate-500 dark:text-slate-400">امتحان هذا الأسبوع</div>
+        </div>
+      </div>
+      
+      <div class="sh-card sh-stat-card p-5 rounded-2xl bg-white dark:bg-[#121826] border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl shrink-0">⏱️</div>
+        <div>
+          <div class="text-2xl font-black text-slate-900 dark:text-white" id="dash-minutes">0</div>
+          <div class="text-xs font-bold text-slate-500 dark:text-slate-400">دقيقة دراسة اليوم</div>
+        </div>
+      </div>
+      
+      <div class="sh-card sh-stat-card p-5 rounded-2xl bg-white dark:bg-[#121826] border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-4 border-r-4 border-r-orange-500">
+        <div class="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 flex items-center justify-center text-2xl shrink-0">🔥</div>
+        <div>
+          <div class="text-2xl font-black text-orange-600 dark:text-orange-400" id="dash-streak">0</div>
+          <div class="text-xs font-bold text-slate-500 dark:text-slate-400">أيام دراسة متتالية</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content 2-Column Bento Grid -->
+    <section class="grid lg:grid-cols-2 gap-6 md:gap-8">
+      <div class="space-y-6 flex flex-col">
+        
+        <!-- Nearest Exam Card -->
+        <div class="sh-card p-6 md:p-7 bg-gradient-to-br from-white to-slate-50 dark:from-[#121826] dark:to-[#0f172a] border border-indigo-500/20 shadow-lg relative overflow-hidden rounded-3xl">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <span class="text-indigo-600 dark:text-indigo-400">⏳</span>
+              <span>أقرب امتحان قادم</span>
+            </h2>
+            <a class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-bold bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full" href="exams.html">كل الامتحانات ←</a>
+          </div>
+          <div class="min-h-[90px] flex items-center justify-center" id="dash-countdown">
+            <p class="text-slate-400 text-center text-sm font-medium">جاري التحميل...</p>
+          </div>
+        </div>
+
+        <!-- Quick Focus Pomodoro Card -->
+        <div class="sh-card p-6 md:p-7 shadow-lg border border-slate-200/80 dark:border-slate-800 rounded-3xl flex-1 flex flex-col justify-between bg-white dark:bg-[#121826]">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-xl">🎯</span>
+            <h2 class="text-lg font-black text-slate-900 dark:text-white">التركيز السريع بومودورو</h2>
+          </div>
+          
+          <div class="flex flex-col items-center gap-6 flex-1 justify-center py-2">
+            <div class="sh-ring shadow-xl transition-all hover:scale-105 duration-300" id="pomo-ring">
+              <div class="sh-ring-inner">
+                <div class="text-center">
+                  <div class="sh-pomo-timer text-slate-900 dark:text-white tracking-tight" id="pomo-timer">25:00</div>
+                  <div id="pomo-mode" class="text-xs text-indigo-600 dark:text-indigo-400 font-extrabold mt-1 uppercase tracking-widest">تركيز</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="w-full max-w-sm space-y-4">
+              <!-- Presets -->
+              <div>
+                <div class="text-[11px] font-bold text-slate-400 mb-2 text-center uppercase tracking-wider">اختار مدة التركيز</div>
+                <div class="flex flex-wrap justify-center gap-2" id="pomo-presets">
+                  <button class="sh-pomo-preset active" data-min="25">25</button>
+                  <button class="sh-pomo-preset" data-min="50">50</button>
+                  <button class="sh-pomo-preset" data-min="75">75</button>
+                  <button class="sh-pomo-preset" data-min="90">90</button>
+                  <button class="sh-pomo-preset" data-min="custom" title="مخصص">⚙️</button>
+                </div>
+              </div>
+
+              <!-- Stepper Controls -->
+              <div class="flex items-center gap-2 justify-center bg-slate-100 dark:bg-slate-800/80 rounded-2xl p-1.5">
+                <button class="sh-pomo-adj rounded-xl font-bold" data-adj="-5">−5</button>
+                <button class="sh-pomo-adj rounded-xl font-bold" data-adj="-1">−1</button>
+                <span class="text-base text-slate-800 dark:text-gray-200 min-w-[70px] text-center font-black bg-white dark:bg-slate-900 py-1 rounded-xl shadow-sm" id="pomo-current-min">25 د</span>
+                <button class="sh-pomo-adj rounded-xl font-bold" data-adj="1">+1</button>
+                <button class="sh-pomo-adj rounded-xl font-bold" data-adj="5">+5</button>
+              </div>
+
+              <!-- Options -->
+              <div class="space-y-3 bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-800 text-xs">
+                <div class="flex items-center justify-between gap-4">
+                  <label class="font-bold text-slate-600 dark:text-slate-300">☕ استراحة</label>
+                  <div class="flex gap-1.5">
+                    <button class="sh-pomo-break-opt text-xs py-1 px-2.5" data-break="5">5 د</button>
+                    <button class="sh-pomo-break-opt text-xs py-1 px-2.5" data-break="15">15 د</button>
+                    <button class="sh-pomo-break-opt active text-xs py-1 px-2.5" data-break="0">بدون</button>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <label class="font-bold text-slate-600 dark:text-slate-300">🔊 التنبيه</label>
+                  <div class="flex gap-1.5">
+                    <button class="sh-pomo-snd-opt text-xs py-1 px-2.5" data-snd="silent">صامت</button>
+                    <button class="sh-pomo-snd-opt active text-xs py-1 px-2.5" data-snd="beep">نغمة</button>
+                  </div>
+                </div>
+                <label class="flex items-center gap-2 font-bold text-slate-600 dark:text-slate-300 cursor-pointer pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                  <input checked="" class="accent-indigo-600 w-4 h-4 rounded text-indigo-600" id="pomo-wake-cb" type="checkbox"/>
+                  إبقاء الشاشة مفتوحة
+                </label>
+              </div>
+
+              <!-- Subject & Start -->
+              <div class="flex items-center gap-2 w-full">
+                <select class="sh-input flex-1 shadow-sm text-xs font-bold" id="pomo-subject"></select>
+                <button class="sh-btn primary shadow-md px-5 py-2.5 flex-shrink-0 font-black" id="pomo-btn">ابدأ ▶</button>
+                <button class="sh-btn ghost p-2.5 flex-shrink-0" id="pomo-reset" title="تصفير">↺</button>
+              </div>
+              <div class="text-xs text-center text-slate-400 font-bold" id="pomo-today"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Alerts, Tasks, Resources -->
+      <div class="space-y-6">
+        <div class="sh-card p-6 rounded-3xl bg-white dark:bg-[#121826] border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+            <h2 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">⚠️ تنبيهات هامة</h2>
+          </div>
+          <div class="space-y-2.5 min-h-[50px]" id="dash-alerts"></div>
+        </div>
+
+        <div class="sh-card p-6 rounded-3xl bg-white dark:bg-[#121826] border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+            <h2 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">📋 مهام قادمة</h2>
+            <a class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline" href="tasks.html">الكل ←</a>
+          </div>
+          <div class="space-y-2.5 min-h-[90px]" id="dash-tasks"></div>
+        </div>
+
+        <div class="sh-card p-6 rounded-3xl bg-white dark:bg-[#121826] border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+            <h2 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">🔗 روابط ومراجع سريعة</h2>
+            <a class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline" href="resources.html">الكل ←</a>
+          </div>
+          <div class="space-y-2.5 min-h-[90px]" id="dash-resources"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+
+  <script src="js/store.js"></script>
+  <script src="js/labels.js"></script>
+  <script src="js/prayer.js"></script>
+  <script src="js/onboarding.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var u = Store.state.user;
+      if (!u.name) {
+        u.name = 'طالب متميز';
+        u.role = 'school';
+        u.onboardingDone = true;
+        if (!Store.state.subjects.length) {
+          Store.state.subjects = [
+            { id: 'sub-1', name: 'الرياضيات', color: '#6366f1' },
+            { id: 'sub-2', name: 'الفيزياء', color: '#10b981' },
+            { id: 'sub-3', name: 'اللغة الإنجليزية', color: '#f59e0b' },
+            { id: 'sub-4', name: 'اللغة العربية', color: '#3b82f6' }
+          ];
+        }
+        Store.save();
+        if (Dash && Dash.init) Dash.init();
+      }
+    });
+  </script>
+</body>
+</html>

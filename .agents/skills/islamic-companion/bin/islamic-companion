@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# Islamic Companion CLI (Bash Version)
+
+# Set UTF-8
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB_DIR="$(dirname "$SCRIPT_DIR")/lib"
+
+# Helper Check
+check_deps() {
+    local missing=()
+    if ! command -v curl >/dev/null 2>&1; then missing+=("curl"); fi
+    
+    if [ ${#missing[@]} -ne 0 ]; then
+        echo "Error: Missing required dependencies: ${missing[*]}" >&2
+        echo "Please install them via your package manager." >&2
+        exit 1
+    fi
+    
+    if ! command -v jq >/dev/null 2>&1; then
+        echo "Warning: 'jq' is not installed. Some features may be slower or less robust." >&2
+    fi
+}
+check_deps
+
+# Load Config
+source "${LIB_DIR}/config.sh"
+
+# Help Function
+show_help() {
+    echo "Islamic Companion CLI"
+    echo "---------------------"
+    echo "Usage:"
+    echo "  islamic-companion prayer --today | --sync [--lat L] [--long L] [--tz TZ]"
+    echo "  islamic-companion fasting --today [--lat L] [--long L] [--tz TZ]"
+    echo "  islamic-companion zakat --nisab [--currency IDR]"
+    echo "  islamic-companion calendar --city \"City\" [--month M] [--year Y] [--tz TZ]"
+    echo "  islamic-companion quotes --random | --setup"
+    echo "  islamic-companion quran --search \"keyword\""
+    echo "  islamic-companion quran --surah NUM [--ayah NUM] [--tz TZ]"
+    echo "  islamic-companion config"
+    echo ""
+}
+
+# Main Dispatcher
+case "$1" in
+    prayer)
+        source "${LIB_DIR}/prayer.sh"
+        shift
+        handle_prayer "$@"
+        ;;
+    fasting)
+        source "${LIB_DIR}/fasting.sh"
+        shift
+        handle_fasting "$@"
+        ;;
+    zakat)
+        source "${LIB_DIR}/zakat.sh"
+        shift
+        handle_zakat "$@"
+        ;;
+    calendar)
+        source "${LIB_DIR}/calendar.sh"
+        shift
+        handle_calendar "$@"
+        ;;
+    quotes)
+        source "${LIB_DIR}/quotes.sh"
+        shift
+        handle_quotes "$@"
+        ;;
+    quran)
+        source "${LIB_DIR}/quran.sh"
+        shift
+        handle_quran "$@"
+        ;;
+    config)
+        echo "Configuration File: ${LIB_DIR}/../config.json"
+        echo "------------------------------------------------"
+        echo "Method: ${CALCULATION_METHOD:-20}"
+        echo "School: ${CALCULATION_SCHOOL:-0}"
+        echo "Timezone: ${TIMEZONE:-UTC}"
+        echo "Zakat Currency: ${ZAKAT_CURRENCY:-IDR}"
+        echo "Quran Language: ${QURAN_LANGUAGE:-id}"
+        ;;
+    *)
+        show_help
+        ;;
+esac

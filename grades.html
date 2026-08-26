@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='dark'){document.documentElement.classList.add('dark');}}catch(e){}}();</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الدرجات والتقييمات - Student Hub</title>
+  <meta name="theme-color" content="#4648d4">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <!-- Google Fonts: Cairo & Tajawal / Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tailwind.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <style>
+    .focus-zone { max-width: 900px; margin: 0 auto; }
+    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); }
+    body.dark .glass-card { background: rgba(18, 24, 38, 0.95); }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-[#0B0F19] min-h-screen text-slate-800 dark:text-slate-100 pb-28 md:pb-12 font-sans antialiased transition-colors">
+  <div id="sh-header"></div>
+
+  <main class="focus-zone px-4 py-6 md:py-8 space-y-6">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">سجل الدرجات 🎯</h2>
+      <button class="sh-btn primary shadow-sm flex items-center gap-2" onclick="GradesPage.openForm()">
+        <span>+ إضافة درجة</span>
+      </button>
+    </div>
+
+    <!-- Bento Grid Summaries -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+      <!-- Average Grade Card -->
+      <div class="glass-card rounded-3xl p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+        <div>
+          <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">المعدل التراكمي</h3>
+          <div class="text-3xl md:text-4xl font-black text-indigo-600 dark:text-indigo-400 font-mono" id="grades-avg-text">0%</div>
+          <p class="text-xs font-bold text-amber-600 dark:text-amber-400 mt-1" id="grades-status-text">جاري الحساب...</p>
+        </div>
+        <div class="relative w-24 h-24">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+            <path class="text-slate-100 dark:text-slate-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+            <path class="text-indigo-600 dark:text-indigo-400" id="grades-svg-circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="0, 100" stroke-linecap="round" stroke-width="3"></path>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-2xl">📈</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Tests Card -->
+      <div class="glass-card rounded-3xl p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+        <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">إجمالي الاختبارات</h3>
+        <div class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white font-mono" id="grades-count-text">0</div>
+        <div class="mt-4">
+          <div class="flex justify-between text-xs font-bold mb-1 text-slate-500 dark:text-slate-400">
+            <span>التقدم</span>
+            <span id="grades-ratio-text">0/10</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-indigo-500 to-amber-500 rounded-full transition-all duration-500" id="grades-linear-bar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subject Selector -->
+    <div class="flex flex-wrap gap-2 items-center mb-4">
+      <span class="text-xs font-bold text-slate-400">تصفية بالمواد:</span>
+      <select id="grades-subject" class="sh-input !w-auto !py-1 text-xs">
+        <option value="all">كل المواد</option>
+      </select>
+    </div>
+
+    <!-- Recent Grades List -->
+    <div>
+      <h3 class="text-lg font-black mb-3 text-slate-900 dark:text-white">أحدث الدرجات</h3>
+      <div id="grades-list" class="flex flex-col gap-3"></div>
+    </div>
+  </main>
+
+
+  <script src="js/store.js"></script>
+  <script src="js/labels.js"></script>
+  <script src="js/prayer.js"></script>
+  <script src="js/onboarding.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/grades.js"></script>
+</body>
+</html>

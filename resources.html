@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='dark'){document.documentElement.classList.add('dark');}}catch(e){}}();</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الملخصات وقنوات المنصات الذكية - Student Hub</title>
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/tailwind.css">
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-12 font-sans antialiased transition-colors">
+  <div id="sh-header"></div>
+
+  <main class="max-w-6xl mx-auto px-4 py-6 md:py-8 space-y-6">
+    
+    <!-- Hero Banner with Quick Code Input Box -->
+    <div class="sh-card p-6 md:p-8 rounded-3xl bg-gradient-to-r from-indigo-600/10 via-purple-600/10 to-amber-500/10 border border-indigo-500/30 space-y-4">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-black">
+            <span>🚀</span>
+            <span>نظام مشاركة الملخصات والقنوات الذكية</span>
+          </div>
+          <h2 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">الملخصات والمنصات 📚</h2>
+          <p class="text-xs text-slate-500 max-w-lg leading-relaxed">
+            ادخل كود حصة فردية أو كود باقة متجددة لمتابعة دروس ومذكرات أستاذك وزملائك أولاً بأول.
+          </p>
+        </div>
+
+        <!-- Quick Code Input Form -->
+        <div class="w-full md:w-auto flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border-2 border-indigo-500/30 shadow-md">
+          <input type="text" id="quick-code-input" placeholder="اكتب الكود (NOTE-.. أو CHAN-..)" class="px-3 py-2 text-xs font-mono font-bold bg-transparent outline-none text-slate-900 dark:text-white w-full md:w-56" dir="ltr">
+          <button onclick="ResourcesPage.submitQuickCode()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow active:scale-95 transition whitespace-nowrap">
+            📥 استيراد
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs Strip -->
+    <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" id="resources-tabs">
+      <!-- Generated dynamically -->
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div id="resources-content" class="min-h-[300px]">
+      <!-- Rendered dynamically -->
+    </div>
+
+  </main>
+
+  <!-- Modal: Add Custom Platform -->
+  <div id="add-platform-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="font-black text-slate-900 dark:text-white text-base flex items-center gap-2">
+          <span>🌐</span>
+          <span>إضافة منصة معلم جديدة</span>
+        </h3>
+        <button onclick="ResourcesPage.closeAddPlatformModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <p class="text-xs text-slate-500">
+          ضع رابط المنصة وسيقوم التطبيق بجلب لوجو وأيقونة الموقع تلقائياً.
+        </p>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">رابط المنصة (URL):</label>
+          <input type="text" id="plat-url-input" placeholder="مثال: https://bastathalak.com أو abdelmabood.com" class="sh-input text-xs font-mono" dir="ltr">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">اسم المنصة:</label>
+          <input type="text" id="plat-name-input" placeholder="مثال: منصة بسطتهالك / منصة عبد المعبود..." class="sh-input text-xs font-bold">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">اسم الأستاذ / المادة (اختياري):</label>
+          <input type="text" id="plat-teacher-input" placeholder="مثال: مستر محمد عبد العظيم - لغة عربية" class="sh-input text-xs font-medium">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">ملاحظات / موعد نزول الحصص (اختياري):</label>
+          <input type="text" id="plat-notes-input" placeholder="مثال: الحصة بتنزل الأحد والأربعاء الساعة 6م" class="sh-input text-xs font-medium">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="ResourcesPage.closeAddPlatformModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500">إلغاء</button>
+        <button onclick="ResourcesPage.saveCustomPlatform()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black shadow-md active:scale-95">
+          + حفظ المنصة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create Dynamic Stream -->
+  <div id="create-stream-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="font-black text-slate-900 dark:text-white text-base flex items-center gap-2">
+          <span>📡</span>
+          <span>إنشاء باقة متجددة جديدة</span>
+        </h3>
+        <button onclick="ResourcesPage.closeCreateStreamModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">عنوان الباقة:</label>
+          <input type="text" id="stream-title-input" placeholder="مثال: فيزياء 3 ثانوي - الفصل الأول والثاني" class="sh-input text-xs font-bold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">المادة:</label>
+            <input type="text" id="stream-subject-input" placeholder="مثال: الفيزياء" class="sh-input text-xs font-bold">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">اسم المدرس (اختياري):</label>
+            <input type="text" id="stream-teacher-input" placeholder="مثال: مستر محمد" class="sh-input text-xs font-bold">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">وصف الباقة:</label>
+          <input type="text" id="stream-desc-input" placeholder="مثال: ملخصات وتجميعات أسبوعية شاملة لحصص السنتر" class="sh-input text-xs font-medium">
+        </div>
+
+        <!-- First Lesson inside Stream -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+          <span class="text-xs font-black text-indigo-600 dark:text-indigo-400 block">الحصة الأولى في السلسلة:</span>
+          <input type="text" id="stream-lesson1-title" placeholder="عنوان الحصة 1: مثلاً قوانين كيرشوف" class="sh-input text-xs font-bold">
+          <textarea id="stream-lesson1-content" rows="3" placeholder="ملخص ونقاط الحصة 1..." class="sh-input text-xs font-medium"></textarea>
+          <input type="text" id="stream-lesson1-pdf" placeholder="رابط مذكرة PDF إن وجد (اختياري)" class="sh-input text-xs font-mono" dir="ltr">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="ResourcesPage.closeCreateStreamModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500">إلغاء</button>
+        <button onclick="ResourcesPage.saveNewStream()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black shadow-md active:scale-95">
+          🚀 نشر وتوليد كود الباقة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Lesson to Stream -->
+  <div id="add-lesson-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="font-black text-slate-900 dark:text-white text-base">إضافة حصة جديدة في الباقة 📝</h3>
+        <button onclick="ResourcesPage.closeAddLessonModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">عنوان الحصة:</label>
+          <input type="text" id="new-lesson-title" placeholder="مثال: الحصة 2 - المقاومة الكهربية وقانون أوم" class="sh-input text-xs font-bold">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">ملخص ومحتوى الحصة:</label>
+          <textarea id="new-lesson-content" rows="4" placeholder="اكتب ملخص القوانين والشرح هنا..." class="sh-input text-xs font-medium"></textarea>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">رابط مذكرة PDF (اختياري):</label>
+          <input type="text" id="new-lesson-pdf" placeholder="https://..." class="sh-input text-xs font-mono" dir="ltr">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="ResourcesPage.closeAddLessonModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500">إلغاء</button>
+        <button onclick="ResourcesPage.saveNewLessonToStream()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black shadow-md active:scale-95">
+          + حفظ الحصة في السلسلة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create Single Note -->
+  <div id="create-note-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="font-black text-slate-900 dark:text-white text-base">نشر ملخص حصة فردية 📑</h3>
+        <button onclick="ResourcesPage.closeCreateNoteModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">عنوان الملخص / الدرس:</label>
+          <input type="text" id="note-title-input" placeholder="مثال: ملخص مدرسة الإحياء والبعث" class="sh-input text-xs font-bold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">المادة:</label>
+            <input type="text" id="note-subject-input" placeholder="اللغة العربية" class="sh-input text-xs font-bold">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">الأستاذ:</label>
+            <input type="text" id="note-teacher-input" placeholder="مستر محمد" class="sh-input text-xs font-bold">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">نص التلخيص والشرح:</label>
+          <textarea id="note-content-input" rows="4" placeholder="اكتب أهم القوانين والأفكار الأساسية..." class="sh-input text-xs font-medium"></textarea>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">رابط PDF (اختياري):</label>
+          <input type="text" id="note-pdf-input" placeholder="https://..." class="sh-input text-xs font-mono" dir="ltr">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="ResourcesPage.closeCreateNoteModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500">إلغاء</button>
+        <button onclick="ResourcesPage.saveNewSingleNote()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black shadow-md active:scale-95">
+          🚀 توليد كود الحصة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Link -->
+  <div id="add-link-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="font-black text-slate-900 dark:text-white text-base">إضافة مرجع / مذكرة 🔗</h3>
+        <button onclick="ResourcesPage.closeAddLinkModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">عنوان المرجع:</label>
+          <input type="text" id="link-title-input" placeholder="مثال: مذكرة أسئلة التميز" class="sh-input text-xs font-bold">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">الرابط:</label>
+          <input type="text" id="link-url-input" placeholder="https://..." class="sh-input text-xs font-mono" dir="ltr">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400">نوع المرجع:</label>
+          <select id="link-type-input" class="sh-input text-xs font-bold">
+            <option value="pdf">ملف PDF 📄</option>
+            <option value="drive">مجلد درايف 📁</option>
+            <option value="youtube">فيديو يوتيوب ▶️</option>
+            <option value="other">رابط آخر 🔗</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="ResourcesPage.closeAddLinkModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500">إلغاء</button>
+        <button onclick="ResourcesPage.saveNewLink()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-black shadow-md active:scale-95">
+          + حفظ المرجع
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/labels.js"></script>
+  <script src="js/prayer.js"></script>
+  <script src="js/onboarding.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/resources.js"></script>
+</body>
+</html>

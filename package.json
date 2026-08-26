@@ -1,0 +1,31 @@
+{
+  "name": "student-hub",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx --yes http-server . -p 5173 -o --no-cache -c-1",
+    "build": "node build.js",
+    "cap:sync": "npm run build && npx cap sync android",
+    "cap:open": "npm run build && npx cap sync android && npx cap open android",
+    "cap:run": "npm run build && npx cap sync android && npx cap run android",
+    "android": "npm run cap:open"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/app": "^7.0.1",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/filesystem": "^7.0.1",
+    "@capacitor/local-notifications": "^7.0.1",
+    "@capacitor/splash-screen": "^7.0.1",
+    "@capacitor/status-bar": "^7.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "autoprefixer": "^10.5.4",
+    "http-server": "^14.1.1",
+    "postcss": "^8.5.26",
+    "serve": "^14.2.6",
+    "tailwindcss": "^3.4.19"
+  }
+}
