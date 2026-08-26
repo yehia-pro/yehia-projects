@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='dark'){document.documentElement.classList.add('dark');}}catch(e){}}();</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المهام - Student Hub</title>
+  <meta name="theme-color" content="#4648d4">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <!-- Google Fonts: Cairo & Tajawal / Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tailwind.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <style>
+    .focus-zone { max-width: 960px; margin: 0 auto; }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-28 md:pb-12 font-sans antialiased transition-colors">
+  <div id="sh-header"></div>
+
+  <main class="focus-zone px-margin-mobile md:px-gutter py-6 space-y-6">
+    <!-- Header Section -->
+    <div class="mb-lg">
+      <h2 class="font-display-lg text-display-lg text-on-background dark:text-white mb-xs" data-label-html="tasksPageTitle">المهام ✅</h2>
+      <p class="text-sm text-on-surface-variant dark:text-slate-400">قم بإدارة وتتبع مهامك الأكاديمية واليومية.</p>
+    </div>
+
+    <!-- Filter Chips -->
+    <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      <button class="sh-filter active" data-filter="all">الكل</button>
+      <button class="sh-filter" data-filter="open">مفتوحة</button>
+      <button class="sh-filter" data-filter="today">اليوم</button>
+      <button class="sh-filter" data-filter="week">هذا الأسبوع</button>
+      <button class="sh-filter text-error dark:text-red-400" data-filter="overdue">متأخرة</button>
+      <button class="sh-filter" data-filter="done">مكتملة</button>
+    </div>
+
+    <!-- Subject Selector -->
+    <div class="flex flex-wrap gap-2 items-center">
+      <span class="text-xs font-bold text-slate-400">تصفية بالمواد:</span>
+      <select id="tasks-subject" class="sh-input !w-auto !py-1 text-xs">
+        <option value="all">كل المواد</option>
+      </select>
+    </div>
+
+    <!-- Task List Bento Grid -->
+    <div id="tasks-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
+
+  <!-- FAB for adding task -->
+  <button aria-label="Add Task" class="fixed bottom-6 left-6 md:bottom-8 md:left-8 w-14 h-14 bg-indigo-600 text-white rounded-2xl shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-40 text-2xl font-black" onclick="Tasks.openForm()">
+    +
+  </button>
+
+  <script src="js/store.js"></script>
+  <script src="js/labels.js"></script>
+  <script src="js/prayer.js"></script>
+  <script src="js/onboarding.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/tasks.js"></script>
+</body>
+</html>
