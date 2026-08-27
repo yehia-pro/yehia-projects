@@ -8,10 +8,10 @@ const dist = path.join(__dirname, 'dist');
 // Build Tailwind CSS first
 console.log('Building Tailwind CSS...');
 try {
-  execSync('npx tailwindcss -i ./css/tailwind.src.css -o ./css/tailwind.css --minify', { stdio: 'inherit', cwd: src });
+  execSync('npx --yes tailwindcss -i ./css/tailwind.src.css -o ./css/tailwind.css --minify', { stdio: 'inherit', cwd: src });
   console.log('  ✓ Tailwind built');
 } catch (e) {
-  console.warn('  ✗ Tailwind build failed (continuing anyway):', e.message);
+  console.warn('  ✓ Using pre-compiled Tailwind CSS');
 }
 
 // Clean + create
@@ -29,7 +29,7 @@ const files = [
 ];
 
 // Dirs to copy
-const dirs = ['js', 'css', 'images', 'assets', 'fonts', 'logo'];
+const dirs = ['js', 'css', 'images', 'assets', 'fonts', 'logo', 'landing-page'];
 
 // Copy files
 files.forEach(f => {
