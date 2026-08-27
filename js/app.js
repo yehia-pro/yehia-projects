@@ -95,7 +95,7 @@ const App = {
       '<div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">' +
       '<a href="index.html" class="flex items-center gap-2.5 font-black text-lg text-indigo-600 dark:text-indigo-400 shrink-0 hover:opacity-90 transition">' +
       '<div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-600 to-slate-900 p-1.5 shadow-md flex items-center justify-center">' +
-      '<img src="logo/student_hub_logo.png" alt="Logo" class="h-full w-full object-contain filter drop-shadow" onerror="this.outerHTML=\'<span class=\\\'text-lg\\\'>🎓</span>\'">' +
+      '<img src="logo/student_hub_logo.png" alt="Logo" class="h-full w-full object-contain filter drop-shadow" width="32" height="32" style="max-width: 32px; max-height: 32px;" onerror="this.outerHTML=\'<span class=\\\'text-lg\\\'>🎓</span>\'">' +
       '</div>' +
       '<span class="tracking-tight text-slate-900 dark:text-white">Student Hub</span></a>' +
       prayerHeaderBadge +
