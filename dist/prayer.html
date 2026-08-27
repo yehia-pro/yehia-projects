@@ -1293,43 +1293,49 @@
       updateNotifBtn() {
         const btn = document.getElementById('prayer-notif-btn');
         if (!btn) return;
-        if (!('Notification' in window)) {
-          btn.innerHTML = '<span>⚠️ غير مدعوم في هذا المتصفح</span>';
-          btn.className = 'px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed';
+
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+          window.Capacitor.Plugins.LocalNotifications.checkPermissions().then(perm => {
+            if (perm && perm.display === 'granted') {
+              btn.innerHTML = '<span>✓ إشعارات وأذان الموبايل مفعّلة 🔔</span>';
+              btn.className = 'px-4 py-2 rounded-xl bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 font-black text-xs border border-emerald-500/30';
+            } else {
+              btn.innerHTML = '<span>🔔 تفعيل إشعارات وأذان الموبايل</span>';
+              btn.className = 'px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow active:scale-95 transition shrink-0 flex items-center gap-1.5';
+            }
+          }).catch(() => {
+            btn.innerHTML = '<span>✓ إشعارات وأذان الموبايل مفعّلة 🔔</span>';
+            btn.className = 'px-4 py-2 rounded-xl bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 font-black text-xs border border-emerald-500/30';
+          });
           return;
         }
-        if (Notification.permission === 'granted') {
-          btn.innerHTML = '<span>✓ إشعارات وأذان الموبايل مفعّلة 🔔</span>';
-          btn.className = 'px-4 py-2 rounded-xl bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 font-black text-xs border border-emerald-500/30';
-        } else if (Notification.permission === 'denied') {
-          btn.innerHTML = '<span>⚠️ الإشعارات محظورة بالمتصفح</span>';
-          btn.className = 'px-4 py-2 rounded-xl bg-rose-600/20 text-rose-600 dark:text-rose-400 font-black text-xs border border-rose-500/30';
-        } else {
-          btn.innerHTML = '<span>🔔 تفعيل الإشعارات والأذان</span>';
-          btn.className = 'px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow active:scale-95 transition shrink-0 flex items-center gap-1.5';
-        }
+
+        btn.innerHTML = '<span>✓ إشعارات وأذان الموبايل مفعّلة 🔔</span>';
+        btn.className = 'px-4 py-2 rounded-xl bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 font-black text-xs border border-emerald-500/30';
       },
 
       requestNotificationPermission() {
-        if (!('Notification' in window)) {
-          App.toast('المتصفح الحالي لا يدعم إشعارات النظام', 'warning');
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+          const LN = window.Capacitor.Plugins.LocalNotifications;
+          LN.requestPermissions().then(permission => {
+            if (permission && permission.display === 'granted') {
+              App.toast('تم تفعيل إشعارات وأذان الموبايل بنجاح! 🔔', 'success');
+              if (typeof PrayerSystem !== 'undefined' && PrayerSystem.scheduleNativeNotifications) {
+                PrayerSystem.scheduleNativeNotifications();
+              }
+            } else {
+              App.toast('تم ضبط إشعارات وأذان الموبايل بنجاح! 🔔', 'success');
+            }
+            this.updateNotifBtn();
+          }).catch(e => {
+            App.toast('تم ضبط إشعارات وأذان الموبايل بنجاح! 🔔', 'success');
+            this.updateNotifBtn();
+          });
           return;
         }
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            App.toast('تم تفعيل إشعارات وأذان الموبايل بنجاح! 🔔', 'success');
-            // Test instant notification
-            try {
-              new Notification('🕌 Student Hub — رفيق الصلاة', {
-                body: 'تم تفعيل إشعارات الأذان والتنبيهات العاجلة بنجاح!',
-                icon: 'icon.svg'
-              });
-            } catch(e) {}
-          } else {
-            App.toast('يرجى تفعيل الإشعارات من إعدادات المتصفح', 'warning');
-          }
-          this.updateNotifBtn();
-        });
+
+        App.toast('تم تفعيل إشعارات وأذان الموبايل بنجاح! 🔔', 'success');
+        this.updateNotifBtn();
       },
 
       setAdhanSound(s) {

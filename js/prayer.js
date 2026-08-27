@@ -700,7 +700,7 @@ const PrayerSystem = {
   detectLocation() {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        return reject(new Error('المتصفح لا يدعم تحديد الموقع'));
+        return reject(new Error('خدمة تحديد الموقع غير مفعلة على الهاتف'));
       }
       navigator.geolocation.getCurrentPosition(
         (pos) => {
