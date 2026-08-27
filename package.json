@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "npx --yes http-server . -p 5173 -o --no-cache -c-1",
     "build": "node build.js",
-    "cap:sync": "npm run build && npx cap sync android",
-    "cap:open": "npm run build && npx cap sync android && npx cap open android",
-    "cap:run": "npm run build && npx cap sync android && npx cap run android",
+    "cap:sync": "node scripts/sync-android.js",
+    "cap:open": "node scripts/sync-android.js && npx cap open android",
+    "cap:run": "node scripts/sync-android.js && npx cap run android",
     "android": "npm run cap:open"
   },
   "dependencies": {
