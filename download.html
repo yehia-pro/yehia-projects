@@ -232,6 +232,31 @@
 
   </div>
 
+  <script>
+    // Auto-resolve exact APK download URL from GitHub Releases
+    (async function() {
+      try {
+        const res = await fetch('https://api.github.com/repos/yehia-pro/yehia-projects/releases');
+        if (res.ok) {
+          const releases = await res.json();
+          if (releases && releases.length > 0) {
+            // Find latest release with an APK asset
+            for (const rel of releases) {
+              const apkAsset = (rel.assets || []).find(a => a.name && a.name.endsWith('.apk'));
+              if (apkAsset && apkAsset.browser_download_url) {
+                const btn = document.getElementById('download-apk-btn');
+                if (btn) {
+                  btn.href = apkAsset.browser_download_url;
+                  btn.setAttribute('download', apkAsset.name);
+                }
+                break;
+              }
+            }
+          }
+        }
+      } catch(e) {}
+    })();
+  </script>
 </body>
 
 </html>

@@ -37,12 +37,6 @@ files.forEach(f => {
   console.log('  file:', f);
 });
 
-// Set dist/index.html to be download.html (Landing & Download page for Vercel/Web)
-if (fs.existsSync(path.join(src, 'download.html'))) {
-  fs.copyFileSync(path.join(src, 'download.html'), path.join(dist, 'index.html'));
-  console.log('  ✓ Set dist/index.html → Landing/Download Page');
-}
-
 // Copy dirs
 dirs.forEach(d => {
   const srcDir = path.join(src, d);
