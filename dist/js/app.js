@@ -1,16 +1,9 @@
 const NAV_ITEMS = [
   { href: 'index.html', label: 'الرئيسية', icon: '🏠', key: 'dashboard' },
-  { href: 'prayer.html', label: 'الصلاة والقرآن', icon: '🕌', key: 'prayer' },
-  { href: 'tasks.html', label: 'المهام', icon: '✅', key: 'tasks' },
-  { href: 'flashcards.html', label: 'البطاقات الذكية', icon: '🎴', key: 'flashcards' },
-  { href: 'groups.html', label: 'المجموعات والمنصات', icon: '👥', key: 'groups' },
-  { href: 'exams.html', label: 'الامتحانات', icon: '📝', key: 'exams' },
-  { href: 'lectures.html', label: 'المحاضرات', icon: '📚', key: 'lectures' },
-  { href: 'subjects.html', label: 'المواد', icon: '🗂️', key: 'subjects' },
-  { href: 'grades.html', label: 'الدرجات', icon: '🎯', key: 'grades' },
-  { href: 'teachers.html', label: 'المدرسين', icon: '👨‍🏫', key: 'teachers', labelKey: 'navTeachers' },
-  { href: 'resources.html', label: 'الملخصات والمنصات', icon: '📚', key: 'resources' },
-  { href: 'stats.html', label: 'إحصائياتي ورتبتي', icon: '📊', key: 'stats' }
+  { href: 'subjects.html', label: 'المركز الأكاديمي', icon: '📚', key: 'subjects' },
+  { href: 'tasks.html', label: 'مركز الإنجاز', icon: '🎯', key: 'tasks' },
+  { href: 'resources.html', label: 'مكتبة الـ PDF والملخصات', icon: '💡', key: 'resources' },
+  { href: 'prayer.html', label: 'الرفيق الإيماني والرتب', icon: '🕌', key: 'prayer' }
 ];
 
 const App = {
@@ -20,7 +13,7 @@ const App = {
     this.applyPageTitle();
     this.renderHeader();
     this.renderBottomNav();
-    this.applyTheme(Store.state.user.theme || 'light');
+    this.applyTheme(Store.state.user.theme || 'dark');
     this.initSearch();
     this.initSettings();
     this.setActiveNav();
@@ -33,17 +26,10 @@ const App = {
     const page = location.pathname.split('/').pop() || 'index.html';
     const pageTitles = {
       'index.html': { school: 'الرئيسية', uni: 'الرئيسية' },
-      'prayer.html': { school: 'مواقيت الصلاة والورد القرآني', uni: 'مواقيت الصلاة والورد القرآني' },
-      'flashcards.html': { school: 'البطاقات الذكية والتكرار المتباعد', uni: 'البطاقات الذكية والتكرار المتباعد' },
-      'tasks.html': { school: 'المهام', uni: 'المهام' },
-      'exams.html': { school: 'الامتحانات', uni: 'الامتحانات' },
-      'lectures.html': { school: 'المحاضرات', uni: 'محاضرات وسكاشن' },
-      'subjects.html': { school: 'المواد', uni: 'المواد' },
-      'grades.html': { school: 'الدرجات والتقييمات', uni: 'الدرجات والتقييمات' },
-      'teachers.html': { school: 'المدرسين والسناتر', uni: 'الدكاترة والكورسات' },
-      'groups.html': { school: 'المجموعات والمنصات', uni: 'الكورسات والمجموعات' },
-      'resources.html': { school: 'روابط سريعة', uni: 'روابط سريعة' },
-      'stats.html': { school: 'إحصائياتي ورتبتي', uni: 'إحصائياتي ورتبتي' }
+      'subjects.html': { school: 'المركز الأكاديمي - المواد والمحاضرات', uni: 'المركز الأكاديمي - المواد والمحاضرات' },
+      'tasks.html': { school: 'مركز الإنجاز - المهام والامتحانات والتركيز', uni: 'مركز الإنجاز - المهام والامتحانات والتركيز' },
+      'resources.html': { school: 'مكتبة الـ PDF والبطاقات والملخصات', uni: 'مكتبة الـ PDF والبطاقات والملخصات' },
+      'prayer.html': { school: 'الرفيق الإيماني ورتب الشرف', uni: 'الرفيق الإيماني ورتب الشرف' }
     };
     const t = (pageTitles[page] && pageTitles[page][L.role]) || '';
     if (t) document.title = t + ' - Student Hub';
@@ -287,72 +273,223 @@ const App = {
   },
 
   openSettings() {
-    const u = Store.state.user;
+    const u = Store.state.user || {};
+    const isTeacher = u.role === 'teacher';
+    const isSchool = u.role === 'school';
+    const isUni = u.role === 'uni';
     const P = Store.state.pomodoroSettings || {};
     const pv = function (k, fb) { return Number(P[k]) > 0 ? P[k] : fb; };
+
+    const roleBadgeText = isTeacher ? '👨‍🏫 حساب معلم معتمد' : (isUni ? '🎓 حساب طالب جامعي' : '🎒 حساب طالب مدرسي');
+
+    let profileFieldsHtml = '';
+    if (isTeacher) {
+      profileFieldsHtml = `
+        <!-- Teacher Profile & Avatar -->
+        <div class="p-4 rounded-3xl bg-indigo-500/10 border border-indigo-500/30 space-y-3 mb-4">
+          <div class="flex items-center gap-4">
+            <div class="relative group shrink-0">
+              <div class="w-16 h-16 rounded-full bg-indigo-600 border-2 border-indigo-400 overflow-hidden flex items-center justify-center text-2xl text-white shadow-md" id="profile-avatar-preview">
+                ${u.avatar ? `<img src="${u.avatar}" class="w-full h-full object-cover" />` : '👨‍🏫'}
+              </div>
+              <label for="teacher-avatar-file" class="absolute bottom-0 right-0 w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs cursor-pointer shadow hover:bg-indigo-600 transition" title="رفع صورة شخصية">
+                📷
+              </label>
+              <input type="file" id="teacher-avatar-file" accept="image/*" class="hidden">
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-slate-400">صورة المعلم الشخصية</div>
+              <p class="text-[11px] text-slate-500">تظهر في كوكبك التعليمي وجدول المجموعات مع طلابك.</p>
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-2 border-t border-slate-200/60 dark:border-slate-800">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">اسم المعلم / اللقب:</label>
+              <input id="set-name" class="sh-input font-bold" placeholder="اسم المعلم" value="${escapeHtml(u.name || '')}">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">المادة التي تدرسها:</label>
+              <input id="set-teacher-subject" class="sh-input font-bold" placeholder="المادة الدراسية" value="${escapeHtml(u.teacherSubject || '')}">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">اسم الكوكب التعليمي:</label>
+              <input id="set-planet-name" class="sh-input font-bold" placeholder="اسم الكوكب" value="${escapeHtml(u.planetName || '')}">
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      let gradeLabel = 'غير محدد';
+      if (isUni) {
+        gradeLabel = (u.faculty || 'الجامعة') + ' - ' + (u.year || 'السنة الدراسية');
+      } else {
+        const gradeMap = { prep1: 'الأول الإعدادي', prep2: 'الثاني الإعدادي', prep3: 'الثالث الإعدادي', g1: 'الأول الثانوي', g2: 'الثاني الثانوي', g3: 'الثالث الثانوي' };
+        gradeLabel = gradeMap[u.grade] || u.grade || 'طالب مدرسي';
+        if (u.specialty) {
+          const specMap = { sci: 'علمي', lit: 'أدبي', 'sci-s': 'علمي علوم', 'sci-m': 'علمي رياضة' };
+          gradeLabel += ' (' + (specMap[u.specialty] || u.specialty) + ')';
+        }
+      }
+
+      profileFieldsHtml = `
+        <!-- Student Profile -->
+        <div class="space-y-3 mb-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">اسم الطالب:</label>
+            <input id="set-name" class="sh-input font-bold" placeholder="اكتب اسمك" value="${escapeHtml(u.name || '')}">
+          </div>
+
+          <!-- Academic Year & Upgrade Card -->
+          <div class="p-4 rounded-3xl bg-indigo-500/10 border border-indigo-500/30 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <div class="text-[11px] font-bold text-slate-400">الصف الدراسي والمقررات:</div>
+                <div class="font-black text-sm text-indigo-600 dark:text-indigo-300">${escapeHtml(gradeLabel)}</div>
+              </div>
+              <button onclick="App.openUpgradeModal()" class="px-3.5 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow transition active:scale-95 flex items-center gap-1.5 shrink-0">
+                <span>🎓</span>
+                <span>ترقية الصف والمواد</span>
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-500">انتقلت لسنة دراسية جديدة؟ حدّث صفك وموادك بضغطة زر مع الحفاظ الكامل على نقاط الـ XP وإنجازاتك وسجلاتك.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">الهدف الأسبوعي (ساعات دراسة ومذاكرة):</label>
+            <div class="flex flex-wrap gap-2 mb-2">
+              ${[4, 6, 8, 12, 16].map(function(h) {
+                return '<button class="sh-pomo-preset ' + (u.weeklyGoal === h ? 'active' : '') + '" data-goal="' + h + '">' + h + ' س</button>';
+              }).join('')}
+            </div>
+            <input id="set-goal" type="number" min="1" max="80" class="sh-input text-center font-bold" placeholder="أو عدد ساعات مخصص (1-80)" value="${u.weeklyGoal || 4}">
+          </div>
+        </div>
+      `;
+    }
+
     const modal = this.showModal(
-      '<div class="flex items-center justify-between mb-4">' +
-      '<h3 class="text-lg font-extrabold">الإعدادات ⚙️</h3>' +
+      '<div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">' +
+      '<div class="flex items-center gap-2">' +
+      '<h3 class="text-base md:text-lg font-black text-slate-900 dark:text-white">الملف الشخصي والإعدادات ⚙️</h3>' +
+      '</div>' +
       '<button class="sh-btn ghost !p-1.5" id="sh-modal-close">✕</button></div>' +
-      '<label class="block text-sm font-bold mb-1">اسمي</label>' +
-      '<input id="set-name" class="sh-input mb-4" placeholder="اكتب اسمك" value="' + escapeHtml(u.name) + '">' +
-      '<label class="block text-sm font-bold mb-1">هدفي الأسبوعي (ساعات دراسة)</label>' +
-      '<div class="flex flex-wrap gap-2 mb-2">' +
-      [5,10,15,20,30].map(function(h) {
-        return '<button class="sh-pomo-preset" data-goal="' + h + '" style="' + (u.weeklyGoal === h ? 'background:var(--sh-primary);color:#fff' : '') + '">' + h + ' س</button>';
-      }).join('') +
+
+      '<!-- Role Badge (Locked) -->' +
+      '<div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between mb-4">' +
+      '<div class="flex items-center gap-2">' +
+      '<span class="font-black text-xs md:text-sm text-indigo-600 dark:text-indigo-400">' + roleBadgeText + '</span>' +
+      '<span class="text-[10px] font-bold text-slate-400">🔒 (نوع الحساب مقفل)</span>' +
       '</div>' +
-      '<input id="set-goal" type="number" min="1" max="80" class="sh-input mb-4" placeholder="أو اكتب عدد ساعات مخصص (1-80)" value="' + (u.weeklyGoal || 10) + '">' +
-      '<div class="sh-card p-3 mb-4 flex items-center justify-between">' +
-      '<span class="text-sm font-bold">🔥 يوم متواصل: <span id="set-streak">' + (Store.state.streak.count || 0) + '</span></span>' +
+      '<span class="text-xs text-slate-400 font-mono">' + (Store.state.streak.count || 0) + ' يوم 🔥</span>' +
       '</div>' +
-      '<div class="sh-card p-3 mb-4">' +
-      '<div class="font-extrabold text-sm mb-2">🍅 مؤقت التركيز</div>' +
-      '<div class="grid grid-cols-3 gap-2 mb-2">' +
-      '<div><label class="block text-[11px] font-bold mb-1">تركيز (دقيقة)</label><input id="set-pomo-dur" type="number" min="1" max="120" class="sh-input" value="' + pv('duration', 25) + '"></div>' +
-      '<div><label class="block text-[11px] font-bold mb-1">استراحة (دقيقة)</label><input id="set-pomo-break" type="number" min="1" max="60" class="sh-input" value="' + pv('breakDuration', 5) + '"></div>' +
-      '<div><label class="block text-[11px] font-bold mb-1">استراحة طويلة</label><input id="set-pomo-long" type="number" min="5" max="90" class="sh-input" value="' + pv('longBreak', 15) + '"></div>' +
+
+      profileFieldsHtml +
+
+      '<!-- Pomodoro Settings -->' +
+      '<div class="sh-card p-4 mb-4 space-y-3 bg-slate-50 dark:bg-slate-900/50">' +
+      '<div class="font-black text-xs text-slate-900 dark:text-white flex items-center gap-1.5">🍅 مؤقت التركيز وبومودورو:</div>' +
+      '<div class="grid grid-cols-3 gap-2">' +
+      '<div><label class="block text-[10px] font-bold mb-1 text-slate-400">جلسة (د)</label><input id="set-pomo-dur" type="number" min="1" max="120" class="sh-input text-center text-xs" value="' + pv('duration', 25) + '"></div>' +
+      '<div><label class="block text-[10px] font-bold mb-1 text-slate-400">راحة (د)</label><input id="set-pomo-break" type="number" min="1" max="60" class="sh-input text-center text-xs" value="' + pv('breakDuration', 5) + '"></div>' +
+      '<div><label class="block text-[10px] font-bold mb-1 text-slate-400">راحة طويلة</label><input id="set-pomo-long" type="number" min="5" max="90" class="sh-input text-center text-xs" value="' + pv('longBreak', 15) + '"></div>' +
       '</div>' +
-      '<div class="flex items-center justify-between gap-2 mb-2">' +
-      '<label class="text-[11px] font-bold">🔔 صوت نهاية الجلسة</label>' +
-      '<select id="set-pomo-sound" class="sh-input !py-1.5">' +
+      '<div class="flex items-center justify-between gap-2 text-xs">' +
+      '<label class="text-[11px] font-bold text-slate-500">🔔 صوت نهاية الجلسة</label>' +
+      '<select id="set-pomo-sound" class="sh-input !py-1 text-xs w-32">' +
       '<option value="silent"' + (P.ambientSound === 'silent' ? ' selected' : '') + '>صامت</option>' +
-      '<option value="beep"' + (P.ambientSound === 'beep' ? ' selected' : '') + '>نغمة</option>' +
+      '<option value="beep"' + (P.ambientSound === 'beep' ? ' selected' : '') + '>نغمة تنبيه</option>' +
       '</select></div>' +
-      '<label class="flex items-center gap-2 text-[11px] font-bold cursor-pointer"><input type="checkbox" id="set-pomo-wake" class="accent-indigo-500"' + (P.wakeLock !== false ? ' checked' : '') + '> إبقاء الشاشة مفتوحة أثناء التركيز</label>' +
+      '<label class="flex items-center gap-2 text-[11px] font-bold text-slate-500 cursor-pointer"><input type="checkbox" id="set-pomo-wake" class="accent-indigo-500"' + (P.wakeLock !== false ? ' checked' : '') + '> إبقاء الشاشة مفتوحة أثناء التركيز</label>' +
       '</div>' +
-      '<button class="sh-btn outline w-full mb-3" id="set-onboarding">🎓 إعادة إعداد الملف الشخصي</button>' +
-      '<div class="flex flex-wrap gap-2 mb-2">' +
-      '<button class="sh-btn outline" id="set-export">⬇️ تصدير البيانات</button>' +
-      '<button class="sh-btn outline" id="set-import">⬆️ استيراد بيانات</button>' +
-      '<button class="sh-btn danger" id="set-wipe">🗑️ مسح كل شيء</button>' +
+
+      '<!-- Backup & Data Controls -->' +
+      '<div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">' +
+      '<div class="grid grid-cols-2 gap-2">' +
+      '<button class="sh-btn outline text-xs font-bold" id="set-export">⬇️ تصدير نسخة احتياطية</button>' +
+      '<button class="sh-btn outline text-xs font-bold" id="set-import">⬆️ استيراد بيانات</button>' +
+      '</div>' +
+      '<button class="sh-btn danger w-full text-xs font-black py-2.5 mt-2" id="set-wipe">🗑️ حذف الحساب وإعادة التهيئة من الصفر</button>' +
       '</div>' +
       '<input type="file" id="set-file" accept="application/json" class="hidden">' +
-      '<div id="set-restore-section"></div>' +
-      '<p class="text-[11px] text-slate-400 mt-2">البيانات محفوظة محليًا 🔒 — نسخة احتياطية تلقائية كل يوم</p>'
+      '<div id="set-restore-section"></div>'
     );
+
     modal.querySelector('#sh-modal-close').addEventListener('click', function () { App.closeModal(); });
-    modal.querySelector('#set-name').addEventListener('change', function (e) {
-      Store.update('user', '', { name: e.target.value.trim() });
-      App.toast('تم حفظ الاسم ✅');
-    });
-    modal.querySelector('#set-goal').addEventListener('change', function (e) {
-      const v = Math.min(80, Math.max(1, Number(e.target.value) || 10));
-      e.target.value = v;
-      Store.update('user', '', { weeklyGoal: v });
-      App.toast('تم تحديث الهدف ✅');
-    });
-    // Quick goal buttons
-    modal.querySelectorAll('[data-goal]').forEach(function(b) {
-      b.addEventListener('click', function() {
-        const v = parseInt(b.dataset.goal);
-        modal.querySelector('#set-goal').value = v;
-        Store.update('user', '', { weeklyGoal: v });
-        modal.querySelectorAll('[data-goal]').forEach(function(x) { x.style.background = ''; x.style.color = ''; });
-        b.style.background = 'var(--sh-primary)'; b.style.color = '#fff';
-        App.toast('الهدف الأسبوعي: ' + v + ' ساعات ✅');
+
+    // Name update
+    const nameEl = modal.querySelector('#set-name');
+    if (nameEl) {
+      nameEl.addEventListener('change', function (e) {
+        Store.update('user', '', { name: e.target.value.trim() });
+        App.toast('تم حفظ الاسم بنجاح ✅');
       });
-    });
+    }
+
+    // Teacher specific updates
+    if (isTeacher) {
+      const tSubEl = modal.querySelector('#set-teacher-subject');
+      if (tSubEl) {
+        tSubEl.addEventListener('change', function(e) {
+          Store.update('user', '', { teacherSubject: e.target.value.trim() });
+          App.toast('تم تحديث مادة المعلم ✅');
+        });
+      }
+
+      const tPlanetEl = modal.querySelector('#set-planet-name');
+      if (tPlanetEl) {
+        tPlanetEl.addEventListener('change', function(e) {
+          Store.update('user', '', { planetName: e.target.value.trim() });
+          App.toast('تم تحديث اسم الكوكب ✅');
+        });
+      }
+
+      const avatarInput = modal.querySelector('#teacher-avatar-file');
+      if (avatarInput) {
+        avatarInput.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          if (file.size > 2 * 1024 * 1024) {
+            App.toast('حجم الصورة كبير جداً، يرجى اختيار صورة أقل من 2 ميجابايت ⚠️', 'warning');
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const dataUrl = evt.target.result;
+            Store.update('user', '', { avatar: dataUrl });
+            const preview = modal.querySelector('#profile-avatar-preview');
+            if (preview) {
+              preview.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover" />`;
+            }
+            App.toast('تم حفظ وتعيين صورة المعلم بنجاح! 📸', 'success');
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    } else {
+      // Student specific goal updates
+      const goalEl = modal.querySelector('#set-goal');
+      if (goalEl) {
+        goalEl.addEventListener('change', function (e) {
+          const v = Math.min(80, Math.max(1, Number(e.target.value) || 4));
+          e.target.value = v;
+          Store.update('user', '', { weeklyGoal: v });
+          App.toast('تم تحديث الهدف الأسبوعي ✅');
+        });
+      }
+
+      modal.querySelectorAll('[data-goal]').forEach(function(b) {
+        b.addEventListener('click', function() {
+          const v = parseInt(b.dataset.goal);
+          if (goalEl) goalEl.value = v;
+          Store.update('user', '', { weeklyGoal: v });
+          modal.querySelectorAll('[data-goal]').forEach(function(x) { x.classList.remove('active'); });
+          b.classList.add('active');
+          App.toast('الهدف الأسبوعي: ' + v + ' ساعات ✅');
+        });
+      });
+    }
+
     function savePomo(patch) {
       Store.updateSettings(patch);
       App.toast('تم حفظ إعدادات التركيز ✅');
@@ -362,10 +499,7 @@ const App = {
     modal.querySelector('#set-pomo-long').addEventListener('change', function (e) { savePomo({ longBreak: Math.max(5, Number(e.target.value) || 15) }); });
     modal.querySelector('#set-pomo-sound').addEventListener('change', function (e) { savePomo({ ambientSound: e.target.value }); });
     modal.querySelector('#set-pomo-wake').addEventListener('change', function (e) { savePomo({ wakeLock: e.target.checked }); });
-    modal.querySelector('#set-onboarding').addEventListener('click', function () {
-      App.closeModal();
-      Onboarding.start(true);
-    });
+
     modal.querySelector('#set-export').addEventListener('click', function () {
       const blob = new Blob([Store.exportJSON()], { type: 'application/json' });
       const a = document.createElement('a');
@@ -375,9 +509,11 @@ const App = {
       URL.revokeObjectURL(a.href);
       App.toast('تم تصدير نسخة احتياطية ⬇️');
     });
+
     modal.querySelector('#set-import').addEventListener('click', function () {
       modal.querySelector('#set-file').click();
     });
+
     modal.querySelector('#set-file').addEventListener('change', function (e) {
       const f = e.target.files[0];
       if (!f) return;
@@ -393,11 +529,12 @@ const App = {
       };
       reader.readAsText(f);
     });
+
     modal.querySelector('#set-wipe').addEventListener('click', function () {
-      App.confirm('مسح كل البيانات؟', 'هيحذف كل مهامك وامتحاناتك للأبد. أنصحك بتصدير نسخة احتياطية الأول.', function () {
-        Store.wipe();
-        App.toast('تم المسح');
-        setTimeout(function () { location.reload(); }, 600);
+      App.confirm('هل أنت متأكد من حذف الحساب نهائياً؟', 'سيتم مسح كافة بياناتك وجدولك ومهامك بشكل كامل والعودة لمعالج التسجيل للبدء من جديد كحساب جديد.', function () {
+        localStorage.removeItem('studentHub_v2');
+        App.toast('تم حذف الحساب بالكامل');
+        setTimeout(function () { location.href = 'index.html'; }, 500);
       }, true);
     });
     // ===== Restore من نسخ احتياطية محلية =====
@@ -415,6 +552,89 @@ const App = {
         }).join('') +
         '</div>';
     }
+  },
+
+  openUpgradeModal() {
+    App.closeModal();
+    const u = Store.state.user || {};
+    const isUni = u.role === 'uni';
+
+    if (isUni) {
+      const yearChoice = prompt(
+        '🎓 ترقية السنة الجامعية:\n\nاختر السنة الدراسية الجديدة:\n1. الفرقة الأولى\n2. الفرقة الثانية\n3. الفرقة الثالثة\n4. الفرقة الرابعة\n5. الفرقة الخامسة',
+        '2'
+      );
+      if (!yearChoice) return;
+      const yearMap = { '1': 'الفرقة الأولى', '2': 'الفرقة الثانية', '3': 'الفرقة الثالثة', '4': 'الفرقة الرابعة', '5': 'الفرقة الخامسة' };
+      const newYear = yearMap[yearChoice] || 'الفرقة الثانية';
+
+      const termChoice = prompt('اختر الفصل الدراسي:\n\n1. الترم الأول\n2. الترم الثاني', '1');
+      const newTerm = termChoice === '2' ? 'الترم الثاني' : 'الترم الأول';
+
+      const rawSubjs = prompt('اكتب أسماء مقررات/مواد هذه السنة مفصولة بفاصلة (,):\n(مثال: مادة 1, مادة 2, مادة 3):', '');
+      let newSubjects = [];
+      if (rawSubjs && rawSubjs.trim()) {
+        newSubjects = rawSubjs.split(',').map(s => s.trim()).filter(Boolean);
+      }
+
+      Store.upgradeStudentGrade({
+        year: newYear,
+        term: newTerm,
+        subjects: newSubjects
+      });
+
+      App.toast('ألف مبروك الترقية للسنة الجامعية الجديدة! 🎉 (+50 XP)', 'success');
+      setTimeout(() => location.reload(), 800);
+      return;
+    }
+
+    // School Upgrade
+    const gradeChoice = prompt(
+      '🎒 ترقية الصف الدراسي:\n\nاختر صفك الدراسي الجديد:\n1. الأول الإعدادي\n2. الثاني الإعدادي\n3. الثالث الإعدادي\n4. الأول الثانوي\n5. الثاني الثانوي\n6. الثالث الثانوي',
+      '5'
+    );
+    if (!gradeChoice) return;
+
+    const gradeMap = { '1': 'prep1', '2': 'prep2', '3': 'prep3', '4': 'g1', '5': 'g2', '6': 'g3' };
+    const gradeId = gradeMap[gradeChoice] || 'g2';
+
+    let specialty = '';
+    let newSubjects = [];
+
+    if (gradeId === 'g2') {
+      const specChoice = prompt('اختر الشعبة:\n\n1. علمي\n2. أدبي', '1');
+      specialty = specChoice === '2' ? 'lit' : 'sci';
+      if (specialty === 'sci') {
+        newSubjects = ['الفيزياء', 'الكيمياء', 'الأحياء', 'الرياضيات', 'اللغة العربية', 'اللغة الإنجليزية', 'اللغة الفرنسية'];
+      } else {
+        newSubjects = ['التاريخ', 'الجغرافيا', 'علم النفس والاجتماع', 'الفلسفة والمنطق', 'اللغة العربية', 'اللغة الإنجليزية', 'اللغة الفرنسية'];
+      }
+    } else if (gradeId === 'g3') {
+      const specChoice = prompt('اختر الشعبة للثانوية العامة:\n\n1. علمي علوم\n2. علمي رياضة\n3. أدبي', '1');
+      if (specChoice === '2') {
+        specialty = 'sci-m';
+        newSubjects = ['الرياضيات البحتة', 'الرياضيات التطبيقية', 'الفيزياء', 'الكيمياء', 'اللغة العربية', 'اللغة الإنجليزية', 'اللغة الفرنسية', 'الجيولوجيا'];
+      } else if (specChoice === '3') {
+        specialty = 'lit';
+        newSubjects = ['التاريخ', 'الجغرافيا', 'علم النفس والاجتماع', 'الفلسفة والمنطق', 'اللغة العربية', 'اللغة الإنجليزية', 'اللغة الفرنسية'];
+      } else {
+        specialty = 'sci-s';
+        newSubjects = ['الأحياء', 'الجيولوجيا', 'الكيمياء', 'الفيزياء', 'اللغة العربية', 'اللغة الإنجليزية', 'اللغة الفرنسية'];
+      }
+    } else if (gradeId === 'g1') {
+      newSubjects = ['اللغة العربية', 'اللغة الإنجليزية', 'اللغة الفرنسية', 'الرياضيات', 'العلوم المتكاملة', 'التاريخ', 'الفلسفة'];
+    } else {
+      newSubjects = ['اللغة العربية', 'اللغة الإنجليزية', 'الرياضيات', 'العلوم', 'الدراسات الاجتماعية'];
+    }
+
+    Store.upgradeStudentGrade({
+      grade: gradeId,
+      specialty,
+      subjects: newSubjects
+    });
+
+    App.toast('ألف مبروك الترقية للسنة الدراسية الجديدة! وتم تحديث المقررات 🎉 (+50 XP)', 'success');
+    setTimeout(() => location.reload(), 800);
   },
 
   _restoreBackup(key) {

@@ -23,7 +23,7 @@ const DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأرب
 function seedData() {
   const d = {
     version: 6,
-    user: { name: '', theme: 'light', weeklyGoal: 5, role: '', grade: '', stage: '', specialty: '', faculty: '', year: '', term: '', count: 0, onboardingDone: false, xp: 0, level: 1 },
+    user: { name: '', theme: 'dark', weeklyGoal: 5, role: '', grade: '', stage: '', specialty: '', faculty: '', year: '', term: '', count: 0, onboardingDone: false, xp: 0, level: 1 },
     subjects: [],
     tasks: [],
     exams: [],
@@ -60,7 +60,13 @@ function seedData() {
     sharedClassrooms: [],
     sharedNotes: [],
     sharedStreams: [],
-    customPlatforms: []
+    customPlatforms: [],
+    teacherPlanets: [],
+    teacherWeeklySchedule: [],
+    savedTeacherGroups: [],
+    studentWeeklySchedule: [],
+    joinedPlanets: [],
+    focusExcuses: []
   };
   return d;
 }
@@ -147,6 +153,9 @@ function migrate(db) {
     if (!db.sharedStreams) db.sharedStreams = [];
     if (!db.customPlatforms) db.customPlatforms = [];
     db.version = 7;
+  }
+  if (Array.isArray(db.customPlatforms)) {
+    db.customPlatforms = db.customPlatforms.filter(p => p.id !== 'plat-1' && p.id !== 'plat-2');
   }
   return db;
 }
@@ -487,15 +496,19 @@ const Store = {
   toggleJuzComplete(juzNum) {
     const k = this.getKhatmah();
     const num = Number(juzNum);
+    if (!Array.isArray(k.completedJuz)) k.completedJuz = [];
     const idx = k.completedJuz.indexOf(num);
+    let isAdded = false;
     if (idx > -1) {
       k.completedJuz.splice(idx, 1);
     } else {
       k.completedJuz.push(num);
       k.completedJuz.sort((a, b) => a - b);
+      isAdded = true;
     }
+    k.readPages = Math.min(604, Math.round(k.completedJuz.length * 20.13));
     this.save();
-    return k;
+    return { khatmah: k, isAdded };
   },
 
   setKhatmahPages(pages) {
@@ -906,26 +919,8 @@ const Store = {
 
   // ===== بوابة المنصات الذكية المخصصة (Smart Custom Platforms) =====
   getCustomPlatforms() {
-    if (!Array.isArray(this.state.customPlatforms) || !this.state.customPlatforms.length) {
-      this.state.customPlatforms = [
-        {
-          id: 'plat-1',
-          name: 'منصة بسطتهالك',
-          teacherName: 'مستر محمد عبد العظيم',
-          url: 'https://bastathalak.com',
-          icon: 'https://www.google.com/s2/favicons?domain=bastathalak.com&sz=128',
-          notes: 'شروحات اللغة العربية والنحو والبلاغة'
-        },
-        {
-          id: 'plat-2',
-          name: 'منصة عبد المعبود',
-          teacherName: 'مستر محمد عبد المعبود',
-          url: 'https://abdelmabood.com',
-          icon: 'https://www.google.com/s2/favicons?domain=abdelmabood.com&sz=128',
-          notes: 'فيزياء الثانوية العامة والمسائل المتقدمة'
-        }
-      ];
-      this.save();
+    if (!Array.isArray(this.state.customPlatforms)) {
+      this.state.customPlatforms = [];
     }
     return this.state.customPlatforms;
   },
@@ -962,6 +957,252 @@ const Store = {
   deleteCustomPlatform(id) {
     this.state.customPlatforms = this.getCustomPlatforms().filter(p => p.id !== id);
     this.save();
+  },
+
+  // ===== Teacher Verification & Saved Groups Registry =====
+  isTeacher() {
+    return !!(this.state.user && this.state.user.role === 'teacher');
+  },
+
+  getSavedTeacherGroups() {
+    if (!Array.isArray(this.state.savedTeacherGroups)) this.state.savedTeacherGroups = [];
+    return this.state.savedTeacherGroups;
+  },
+
+  addSavedTeacherGroup(data) {
+    const list = this.getSavedTeacherGroups();
+    const group = {
+      id: 'grp_' + Date.now(),
+      name: data.name || 'مجموعة جديدة',
+      location: data.location || 'السنتر',
+      stage: data.stage || 'المرحلة الثانوية',
+      capacity: Number(data.capacity) || 0,
+      assistantPhone: data.assistantPhone || '',
+      price: data.price || '',
+      notes: data.notes || '',
+      createdAt: localDateStr()
+    };
+    list.unshift(group);
+    this.addXP(25, 'إضافة مجموعة دراسية جديدة');
+    this.save();
+    return group;
+  },
+
+  deleteSavedTeacherGroup(id) {
+    this.state.savedTeacherGroups = this.getSavedTeacherGroups().filter(g => g.id !== id);
+    this.save();
+  },
+
+  // ===== Teacher Studio & Weekly Schedule =====
+  getTeacherSchedule() {
+    if (!Array.isArray(this.state.teacherWeeklySchedule)) this.state.teacherWeeklySchedule = [];
+    return this.state.teacherWeeklySchedule;
+  },
+
+  addTeacherScheduleItem(data) {
+    const list = this.getTeacherSchedule();
+    const item = {
+      id: 'sch_' + Date.now(),
+      type: data.type || 'group', // 'group' | 'break'
+      title: data.title || (data.type === 'break' ? 'وقت راحة واستراحة ☕' : 'مجموعة دراسية'),
+      day: data.day || 'السبت',
+      startTime: data.startTime || '14:00',
+      endTime: data.endTime || '16:00',
+      location: data.location || (data.type === 'break' ? 'استراحة' : 'السنتر'),
+      grade: data.grade || 'ثانوي',
+      capacity: Number(data.capacity) || 0,
+      assistantPhone: data.assistantPhone || '',
+      price: data.price || '',
+      notes: data.notes || ''
+    };
+    list.push(item);
+    // Sort by day and time
+    const dayOrder = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+    list.sort((a, b) => {
+      const d1 = dayOrder.indexOf(a.day);
+      const d2 = dayOrder.indexOf(b.day);
+      if (d1 !== d2) return d1 - d2;
+      return (a.startTime || '').localeCompare(b.startTime || '');
+    });
+    this.addXP(20, 'تنظيم مجموعة في جدول المعلم');
+    this.save();
+    return item;
+  },
+
+  deleteTeacherScheduleItem(id) {
+    this.state.teacherWeeklySchedule = this.getTeacherSchedule().filter(x => x.id !== id);
+    this.save();
+  },
+
+  // ===== Student Weekly Schedule (جدول الـ 7 أيام الذكي للطالب) =====
+  getStudentSchedule() {
+    if (!Array.isArray(this.state.studentWeeklySchedule)) this.state.studentWeeklySchedule = [];
+    return this.state.studentWeeklySchedule;
+  },
+
+  addStudentScheduleItem(data) {
+    const list = this.getStudentSchedule();
+    const item = {
+      id: 'ssch_' + Date.now(),
+      type: data.type || 'lesson', // 'lesson' | 'study' | 'break'
+      sessionCategory: data.sessionCategory || (this.state.user.role === 'uni' ? 'lecture' : 'center'), 
+      // Categories:
+      // School: 'center' (حضور سنتر) | 'online' (أونلاين) | 'private' (درس خاص) | 'study' (مذاكرة ذاتية) | 'break' (استراحة)
+      // Uni: 'lecture' (محاضرة جامعية) | 'section' (سكشن عملي) | 'course' (كورس تدريبي) | 'private' (تدريب/خاص) | 'study' (مذاكرة) | 'break' (استراحة)
+      subjectId: data.subjectId || '',
+      subjectName: data.subjectName || (data.type === 'break' ? 'وقت استراحة وصلاة ☕' : (data.type === 'study' ? 'جلسة مذاكرة ذاتية 📖' : 'حصة دراسية')),
+      teacherName: data.teacherName || '',
+      day: data.day || 'السبت',
+      startTime: data.startTime || '14:00',
+      endTime: data.endTime || '16:00',
+      location: data.location || (data.type === 'break' ? 'استراحة' : (this.state.user.role === 'uni' ? 'المدرج' : 'السنتر')),
+      notes: data.notes || ''
+    };
+    list.push(item);
+    const dayOrder = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+    list.sort((a, b) => {
+      const d1 = dayOrder.indexOf(a.day);
+      const d2 = dayOrder.indexOf(b.day);
+      if (d1 !== d2) return d1 - d2;
+      return (a.startTime || '').localeCompare(b.startTime || '');
+    });
+    this.addXP(20, 'تنظيم حصة في جدولك الأسبوعي');
+    this.save();
+    return item;
+  },
+
+  deleteStudentScheduleItem(id) {
+    this.state.studentWeeklySchedule = this.getStudentSchedule().filter(x => x.id !== id);
+    this.save();
+  },
+
+  // ===== Academic Year Upgrade (ترقية السنة الدراسية وتحديث المواد) =====
+  upgradeStudentGrade(data) {
+    const u = this.state.user;
+    if (data.grade !== undefined) u.grade = data.grade;
+    if (data.specialty !== undefined) u.specialty = data.specialty;
+    if (data.faculty !== undefined) u.faculty = data.faculty;
+    if (data.year !== undefined) u.year = data.year;
+    if (data.term !== undefined) u.term = data.term;
+    if (Array.isArray(data.subjects) && data.subjects.length) {
+      const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+      this.state.subjects = data.subjects.map((name, i) => ({
+        id: 'sub_' + (Date.now() + i),
+        name,
+        color: colors[i % colors.length]
+      }));
+    }
+    this.addXP(50, 'ترقية السنة الدراسية وتحديث المقررات');
+    this.save();
+  },
+
+  // ===== Teacher Planets (كواكب المعلمين الحصرية) =====
+  getTeacherPlanets() {
+    if (!Array.isArray(this.state.teacherPlanets)) this.state.teacherPlanets = [];
+    return this.state.teacherPlanets;
+  },
+
+  getJoinedPlanets() {
+    if (!Array.isArray(this.state.joinedPlanets)) this.state.joinedPlanets = [];
+    return this.state.joinedPlanets;
+  },
+
+  createTeacherPlanet(data) {
+    const planets = this.getTeacherPlanets();
+    const randCode = 'PLANET-' + (data.subject || 'EDU').toUpperCase().slice(0, 4) + '-' + Math.floor(1000 + Math.random() * 9000);
+    const planet = {
+      id: 'pl_' + Date.now(),
+      code: data.code || randCode,
+      name: data.name || 'كوكب المادة',
+      teacherName: data.teacherName || this.state.user.name || 'الأستاذ',
+      subject: data.subject || 'عام',
+      grade: data.grade || 'ثانوية عامة',
+      description: data.description || '',
+      posts: [],
+      honors: [],
+      createdAt: localDateStr()
+    };
+    planets.unshift(planet);
+    this.addXP(50, 'إنشاء كوكب تعليمي للمعلم');
+    this.save();
+    return planet;
+  },
+
+  addPlanetPost(planetId, post) {
+    const planet = this.getTeacherPlanets().find(p => p.id === planetId);
+    if (planet) {
+      if (!Array.isArray(planet.posts)) planet.posts = [];
+      planet.posts.unshift({
+        id: 'post_' + Date.now(),
+        type: post.type || 'announcement', // 'announcement' | 'pdf' | 'honor'
+        title: post.title || '',
+        content: post.content || '',
+        fileUrl: post.fileUrl || '',
+        createdAt: localDateStr(),
+        time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+      });
+      this.addXP(25, 'نشر في كوكب المعلم');
+      this.save();
+    }
+  },
+
+  joinPlanetByCode(code) {
+    const cleanCode = (code || '').trim().toUpperCase();
+    if (!cleanCode) throw new Error('يرجى إدخال كود الكوكب');
+
+    // Search in teacher planets or create connected joined instance
+    let planet = this.getTeacherPlanets().find(p => p.code.toUpperCase() === cleanCode);
+    const joined = this.getJoinedPlanets();
+    if (joined.some(p => p.code.toUpperCase() === cleanCode)) {
+      return { alreadyJoined: true, planet: joined.find(p => p.code.toUpperCase() === cleanCode) };
+    }
+
+    if (!planet) {
+      // Mock/Demo Planet for demonstration if not found locally
+      planet = {
+        id: 'joined_' + Date.now(),
+        code: cleanCode,
+        name: 'كوكب المتفوقين 🪐',
+        teacherName: 'أستاذ المادة',
+        subject: 'مادة دراسية',
+        grade: 'المرحلة الدراسية',
+        description: 'قناة البث الحصرية للمذكرات والإعلانات الرسمية',
+        posts: [
+          {
+            id: 'p1',
+            type: 'announcement',
+            title: 'أهلاً بكم في كوكب المادة 🌟',
+            content: 'هنا سيتم نشر كل الملخصات وشيتات الواجب ومواعيد الحصص وتكريم الأوائل.',
+            createdAt: localDateStr()
+          }
+        ]
+      };
+    }
+
+    joined.unshift(planet);
+    this.addXP(40, 'الانضمام لكوكب معلم');
+    this.save();
+    return { alreadyJoined: false, planet };
+  },
+
+  // ===== Focus Excuses Log (سجل أعذار التشتت) =====
+  getFocusExcuses() {
+    if (!Array.isArray(this.state.focusExcuses)) this.state.focusExcuses = [];
+    return this.state.focusExcuses;
+  },
+
+  addFocusExcuse(reason, minutesSpent) {
+    const list = this.getFocusExcuses();
+    const item = {
+      id: 'exc_' + Date.now(),
+      reason: (reason || '').trim(),
+      minutesSpent: Number(minutesSpent) || 0,
+      date: localDateStr(),
+      time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+    };
+    list.unshift(item);
+    this.save();
+    return item;
   }
 };
 

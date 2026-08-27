@@ -1,7 +1,7 @@
 // sw.js — Service Worker للـ Student Hub
 // استراتيجية: cache-first للملفات الثابتة، network-first للصفحات
 
-const CACHE_VERSION = 'student-hub-v7.0.0';
+const CACHE_VERSION = 'student-hub-v9.0.0';
 const STATIC_CACHE = CACHE_VERSION + '-static';
 const RUNTIME_CACHE = CACHE_VERSION + '-runtime';
 
@@ -20,6 +20,7 @@ const PRECACHE_URLS = [
   './stats.html',
   './teachers.html',
   './groups.html',
+  './download.html',
   './manifest.json',
   './icon.svg',
   './css/tailwind.css',
@@ -35,6 +36,9 @@ const PRECACHE_URLS = [
   './js/exams.js',
   './js/lectures.js',
   './js/subjects.js',
+  './js/teacher-planet.js',
+  './js/quran-reader.js',
+  './js/pdf-studio.js',
   './js/grades.js',
   './js/resources.js',
   './js/stats.js',

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark" style="background-color: #0B0F19; color-scheme: dark;">
 <head>
   <meta charset="UTF-8">
-  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='dark'){document.documentElement.classList.add('dark');}}catch(e){}}();</script>
+  <meta name="color-scheme" content="dark light">
+  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='light'){document.documentElement.classList.remove('dark');document.documentElement.style.backgroundColor='#F8FAFC';document.documentElement.style.colorScheme='light';}}catch(e){}}();</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>مواقيت الصلاة والأذكار والورد القرآني - Student Hub</title>
-  <meta name="theme-color" content="#1e1b4b">
+  <meta name="theme-color" content="#0B0F19">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon.svg">
@@ -45,7 +46,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-28 md:pb-12 font-sans antialiased transition-colors">
+<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-28 md:pb-12 font-sans antialiased" style="background-color: #0B0F19;">
   <div id="sh-header"></div>
 
   <main class="focus-zone px-4 py-6 md:py-8 space-y-6">
@@ -222,10 +223,11 @@
       <div id="athkar-list" class="space-y-3"></div>
     </div>
 
-    <!-- TAB 3: الورد القرآني ومخطط الختمة الحقيقي وتتبع الأجزاء الـ 30 -->
+    <!-- TAB 3: المصحف الشريف المعتمد والورد القرآني -->
     <div id="tab-content-quran" class="space-y-6 hidden">
       
-      <!-- Current Bookmark Hero Card -->
+      <!-- Quran Reader Component Container -->
+      <div id="quran-reader-container" class="space-y-4"></div>
       <div class="sh-card p-6 rounded-3xl bg-gradient-to-r from-emerald-500/10 via-indigo-500/10 to-transparent border border-emerald-500/30 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
@@ -523,15 +525,35 @@
           </div>
         </div>
 
-        <!-- Urgent Reminder Toggle -->
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-5">
-          <div>
-            <h4 class="font-bold text-slate-900 dark:text-white text-xs">التنبيه الصوتي العاجل قبل خروج الصلاة ⚠️</h4>
-            <p class="text-[11px] text-slate-500">إشعار صوتي ونغمي قبل أذان الصلاة التالية بـ 15 دقيقة إذا لم تسجل صلاتك.</p>
+        <!-- Push Notification Permission Banner -->
+        <div class="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🔔</span>
+              <h4 class="font-black text-slate-900 dark:text-white text-xs md:text-sm">إشعارات وأذان الموبايل التلقائي</h4>
+            </div>
+            <p class="text-[11px] text-slate-500">اسمَح للتطبيق بإرسال إشعارات الأذان والتنبيهات العاجلة عند حلول وقت الصلاة.</p>
           </div>
-          <div class="flex items-center gap-3">
-            <button onclick="PrayerSystem.playVoiceReminder('الظهر')" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 text-[11px] font-bold">تجربة النغمة 🔔</button>
-            <input type="checkbox" id="prayer-urgent-toggle" onchange="PrayerPage.toggleUrgentReminder(this.checked)" class="w-5 h-5 accent-indigo-600">
+          <button id="prayer-notif-btn" onclick="PrayerPage.requestNotificationPermission()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow active:scale-95 transition shrink-0 flex items-center gap-1.5">
+            <span>🔔 تفعيل الإشعارات والأذان</span>
+          </button>
+        </div>
+
+        <!-- Urgent Reminder Toggle -->
+        <div class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-slate-900 dark:text-white text-xs">التنبيه الصوتي العاجل قبل خروج الصلاة ⚠️</h4>
+              <p class="text-[11px] text-slate-500">إشعار صوتي ونغمي قبل أذان الصلاة التالية بـ 15 دقيقة إذا لم تسجل صلاتك.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="PrayerSystem.playVoiceReminder('الظهر')" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 text-[11px] font-bold">تجربة النغمة 🔔</button>
+              <input type="checkbox" id="prayer-urgent-toggle" onchange="PrayerPage.toggleUrgentReminder(this.checked)" class="w-5 h-5 accent-indigo-600">
+            </div>
+          </div>
+          <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300 space-y-1">
+            <strong>💡 شرح التنبيه العاجل (لماذا هذا الخيار مهم؟):</strong>
+            <p class="text-slate-600 dark:text-slate-400">يفحص التطبيق سجل صلواتك؛ فإذا انشغلت في المذاكرة واقترب أذان الصلاة التالية (متبقي 15 دقيقة فقط) وأنت لم تؤدِ صلاتك الحالية بعد، يُطلق الموبايل نغمة تنبيه وإشعاراً عاجلاً لتلحق بالصلاة قبل فوات وقتها.</p>
           </div>
         </div>
 
@@ -546,6 +568,10 @@
             <option value="ISNA">الجمعية الإسلامية لأمريكا الشمالية (ISNA)</option>
             <option value="Karachi">جامعة العلوم الإسلامية بكراتشي</option>
           </select>
+          <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
+            <strong>💡 ما هي طريقة الحساب الفلكي؟</strong>
+            <p>تختلف الهيئات الإسلامية في زوايا انخفاض الشمس لحساب صلاتي الفجر والعشاء. في مصر نعتمد رسمياً (الهيئة المصرية العامة للمساحة)، وفي السعودية (أم القرى). اختر الهيئة المطابقة لدولتك لضمان دقة المواعيد بنسبة 100%.</p>
+          </div>
         </div>
 
         <!-- Fine Minute Calibration -->
@@ -553,6 +579,10 @@
           <div>
             <h4 class="font-bold text-slate-900 dark:text-white text-xs">المعايرة الدقيقة بالدقائق (+/-)</h4>
             <p class="text-[11px] text-slate-500">لمطابقة توقيت مسجد منطقتك تماماً بالدقيقة.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
+            <strong>💡 ما هي المعايرة الدقيقة وكيف تستخدمها؟</strong>
+            <p>إذا كان المسجد القريب من منزلك أو قريتك يرفع الأذان بتقديم دقيقة أو تأخير دقيقتين عن الموعد الرسمي للمحافظة، يمكنك كتابة (+1 أو -1) لكل صلاة ليتطابق التطبيق مع ميكروفون مسجدك ثانية بثانية.</p>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
             <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center">
@@ -630,6 +660,7 @@
   <script src="js/store.js"></script>
   <script src="js/labels.js"></script>
   <script src="js/prayer.js"></script>
+  <script src="js/quran-reader.js"></script>
   <script src="js/onboarding.js"></script>
   <script src="js/app.js"></script>
 
@@ -670,7 +701,12 @@
         });
 
         if (tab === 'athkar') this.renderAthkar();
-        if (tab === 'quran') this.renderQuranWard();
+        if (tab === 'quran') {
+          this.renderQuranWard();
+          if (typeof QuranReader !== 'undefined') {
+            QuranReader.init('quran-reader-container');
+          }
+        }
         if (tab === 'settings') this.renderSettingsTab();
       },
 
@@ -1026,12 +1062,12 @@
         if (juzGrid) {
           const completedJuzList = khatmah.completedJuz || [];
           juzGrid.innerHTML = QURAN_JUZ.map(j => {
-            const isDone = completedJuzList.includes(j.num) || readPages >= j.endPage;
+            const isDone = completedJuzList.includes(j.num);
             return `
-              <button onclick="PrayerPage.toggleJuz(${j.num})" class="p-2.5 rounded-2xl border text-center transition-all active:scale-95 ${isDone ? 'juz-badge-done border-emerald-500/40 shadow-sm' : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900'}">
+              <button onclick="PrayerPage.toggleJuz(${j.num})" title="اضغط لتسجيل إتمام أو إلغاء تحديد الجزء ${j.num}" class="p-2.5 rounded-2xl border text-center transition-all active:scale-95 ${isDone ? 'juz-badge-done border-emerald-500/40 shadow-sm bg-emerald-500/10' : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900'}">
                 <div class="flex items-center justify-between text-[11px] font-black mb-1">
                   <span>جزء ${j.num}</span>
-                  <span>${isDone ? '✓' : '○'}</span>
+                  <span class="${isDone ? 'text-emerald-600 dark:text-emerald-400 font-black' : 'text-slate-400'}">${isDone ? '✓ منجز' : '○'}</span>
                 </div>
                 <span class="text-[10px] block truncate text-slate-500 dark:text-slate-400 font-bold">${j.name.split('(')[1]?.replace(')', '') || j.startSurah}</span>
                 <span class="text-[9px] text-slate-400 font-mono">ص ${j.startPage}-${j.endPage}</span>
@@ -1040,7 +1076,7 @@
           }).join('');
 
           const juzDoneEl = document.getElementById('juz-done-counter');
-          if (juzDoneEl) juzDoneEl.textContent = `${doneJuzCount} / 30 جزء منجز`;
+          if (juzDoneEl) juzDoneEl.textContent = `${completedJuzList.length} / 30 جزء منجز`;
         }
 
         // 6. Render Khatmah History List
@@ -1133,10 +1169,18 @@
       },
 
       toggleJuz(num) {
-        const k = Store.toggleJuzComplete(num);
+        const res = Store.toggleJuzComplete(num);
         const juzObj = QURAN_JUZ.find(j => j.num === num);
-        if (juzObj && k.completedJuz.includes(num)) {
-          Store.setKhatmahPages(juzObj.endPage);
+        const name = juzObj ? juzObj.name : `الجزء ${num}`;
+
+        if (res.isAdded) {
+          Store.addXP(25, `إتمام ${name}`);
+          App.toast(`أحسنت! تم تسجيل إتمام ${name} بنجاح (+25 XP) 🎉`, 'success');
+          if (res.khatmah.completedJuz.length === 30) {
+            this.showKhatmDuaModal();
+          }
+        } else {
+          App.toast(`تم إلغاء تحديد ${name} وتعديل الإحصائيات ↩️`, 'info');
         }
         App.sound('click');
         this.renderQuranWard();
@@ -1241,6 +1285,50 @@
         ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'].forEach(k => {
           const inp = document.getElementById('adj-' + k);
           if (inp) inp.value = adj[k] || 0;
+        });
+
+        this.updateNotifBtn();
+      },
+
+      updateNotifBtn() {
+        const btn = document.getElementById('prayer-notif-btn');
+        if (!btn) return;
+        if (!('Notification' in window)) {
+          btn.innerHTML = '<span>⚠️ غير مدعوم في هذا المتصفح</span>';
+          btn.className = 'px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 font-bold text-xs cursor-not-allowed';
+          return;
+        }
+        if (Notification.permission === 'granted') {
+          btn.innerHTML = '<span>✓ إشعارات وأذان الموبايل مفعّلة 🔔</span>';
+          btn.className = 'px-4 py-2 rounded-xl bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 font-black text-xs border border-emerald-500/30';
+        } else if (Notification.permission === 'denied') {
+          btn.innerHTML = '<span>⚠️ الإشعارات محظورة بالمتصفح</span>';
+          btn.className = 'px-4 py-2 rounded-xl bg-rose-600/20 text-rose-600 dark:text-rose-400 font-black text-xs border border-rose-500/30';
+        } else {
+          btn.innerHTML = '<span>🔔 تفعيل الإشعارات والأذان</span>';
+          btn.className = 'px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow active:scale-95 transition shrink-0 flex items-center gap-1.5';
+        }
+      },
+
+      requestNotificationPermission() {
+        if (!('Notification' in window)) {
+          App.toast('المتصفح الحالي لا يدعم إشعارات النظام', 'warning');
+          return;
+        }
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            App.toast('تم تفعيل إشعارات وأذان الموبايل بنجاح! 🔔', 'success');
+            // Test instant notification
+            try {
+              new Notification('🕌 Student Hub — رفيق الصلاة', {
+                body: 'تم تفعيل إشعارات الأذان والتنبيهات العاجلة بنجاح!',
+                icon: 'icon.svg'
+              });
+            } catch(e) {}
+          } else {
+            App.toast('يرجى تفعيل الإشعارات من إعدادات المتصفح', 'warning');
+          }
+          this.updateNotifBtn();
         });
       },
 

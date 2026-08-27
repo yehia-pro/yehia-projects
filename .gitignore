@@ -6,3 +6,9 @@ android/.gradle/
 .vscode/
 .idea/
 *.log
+*.apk
+*.aab
+*.zip
+*.tar.gz
+.DS_Store
+Thumbs.db

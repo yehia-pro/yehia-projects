@@ -682,7 +682,50 @@ const PrayerSystem = {
     if (this._timer) clearInterval(this._timer);
     this._timer = setInterval(() => {
       this.notifyUpdate();
+      this.checkAndTriggerLiveAdhan();
     }, 1000);
+  },
+
+  _playedAdhans: {},
+
+  checkAndTriggerLiveAdhan() {
+    const settings = this.getSettings();
+    if (!settings.notifications || settings.adhanSound === 'silent') return;
+
+    const now = new Date();
+    const todayTimes = this.getTodayTimes(now);
+    const dateKey = localDateStr(now);
+    const prayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+
+    prayers.forEach(pKey => {
+      const pTime = todayTimes[pKey];
+      if (!pTime) return;
+      const diffMs = now.getTime() - pTime.getTime();
+      const uniqueKey = `${dateKey}_${pKey}`;
+
+      if (diffMs >= 0 && diffMs <= 45000 && !this._playedAdhans[uniqueKey]) {
+        this._playedAdhans[uniqueKey] = true;
+        this.triggerAdhanAlert(pKey, pTime);
+      }
+    });
+  },
+
+  triggerAdhanAlert(prayerKey, pTime) {
+    const meta = PRAYER_KEYS.find(p => p.key === prayerKey) || { name: prayerKey };
+    this.playAdhan(this.getSettings().adhanSound || 'makkah');
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(`🕌 حان الآن موعد أذان صلاة ${meta.name}`, {
+          body: `حي على الصلاة، حي على الفلاح — التوقيت المحلي لمدينة ${this.getSettings().cityName || 'القاهرة'}`,
+          icon: 'assets/icon-only.png'
+        });
+      } catch(e) {}
+    }
+
+    if (typeof App !== 'undefined' && App.toast) {
+      App.toast(`🕌 حان الآن موعد أذان صلاة ${meta.name}! الله أكبر الله أكبر`, 'info');
+    }
   },
 
   onUpdate(fn) {
@@ -703,7 +746,18 @@ const PrayerSystem = {
 
     this.stopAudio();
 
-    const reciter = ADHAN_RECITERS.find(r => r.id === reciterId);
+    const reciters = [
+      { id: 'makkah', name: 'أذان الحرم المكي الشريف 🕋', audioUrl: 'assets/audio/adhan_makkah.mp3' },
+      { id: 'afasy', name: 'الشيخ مشاري راشد العفاسي 🇰🇼', audioUrl: 'assets/audio/adhan_afasy.mp3' },
+      { id: 'egypt_refaat', name: 'الشيخ محمد رفعت 🇪🇬', audioUrl: 'assets/audio/adhan_egypt_refaat.mp3' },
+      { id: 'egypt_minshawi', name: 'الشيخ محمد صديق المنشاوي 🇪🇬', audioUrl: 'assets/audio/adhan_egypt_minshawi.mp3' },
+      { id: 'abdulbasit', name: 'الشيخ عبد الباسط عبد الصمد 🇪🇬', audioUrl: 'assets/audio/adhan_abdulbasit.mp3' },
+      { id: 'qatami', name: 'الشيخ ناصر القطامي 🇸🇦', audioUrl: 'assets/audio/adhan_qatami.mp3' },
+      { id: 'aqsa', name: 'أذان المسجد الأقصى المبارك 🇵🇸', audioUrl: 'assets/audio/adhan_aqsa.mp3' },
+      { id: 'banna', name: 'الشيخ محمود علي البنا 🇪🇬', audioUrl: 'assets/audio/adhan_banna.mp3' }
+    ];
+
+    const reciter = reciters.find(r => r.id === reciterId) || reciters[0];
 
     if (reciter && reciter.audioUrl) {
       try {
@@ -711,7 +765,6 @@ const PrayerSystem = {
         audio.volume = 1.0;
         this._currentAudio = audio;
         audio.play().catch(() => {
-          // If offline or streaming fails, fallback to synthesized audio
           this.synthesizeTakbeerat();
         });
         return audio;
@@ -796,6 +849,22 @@ const PrayerSystem = {
   triggerUrgentWarning(prayerKey) {
     const meta = PRAYER_KEYS.find(p => p.key === prayerKey) || { name: prayerKey };
     this.playVoiceReminder(meta.name);
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(`⚠️ تنبيه عاجل: متبقي 15 دقيقة على انتهاء وقت صلاة ${meta.name}!`, {
+          body: `سارع بأداء صلاة ${meta.name} قبل أذان الصلاة التالية. تقبل الله طاعتكم 🤲`,
+          icon: 'icon.svg',
+          badge: 'icon.svg',
+          tag: 'urgent-prayer-' + prayerKey
+        });
+      } catch(e) {}
+    }
+
+    if (navigator.vibrate) {
+      try { navigator.vibrate([300, 150, 300, 150, 600]); } catch(e) {}
+    }
+
     if (typeof App !== 'undefined' && App.toast) {
       App.toast(`⚠️ تنبيه عاجل: متبقي 15 دقيقة على انتهاء وقت صلاة ${meta.name}! سارع بأدائها 🤲`, 'warning');
     }
@@ -894,6 +963,22 @@ const PrayerSystem = {
 
     // تشغيل ملف الصوت الخاص بالشيخ المختار
     this.playAdhan(settings.adhanSound || 'makkah');
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(`🕌 حان الآن موعد أذان صلاة ${meta.name}`, {
+          body: `حي على الصلاة، حي على الفلاح — التوقيت المحلي لمدينة ${settings.cityName || 'القاهرة'}`,
+          icon: 'icon.svg',
+          badge: 'icon.svg',
+          tag: 'adhan-' + prayerKey,
+          requireInteraction: true
+        });
+      } catch(e) {}
+    }
+
+    if (navigator.vibrate) {
+      try { navigator.vibrate([500, 250, 500, 250, 1000]); } catch(e) {}
+    }
 
     // إظهار نافذة الأذان الفخمة
     const modalId = 'adhan-live-popup';

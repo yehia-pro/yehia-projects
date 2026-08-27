@@ -16,6 +16,7 @@ const Dash = {
     this.renderPrayerWidget();
     this.renderCountdown();
     this.renderAlerts();
+    this.renderTodaySchedule();
     this.renderTasks();
     this.renderResources();
     this.initPomodoro();
@@ -301,6 +302,85 @@ const Dash = {
       alerts.push('<div class="sh-empty !p-6"><div class="sh-empty-icon">😌</div><div>مفيش تنبيهات — كله تمام!</div></div>');
     }
     el.innerHTML = alerts.join('');
+  },
+
+  renderTodaySchedule() {
+    const listEl = document.getElementById('dash-today-schedule-list');
+    const titleEl = document.getElementById('dash-today-schedule-title');
+    const subtitleEl = document.getElementById('dash-today-schedule-subtitle');
+    if (!listEl) return;
+
+    const todayDay = DAYS_AR[new Date().getDay()];
+    const isTeacher = Store.isTeacher();
+    const isUni = Store.state.user && Store.state.user.role === 'uni';
+
+    if (titleEl) {
+      titleEl.textContent = isTeacher ? `🪐 مجموعاتك ومواعيدك اليوم (${todayDay})` : `📅 حصصك ومحاضراتك اليوم (${todayDay})`;
+    }
+    if (subtitleEl) {
+      subtitleEl.textContent = isTeacher ? 'جدول المجموعات والسناتر المجدولة لليوم' : 'مواعيدك المنظمة لليوم بالساعة ومكان الحضور';
+    }
+
+    const items = isTeacher ?
+      Store.getTeacherSchedule().filter(x => x.day === todayDay) :
+      Store.getStudentSchedule().filter(x => x.day === todayDay);
+
+    if (!items.length) {
+      listEl.innerHTML = `
+        <div class="col-span-full sh-card p-6 rounded-2xl bg-slate-50 dark:bg-slate-900/60 text-center space-y-2 border border-slate-200/60 dark:border-slate-800">
+          <span class="text-3xl block">✨</span>
+          <h4 class="font-black text-xs text-slate-800 dark:text-white">لا توجد مواعيد مسجلة ليوم (${todayDay})</h4>
+          <p class="text-[11px] text-slate-400">استغل وقتك في المذاكرة الذاتية أو مراجعة مهامك!</p>
+          <a href="subjects.html" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-500 hover:underline pt-1">
+            <span>+ تنظيم موعد في جدول الـ 7 أيام</span>
+            <span>←</span>
+          </a>
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = items.map(item => {
+      let badgeCls = 'bg-indigo-600 text-white';
+      let badgeLabel = isUni ? '🏛️ محاضرة' : '🏫 حضور سنتر';
+
+      if (item.type === 'break') {
+        badgeCls = 'bg-amber-500 text-white';
+        badgeLabel = '☕ استراحة';
+      } else if (item.type === 'study') {
+        badgeCls = 'bg-blue-600 text-white';
+        badgeLabel = '📚 مذاكرة';
+      } else if (item.sessionCategory === 'section') {
+        badgeCls = 'bg-cyan-600 text-white';
+        badgeLabel = '🔬 سكشن';
+      } else if (item.sessionCategory === 'course' || item.sessionCategory === 'online') {
+        badgeCls = 'bg-purple-600 text-white';
+        badgeLabel = '💻 أونلاين';
+      } else if (item.sessionCategory === 'private') {
+        badgeCls = 'bg-emerald-600 text-white';
+        badgeLabel = '📖 درس خاص';
+      }
+
+      return `
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 space-y-2 flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between gap-1.5">
+              <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-black ${badgeCls}">
+                ${badgeLabel}
+              </span>
+              <span class="text-[11px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-md">
+                ⏰ ${formatTime(item.startTime)} - ${formatTime(item.endTime)}
+              </span>
+            </div>
+            <h4 class="font-black text-xs text-slate-900 dark:text-white truncate">${escapeHtml(item.title || item.subjectName || 'موعد دراسي')}</h4>
+            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>📍 ${escapeHtml(item.location || 'السنتر')}</span>
+              ${item.teacherName ? `<span>👨‍🏫 ${escapeHtml(item.teacherName)}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
   },
 
   renderTasks() {

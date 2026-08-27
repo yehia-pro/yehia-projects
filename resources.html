@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark" style="background-color: #0B0F19; color-scheme: dark;">
 <head>
   <meta charset="UTF-8">
-  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='dark'){document.documentElement.classList.add('dark');}}catch(e){}}();</script>
+  <meta name="color-scheme" content="dark light">
+  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='light'){document.documentElement.classList.remove('dark');document.documentElement.style.backgroundColor='#F8FAFC';document.documentElement.style.colorScheme='light';}}catch(e){}}();</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>الملخصات وقنوات المنصات الذكية - Student Hub</title>
-  <meta name="theme-color" content="#4f46e5">
+  <meta name="theme-color" content="#0B0F19">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon.svg">
@@ -17,7 +18,7 @@
   <link rel="stylesheet" href="css/tailwind.css">
   <link rel="stylesheet" href="css/custom.css">
 </head>
-<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-12 font-sans antialiased transition-colors">
+<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-12 font-sans antialiased" style="background-color: #0B0F19;">
   <div id="sh-header"></div>
 
   <main class="max-w-6xl mx-auto px-4 py-6 md:py-8 space-y-6">
@@ -276,6 +277,7 @@
   <script src="js/store.js"></script>
   <script src="js/labels.js"></script>
   <script src="js/prayer.js"></script>
+  <script src="js/pdf-studio.js"></script>
   <script src="js/onboarding.js"></script>
   <script src="js/app.js"></script>
   <script src="js/resources.js"></script>

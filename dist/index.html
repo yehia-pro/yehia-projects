@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark" style="background-color: #0B0F19; color-scheme: dark;">
 <head>
   <meta charset="UTF-8">
-  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='dark'){document.documentElement.classList.add('dark');}}catch(e){}}();</script>
+  <meta name="color-scheme" content="dark light">
+  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='light'){document.documentElement.classList.remove('dark');document.documentElement.style.backgroundColor='#F8FAFC';document.documentElement.style.colorScheme='light';}}catch(e){}}();</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>الرئيسية - Student Hub</title>
-  <meta name="theme-color" content="#4648d4">
+  <meta name="theme-color" content="#0B0F19">
   <meta name="description" content="تطبيق تعليمي ذكي لإدارة المهام والمحاضرات والمدرسين ومواقيت الصلاة">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -17,7 +18,7 @@
   <link rel="stylesheet" href="css/tailwind.css">
   <link rel="stylesheet" href="css/custom.css">
 </head>
-<body class="min-h-screen pb-28 md:pb-12 font-sans bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 antialiased transition-colors duration-300">
+<body class="min-h-screen pb-28 md:pb-12 font-sans bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 antialiased" style="background-color: #0B0F19;">
   <div id="sh-header"></div>
 
   <main class="max-w-6xl mx-auto px-4 py-6 md:py-8 space-y-6 md:space-y-8">
@@ -28,10 +29,11 @@
         <h1 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight" id="dash-greeting">أهلاً 👋</h1>
         <p class="text-xs md:text-sm font-semibold text-slate-500 dark:text-slate-400" id="dash-date"></p>
       </div>
-      <div class="flex items-center gap-2">
-        <button class="sh-btn secondary text-xs !py-2.5 !px-4" onclick="location.href='resources.html'">📚 الملخصات والمنصات</button>
-        <button class="sh-btn secondary text-xs !py-2.5 !px-4" onclick="location.href='flashcards.html'">🎴 البطاقات الذكية</button>
-        <button class="sh-btn primary text-xs !py-2.5 !px-4 shadow-lg" onclick="location.href='tasks.html'">+ مهمة جديدة</button>
+      <div class="flex flex-wrap items-center gap-2">
+        <button class="sh-btn secondary text-xs !py-2.5 !px-3.5" onclick="location.href='subjects.html'">📚 المركز الأكاديمي</button>
+        <button class="sh-btn secondary text-xs !py-2.5 !px-3.5" onclick="location.href='resources.html'">💡 مكتبة الـ PDF</button>
+        <button class="sh-btn secondary text-xs !py-2.5 !px-3.5" onclick="location.href='prayer.html'">🕌 الرفيق الإيماني</button>
+        <button class="sh-btn primary text-xs !py-2.5 !px-4 shadow-lg" onclick="location.href='tasks.html'">🎯 مركز الإنجاز</button>
       </div>
     </div>
 
@@ -209,6 +211,27 @@
       </div>
     </section>
 
+    <!-- Today's Schedule Matrix Card (حصص ومجموعات اليوم) -->
+    <section class="sh-card p-5 md:p-6 rounded-3xl bg-white dark:bg-[#121826] border border-indigo-500/20 shadow-lg space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">📅</span>
+          <div>
+            <h2 class="text-base md:text-lg font-black text-slate-900 dark:text-white" id="dash-today-schedule-title">حصص ومحاضرات اليوم</h2>
+            <span class="text-xs text-slate-400 font-bold" id="dash-today-schedule-subtitle">مواعيدك المنظمة لليوم بالساعة والمكان</span>
+          </div>
+        </div>
+        <a href="subjects.html" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1.5 rounded-full flex items-center gap-1">
+          <span>الجدول الأسبوعي الكامل</span>
+          <span>←</span>
+        </a>
+      </div>
+
+      <div id="dash-today-schedule-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <!-- Injected dynamically -->
+      </div>
+    </section>
+
     <!-- Main Content 2-Column Bento Grid -->
     <section class="grid lg:grid-cols-2 gap-6 md:gap-8">
       <div class="space-y-6 flex flex-col">
@@ -333,6 +356,7 @@
   <script src="js/store.js"></script>
   <script src="js/labels.js"></script>
   <script src="js/prayer.js"></script>
+  <script src="js/pdf-studio.js"></script>
   <script src="js/onboarding.js"></script>
   <script src="js/app.js"></script>
   <script src="js/dashboard.js"></script>
@@ -343,17 +367,9 @@
         u.name = 'طالب متميز';
         u.role = 'school';
         u.onboardingDone = true;
-        if (!Store.state.subjects.length) {
-          Store.state.subjects = [
-            { id: 'sub-1', name: 'الرياضيات', color: '#6366f1' },
-            { id: 'sub-2', name: 'الفيزياء', color: '#10b981' },
-            { id: 'sub-3', name: 'اللغة الإنجليزية', color: '#f59e0b' },
-            { id: 'sub-4', name: 'اللغة العربية', color: '#3b82f6' }
-          ];
-        }
         Store.save();
-        if (Dash && Dash.init) Dash.init();
       }
+      if (typeof Dash !== 'undefined' && Dash.init) Dash.init();
     });
   </script>
 </body>

@@ -1,4 +1,6 @@
-// js/onboarding.js — معالج الإعداد الأولي (Onboarding)
+// js/onboarding.js — معالج الإعداد الأولي الإجباري (Onboarding)
+// يدعم التخصيص الكامل للطلاب (مدرسي / جامعي) والمعلمين مع إلزامية ملء البيانات
+
 const ONB_COLORS = ['#6366f1','#10b981','#f59e0b','#ef4444','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16','#06b6d4','#a855f7','#e11d48','#0ea5e9','#d946ef','#84cc16'];
 
 const GRADES = [
@@ -8,6 +10,16 @@ const GRADES = [
   { id:'g1', label:'الأول الثانوي' },
   { id:'g2', label:'الثاني الثانوي' },
   { id:'g3', label:'الثالث الثانوي' }
+];
+
+const TEACHER_STAGES = [
+  { id: 'prep', label: '🏫 المرحلة الإعدادية', desc: 'صفوف المرحلة الإعدادية' },
+  { id: 'sec', label: '🎓 المرحلة الثانوية', desc: 'صفوف المرحلة الثانوية' },
+  { id: 'uni', label: '🏛️ المرحلة الجامعية', desc: 'الكليات والمعاهد العليا' }
+];
+
+const TEACHER_SUBJECT_PRESETS = [
+  'الفيزياء', 'الكيمياء', 'الأحياء', 'الرياضيات', 'اللغة العربية', 'اللغة الإنجليزية', 'اللغة الفرنسية', 'التاريخ', 'الجغرافيا', 'الفلسفة والمنطق', 'علم النفس والاجتماع', 'الجيولوجيا', 'الحاسب والبرمجة', 'مواد طبية', 'مواد هندسية'
 ];
 
 const SPECIALTIES = {
@@ -69,9 +81,24 @@ const Onboarding = {
   step: 0,
   editing: false,
   root: null,
-  _clickHandler: null,   // نحفظ ref للـ handler عشان نشيله
+  _clickHandler: null,
   history: [],
-  d: { name:'', role:'', grade:'', specialty:'', faculty:'', facultyName:'', year:'', term:'', count:0, weeklyGoal:4, picked:[] },
+  d: {
+    name: '',
+    role: '',
+    grade: '',
+    specialty: '',
+    faculty: '',
+    facultyName: '',
+    year: '',
+    term: '',
+    count: 0,
+    weeklyGoal: 4,
+    picked: [],
+    teacherSubject: '',
+    teacherStages: [],
+    planetName: ''
+  },
 
   start(editing) {
     var st = Store.state;
@@ -91,32 +118,38 @@ const Onboarding = {
       term: u.term || '',
       count: u.count || st.subjects.length || 0,
       weeklyGoal: u.weeklyGoal || 4,
-      picked: st.subjects.map(function(s) { return s.name; })
+      picked: st.subjects.map(function(s) { return s.name; }),
+      teacherSubject: u.teacherSubject || '',
+      teacherStages: u.teacherStages || [],
+      planetName: u.planetName || ''
     };
     if ([2,4,6,8].indexOf(this.d.weeklyGoal) === -1) { this.d.weeklyGoal = 4; }
     this.build();
   },
 
   build() {
-    if (!this.root) {
-      this.root = document.createElement('div');
-      this.root.className = 'fixed inset-0 z-[70] flex items-center justify-center p-4 overflow-y-auto bg-slate-950/70 backdrop-blur-sm';
-      document.body.appendChild(this.root);
-      document.body.style.overflow = 'hidden';
+    var root = document.getElementById('onboarding-root');
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'onboarding-root';
+      root.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto';
+      document.body.appendChild(root);
     }
+    this.root = root;
     this.render();
   },
 
   close() {
     if (this.root) {
-      // شيل الـ listener قبل الحذف
-      if (this._clickHandler) {
-        this.root.removeEventListener('click', this._clickHandler);
-        this._clickHandler = null;
+      if (this.root.remove) {
+        this.root.remove();
+      } else if (this.root.parentNode) {
+        this.root.parentNode.removeChild(this.root);
       }
-      this.root.remove();
-      this.root = null;
-      document.body.style.overflow = '';
+    }
+    this.root = null;
+    if (typeof App !== 'undefined' && App.refreshUI) {
+      App.refreshUI();
     }
   },
 
@@ -124,7 +157,6 @@ const Onboarding = {
     if (!this.root) { return; }
     this.root.innerHTML = this.screen(this.step);
 
-    // ===== إصلاح: شيل الـ listener القديم قبل ما تضيف واحد جديد =====
     if (this._clickHandler) {
       this.root.removeEventListener('click', this._clickHandler);
     }
@@ -137,7 +169,7 @@ const Onboarding = {
     };
     this.root.addEventListener('click', this._clickHandler);
 
-    // إعداد الـ inputs
+    // إعداد حقول الإدخال
     var nameInp = document.getElementById('onb-name');
     if (nameInp) {
       nameInp.value = this.d.name;
@@ -149,6 +181,19 @@ const Onboarding = {
         }
       });
     }
+
+    var tSubInp = document.getElementById('onb-teacher-subject');
+    if (tSubInp) {
+      tSubInp.value = this.d.teacherSubject;
+      tSubInp.focus();
+    }
+
+    var tPlanetInp = document.getElementById('onb-planet-name');
+    if (tPlanetInp) {
+      tPlanetInp.value = this.d.planetName;
+      tPlanetInp.focus();
+    }
+
     var subInp = document.getElementById('onb-sub-input');
     if (subInp) {
       subInp.addEventListener('keydown', function(e) {
@@ -158,15 +203,10 @@ const Onboarding = {
         }
       });
     }
+
     var cntInp = document.getElementById('onb-count');
     if (cntInp) {
       cntInp.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') { self.action({ a:'next' }); }
-      });
-    }
-    var goalInp = document.getElementById('onb-goal-input');
-    if (goalInp) {
-      goalInp.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') { self.action({ a:'next' }); }
       });
     }
@@ -198,11 +238,18 @@ const Onboarding = {
   },
 
   roleLabel() {
-    return this.d.role === 'school' ? 'طالب مدرسة' : this.d.role === 'uni' ? 'طالب جامعة' : '';
+    return this.d.role === 'school' ? 'طالب مدرسة / ثانوي' : this.d.role === 'uni' ? 'طالب جامعة' : this.d.role === 'teacher' ? 'معلم / دكتور جامعي' : '';
   },
 
   levelLabel() {
     var d = this.d;
+    if (d.role === 'teacher') {
+      var stages = (d.teacherStages || []).map(function(s) {
+        var found = TEACHER_STAGES.find(function(ts) { return ts.id === s; });
+        return found ? found.label.replace(/^[^\s]+\s/, '') : s;
+      }).join(' و ');
+      return (d.teacherSubject || 'معلم') + (stages ? ' (' + stages + ')' : '');
+    }
     if (d.role === 'school' && d.grade) {
       var g = GRADES.find(function(x) { return x.id === d.grade; });
       if (g && (d.grade === 'g2' || d.grade === 'g3') && d.specialty) {
@@ -222,12 +269,13 @@ const Onboarding = {
   },
 
   totalSteps() {
+    if (this.d.role === 'teacher') return 6;
     if (this.d.role === 'school') {
       if (this.d.grade === 'g2' || this.d.grade === 'g3') return 9;
       return 8;
     }
     if (this.d.role === 'uni') return 9;
-    return 3; // لو لسه محددش role
+    return 3;
   },
 
   screen(n) {
@@ -235,13 +283,9 @@ const Onboarding = {
     var self = this;
     var isSpec = d.role === 'school' && (d.grade === 'g2' || d.grade === 'g3');
 
-    // زرار الرجوع بيظهر من خطوة 1 فأكثر
     var backBtn = n > 0
       ? '<button data-a="back" class="onb-back-btn flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition active:scale-95" title="رجوع">&#8594;</button>'
       : '<div class="w-10"></div>';
-
-    // زرار تخطي / إلغاء متاح دائماً لمنع تعليق الشاشة
-    var cancelBtn = '<button data-a="skip" class="onb-skip-btn text-xs font-bold text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 px-2 py-1 flex items-center gap-1 transition active:scale-95" title="تخطي والدخول للتطبيق"><span>تخطي ✕</span></button>';
 
     var dotsLine = '<div class="flex gap-1.5 items-center">' + this.dots() + '</div>';
 
@@ -255,7 +299,7 @@ const Onboarding = {
         '<div class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400 tracking-wider">خطوة ' + (n+1) + ' من ' + self.totalSteps() + '</div>' +
         dotsLine +
         '</div>' +
-        cancelBtn +
+        '<div class="w-10"></div>' +
         '</div>' +
         '<div class="relative z-10">' + inner + '</div>' +
         '</div>';
@@ -269,7 +313,7 @@ const Onboarding = {
         '</div>';
     };
 
-    // ===== Step 0: Welcome / Stunning Splash Intro =====
+    // ===== Step 0: Welcome =====
     if (n === 0) {
       return shell(
         '<div class="flex flex-col items-center text-center space-y-4 py-2">' +
@@ -280,56 +324,106 @@ const Onboarding = {
         '<span class="absolute -top-1 -right-1 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-amber-500"></span></span>' +
         '</div>' +
         '<div class="space-y-1">' +
-        '<h2 class="text-2xl font-black text-slate-900 dark:text-white">أهلاً بيك في Student Hub 🚀</h2>' +
-        '<p class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">منصتك الدراسية الذكية والشاملة</p>' +
+        '<h2 class="text-2xl font-black text-slate-900 dark:text-white">أهلاً بك في Student Hub 🚀</h2>' +
+        '<p class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">المنظومة التعليمية الذكية للطلاب والمعلمين</p>' +
         '</div>' +
-        '<div class="grid grid-cols-2 gap-2 w-full text-start py-2">' +
-        '<div class="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-200/60 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2"><span>📚</span><span>المهام والمحاضرات</span></div>' +
-        '<div class="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-200/60 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2"><span>🕌</span><span>مواقيت الصلاة والأذكار</span></div>' +
-        '<div class="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-200/60 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2"><span>⏱️</span><span>التركيز وبومودورو</span></div>' +
-        '<div class="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-200/60 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2"><span>🎯</span><span>الدرجات والإحصائيات</span></div>' +
-        '</div>' +
-        '<p class="text-xs text-slate-500 dark:text-slate-400">خد دقيقة واحدة لتخصيص التطبيق على حسب مرحلتك الدراسية</p>' +
-        '<button data-a="next" class="sh-btn primary w-full text-base py-3.5 shadow-xl font-black">ابدأ التخصيص الآن ←</button>' +
+        '<p class="text-xs text-slate-500 dark:text-slate-400">يرجى ملء بياناتك لتخصيص بيئة التطبيق بدقة بحسب مسارك الأكاديمي.</p>' +
+        '<button data-a="next" class="sh-btn primary w-full text-base py-3.5 shadow-xl font-black">ابدأ الإعداد الآن ←</button>' +
         '</div>'
       );
     }
 
-    // ===== Step 1: Name =====
+    // ===== Step 1: Name (إجباري) =====
     if (n === 1) {
       return shell(
-        header('✏️','إيه اسمك؟','هيفضل محفوظ عندك بس') +
+        header('✏️','ما هو اسمك أو لقبك؟','سيظهر في جدولك وحسابك الشخصي') +
         '<div class="space-y-3">' +
-        '<input id="onb-name" type="text" placeholder="اكتب اسمك هنا…" class="sh-input w-full text-lg text-center" autocomplete="given-name" />' +
-        '<p class="text-xs text-center text-slate-400">هذا الحقل مطلوب ⚠️</p>' +
-        '<button data-a="next" class="sh-btn primary w-full">التالي ←</button>' +
+        '<input id="onb-name" type="text" placeholder="اكتب اسمك هنا (مثال: أ. محمود / أحمد محمد)…" class="sh-input w-full text-lg text-center font-bold" autocomplete="name" />' +
+        '<p class="text-xs text-center text-amber-500 font-bold">⚠️ ملء الاسم إجباري للمتابعة</p>' +
+        '<button data-a="next" class="sh-btn primary w-full font-black">التالي ←</button>' +
         '</div>'
       );
     }
 
-    // ===== Step 2: Role =====
+    // ===== Step 2: Role (إجباري) =====
     if (n === 2) {
       return shell(
-        header('🎯','إنت فين؟','اختر نوع دراستك') +
-        '<div class="grid grid-cols-2 gap-3">' +
-        this.roleCard('school','🎒','طالب مدرسة','إعدادي أو ثانوي') +
-        this.roleCard('uni','🎓','طالب جامعة','كلية وتخصص') +
+        header('🎯','من أنت؟','اختر مسارك لتخصيص الواجهة المناسبة لك') +
+        '<div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">' +
+        this.roleCard('school','🎒','طالب مدرسي','إعدادي أو ثانوي') +
+        this.roleCard('uni','🎓','طالب جامعي','كلية أو معهد') +
+        this.roleCard('teacher','👨‍🏫','معلم / دكتور','استوديو المجموعات والكواكب') +
         '</div>' +
-        (d.role ? '<button data-a="next" class="sh-btn primary w-full mt-3">التالي ←</button>' : '')
+        (d.role ? '<button data-a="next" class="sh-btn primary w-full mt-3 font-black">التالي ←</button>' : '<p class="text-xs text-center text-slate-400 mt-2">اختر مسارك للمتابعة 👆</p>')
       );
     }
 
-    // ===== Step 3: Grade (school) or Year (uni) =====
+    // ===== مسار المعلم (TEACHER FLOW) =====
+    if (d.role === 'teacher') {
+      // Step 3: Teacher Subject
+      if (n === 3) {
+        return shell(
+          header('📚','ما هي المادة التي تدرسها؟','اختر أو اكتب اسم مادتك الدراسية') +
+          '<div class="space-y-3">' +
+          '<input id="onb-teacher-subject" type="text" placeholder="اكتب اسم المادة (مثال: فيزياء، كيمياء، لغة عربية)…" class="sh-input w-full text-center font-bold" value="' + (d.teacherSubject || '') + '" />' +
+          '<div class="flex flex-wrap justify-center gap-1.5 max-h-36 overflow-y-auto p-1">' +
+          TEACHER_SUBJECT_PRESETS.map(function(sub) {
+            var active = d.teacherSubject === sub;
+            return '<button data-a="teacher-sub-chip" data-v="' + sub + '" class="px-2.5 py-1 rounded-xl text-xs font-bold transition ' + (active ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300') + '">' + sub + '</button>';
+          }).join('') +
+          '</div>' +
+          '<button data-a="next" class="sh-btn primary w-full font-black mt-2">التالي ←</button>' +
+          '</div>'
+        );
+      }
+
+      // Step 4: Teacher Stages (إعدادي / ثانوي / جامعة بحد أقصى 2)
+      if (n === 4) {
+        var stages = d.teacherStages || [];
+        return shell(
+          header('🏫','ما هي المراحل التي تدرس لها؟','اختر مرحلة واحدة أو مرحلتين كحد أقصى') +
+          '<div class="space-y-2.5">' +
+          TEACHER_STAGES.map(function(stg) {
+            var isSel = stages.indexOf(stg.id) > -1;
+            return '<button data-a="teacher-toggle-stage" data-v="' + stg.id + '" class="sh-card !p-4 w-full text-start flex items-center justify-between transition ' + (isSel ? '!border-2 !border-indigo-500 !bg-indigo-500/10' : '') + '">' +
+              '<div>' +
+              '<span class="font-black text-sm text-slate-800 dark:text-white block">' + stg.label + '</span>' +
+              '<span class="text-xs text-slate-400">' + stg.desc + '</span>' +
+              '</div>' +
+              '<span class="text-lg font-black ' + (isSel ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-300') + '">' + (isSel ? '✓' : '○') + '</span>' +
+              '</button>';
+          }).join('') +
+          '<p class="text-xs text-center text-slate-400 font-bold">تم اختيار (' + stages.length + ' من 2 كحد أقصى)</p>' +
+          '<button data-a="next" class="sh-btn primary w-full font-black">التالي ←</button>' +
+          '</div>'
+        );
+      }
+
+      // Step 5: Teacher Planet Name & Launch
+      if (n === 5) {
+        return shell(
+          header('🪐','ما هو اسم كوكبك التعليمي؟','الاسم الذي سيظهر لطلابك عند مشاركة المذكرات والجدول') +
+          '<div class="space-y-3">' +
+          '<input id="onb-planet-name" type="text" placeholder="اسم الكوكب (مثال: كوكب العباقرة في الفيزياء)…" class="sh-input w-full text-center font-bold" value="' + (d.planetName || 'كوكب ' + (d.teacherSubject || 'المادة')) + '" />' +
+          '<p class="text-xs text-slate-500 text-center leading-relaxed">سيتم إنشاء كوكب مادتك وتوليد كود دعوة سري لمشاركته مع طلابك فوراً!</p>' +
+          '<button data-a="finish" class="sh-btn primary w-full text-base py-3.5 shadow-xl font-black">🚀 دخول استوديو المعلم والبدء</button>' +
+          '</div>'
+        );
+      }
+    }
+
+    // ===== مسار الطالب المدرسي والجامعي (STUDENT FLOW) =====
+    // Step 3: Grade (school) or Year (uni)
     if (n === 3) {
       if (d.role === 'school') {
         return shell(
-          header('📚','إنت في صف إيه؟','اختر صفك الدراسي') +
+          header('📚','إنت في صف إيه؟','اختر صفك الدراسي (من أولى إعدادي إلى ثالثة ثانوي)') +
           '<div class="space-y-2 max-h-72 overflow-y-auto">' +
           GRADES.map(function(g) {
             var active = d.grade === g.id;
             return '<button data-a="grade" data-v="' + g.id + '" class="sh-card !p-3.5 w-full text-start flex items-center justify-between ' + (active ? '!border-2 !border-indigo-500' : '') + '">' +
               '<span class="font-bold text-sm text-slate-800 dark:text-white">' + g.label + '</span>' +
-              '<span class="text-xs text-slate-400">' + ((g.id === 'g2' || g.id === 'g3') ? '📋 اختر التخصص بعدها' : '✏️ هتكتب موادك') + '</span>' +
+              '<span class="text-xs text-slate-400">' + ((g.id === 'g2' || g.id === 'g3') ? '📋 اختر التخصص بعدها' : '✏️ موادك الأساسية') + '</span>' +
               '</button>';
           }).join('') +
           '</div>'
@@ -349,7 +443,7 @@ const Onboarding = {
       }
     }
 
-    // ===== Step 4: Specialty (g2/g3) or Faculty (uni) =====
+    // Step 4: Specialty (g2/g3) or Faculty (uni)
     if (n === 4) {
       if (d.role === 'school' && (d.grade === 'g2' || d.grade === 'g3')) {
         var opts = SPECIALTIES[d.grade] || [];
@@ -381,7 +475,7 @@ const Onboarding = {
       }
     }
 
-    // ===== Step 5: Term (uni) =====
+    // Step 5: Term (uni)
     if (n === 5 && d.role === 'uni') {
       return shell(
         header('🗓️','إنت في ترم إيه؟','') +
@@ -397,8 +491,7 @@ const Onboarding = {
       );
     }
 
-    // ===== خطوة عدد المواد =====
-    // uni=6, spec school=5, non-spec school=4
+    // Step: Count of subjects (students)
     var countStep = d.role === 'uni' ? 6 : (isSpec ? 5 : 4);
     if (n === countStep) {
       return shell(
@@ -412,12 +505,12 @@ const Onboarding = {
         '<div class="relative">' +
         '<input id="onb-count" type="number" min="1" max="20" placeholder="أو اكتب رقم مخصص (1–20)…" class="sh-input w-full text-center" value="' + (d.count || '') + '" />' +
         '</div>' +
-        '<button data-a="next" class="sh-btn primary w-full">التالي ←</button>' +
+        '<button data-a="next" class="sh-btn primary w-full font-black">التالي ←</button>' +
         '</div>'
       );
     }
 
-    // ===== خطوة المواد =====
+    // Step: Pick subjects (students)
     var subjStep = d.role === 'uni' ? 7 : (isSpec ? 6 : 5);
     if (n === subjStep) {
       var chips = d.picked
@@ -430,167 +523,141 @@ const Onboarding = {
         header('🗂️','اختار موادك','اضغط على المادة عشان تشيلها') +
         '<div class="space-y-3">' +
         '<div class="flex gap-2">' +
-        '<input id="onb-sub-input" type="text" placeholder="اسم المادة…" class="sh-input flex-1" />' +
-        '<button data-a="add-sub" class="sh-btn primary whitespace-nowrap">+ أضف</button>' +
+        '<input id="onb-sub-input" type="text" placeholder="اسم المادة…" class="sh-input flex-1 font-bold" />' +
+        '<button data-a="add-sub" class="sh-btn primary whitespace-nowrap font-bold">+ أضف</button>' +
         '</div>' +
-        (sugCount ? '<button data-a="use-suggested" class="sh-btn w-full text-xs" style="background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3)">📋 استخدم المواد المقترحة (' + sugCount + ' مادة)</button>' : '') +
+        (sugCount ? '<button data-a="use-suggested" class="sh-btn w-full text-xs font-bold" style="background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3)">📋 استخدم المواد المقترحة (' + sugCount + ' مادة)</button>' : '') +
         '<div class="flex flex-wrap gap-2 min-h-[48px] p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">' +
         (d.picked.length ? chips : '<span class="text-sm text-slate-400 self-center">اضغط + أضف لإضافة موادك…</span>') +
         '</div>' +
         '<div class="flex justify-between items-center">' +
         '<span class="text-xs text-slate-400 font-bold">' + d.picked.length + (d.count ? ' من ' + d.count : '') + ' مادة مختارة</span>' +
-        '<button data-a="next" class="sh-btn ' + (d.picked.length ? 'primary' : 'ghost') + ' text-sm">التالي ←</button>' +
+        '<button data-a="next" class="sh-btn ' + (d.picked.length ? 'primary' : 'ghost') + ' text-sm font-black">التالي ←</button>' +
         '</div>' +
         '</div>'
       );
     }
 
-    // ===== خطوة الهدف الأسبوعي (school فقط) =====
-    var goalStep = d.role === 'school' ? (isSpec ? 7 : 6) : -1;
-    if (n === goalStep && d.role === 'school') {
+    // Step: Goal & Launch (students)
+    var goalStep = d.role === 'uni' ? 8 : (isSpec ? 7 : 6);
+    if (n === goalStep) {
       return shell(
-        header('⏱️','هدف المذاكرة الأسبوعي','كام ساعة تحب تذاكر في الأسبوع؟') +
+        header('🎯','هدفك الأسبوعي','كام ساعة مذاكرة مركزة في الأسبوع؟') +
         '<div class="space-y-4">' +
         '<div class="flex flex-wrap justify-center gap-2">' +
-        [5,10,15,20,30].map(function(g) {
-          return '<button type="button" data-a="goal" data-v="' + g + '" class="sh-pomo-preset ' + (d.weeklyGoal === g ? 'active' : '') + '">' + g + ' س</button>';
+        [2,4,6,8,10].map(function(g) {
+          return '<button data-a="goal" data-v="' + g + '" class="sh-pomo-preset ' + (d.weeklyGoal === g ? 'active' : '') + '">' + g + ' س</button>';
         }).join('') +
         '</div>' +
-        '<div class="relative">' +
-        '<input id="onb-goal-input" type="number" min="1" max="80" placeholder="أو اكتب عدد ساعات مخصص (1–80)…" class="sh-input w-full text-center" value="' + (d.weeklyGoal || '') + '" />' +
-        '</div>' +
-        '<button data-a="next" class="sh-btn primary w-full">التالي ←</button>' +
+        '<button data-a="finish" class="sh-btn primary w-full text-base py-3.5 shadow-xl font-black">🎉 إتمام الإعداد والدخول</button>' +
         '</div>'
       );
     }
 
-    // ===== Review screen (آخر شاشة) =====
-    var subsChips = d.picked
-      .map(function(s, i) {
-        return '<span class="sh-chip" style="background:' + ONB_COLORS[i % ONB_COLORS.length] + '22;color:' + ONB_COLORS[i % ONB_COLORS.length] + ';border:1px solid ' + ONB_COLORS[i % ONB_COLORS.length] + '44">' + escapeHtml(s) + '</span>';
-      })
-      .join('');
-
-    return shell(
-      header('✅','كده كل حاجة جاهزة!','راجع بياناتك وابدأ') +
-      '<div class="space-y-2 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 mb-4">' +
-      '<div class="flex justify-between"><span class="text-slate-400 font-bold">الاسم</span><span class="font-bold text-slate-800 dark:text-white">' + escapeHtml(d.name || '—') + '</span></div>' +
-      '<div class="flex justify-between"><span class="text-slate-400 font-bold">الدراسة</span><span class="font-bold text-slate-800 dark:text-white">' + self.roleLabel() + '</span></div>' +
-      '<div class="flex justify-between"><span class="text-slate-400 font-bold">المستوى</span><span class="font-bold text-slate-800 dark:text-white text-end">' + escapeHtml(self.levelLabel() || '—') + '</span></div>' +
-      (d.role === 'school' ? '<div class="flex justify-between"><span class="text-slate-400 font-bold">الهدف الأسبوعي</span><span class="font-bold text-slate-800 dark:text-white">' + d.weeklyGoal + ' ساعات</span></div>' : '') +
-      '<div class="flex justify-between"><span class="text-slate-400 font-bold">عدد المواد</span><span class="font-bold text-slate-800 dark:text-white">' + d.picked.length + '</span></div>' +
-      '<div><span class="text-slate-400 font-bold text-xs">المواد</span><div class="flex flex-wrap gap-1.5 mt-2">' + (d.picked.length ? subsChips : '<span class="text-slate-400 text-xs">بدون مواد</span>') + '</div></div>' +
-      '</div>' +
-      '<button data-a="finish" class="sh-btn success w-full text-base py-3">تمام، ابدأ 🎉</button>'
-    );
+    return '';
   },
 
-  roleCard(role, emoji, label, sub) {
-    var active = this.d.role === role;
-    return '<button data-a="role" data-v="' + role + '" class="sh-card !p-5 text-center border-2 transition ' +
-      (active ? '!border-indigo-500 !bg-indigo-500/10' : '!border-transparent hover:!border-slate-200') + '">' +
-      '<div class="text-4xl mb-2">' + emoji + '</div>' +
-      '<div class="font-extrabold text-slate-800 dark:text-white">' + label + '</div>' +
-      '<div class="text-xs text-slate-400 mt-1">' + sub + '</div>' +
-      (active ? '<div class="mt-2 text-xs font-bold text-indigo-500">✓ محدد</div>' : '') +
+  roleCard(id, emoji, title, sub) {
+    var active = this.d.role === id;
+    return '<button data-a="role" data-v="' + id + '" class="sh-card !p-4 text-center cursor-pointer transition active:scale-95 ' + (active ? '!border-2 !border-indigo-500 !bg-indigo-500/10 shadow-lg' : 'hover:border-indigo-500/40') + '">' +
+      '<div class="text-3xl mb-1.5">' + emoji + '</div>' +
+      '<div class="font-black text-xs md:text-sm text-slate-900 dark:text-white">' + title + '</div>' +
+      '<div class="text-[10px] text-slate-400 mt-0.5">' + sub + '</div>' +
       '</button>';
   },
 
   action(a) {
-    var d = this.d;
     var self = this;
+    var d = this.d;
     var isSpec = d.role === 'school' && (d.grade === 'g2' || d.grade === 'g3');
 
     switch (a.a) {
       case 'next':
-        // ===== Validation =====
+        // Mandatory Validations
         if (this.step === 1) {
-          var nameEl = document.getElementById('onb-name');
-          d.name = (nameEl ? nameEl.value : d.name).trim();
-          if (!d.name) { App.toast('اكتب اسمك عشان نكمّل ⚠️','warning'); return; }
-        }
-        if (this.step === 2 && !d.role) {
-          App.toast('اختار نوع الدراسة الأول ⚠️','warning'); return;
-        }
-        if (this.step === 3 && d.role === 'school' && !d.grade) {
-          App.toast('اختار صفك الأول ⚠️','warning'); return;
-        }
-        if (this.step === 3 && d.role === 'uni' && !d.year) {
-          App.toast('اختار سنة الجامعة الأول ⚠️','warning'); return;
-        }
-        if (this.step === 4 && d.role === 'school' && isSpec && !d.specialty) {
-          App.toast('اختار تخصصك الأول ⚠️','warning'); return;
-        }
-        if (this.step === 4 && d.role === 'uni' && !d.faculty) {
-          App.toast('اختار كليتك الأول ⚠️','warning'); return;
-        }
-        if (this.step === 5 && d.role === 'uni' && !d.term) {
-          App.toast('اختار الترم الأول ⚠️','warning'); return;
-        }
-        // عدد المواد
-        var countN = d.role === 'uni' ? 6 : (isSpec ? 5 : 4);
-        if (this.step === countN) {
-          var cntEl = document.getElementById('onb-count');
-          var cnt = cntEl ? cntEl.value.trim() : '';
-          var cv = parseInt(cnt, 10);
-          if (d.count < 1 && (!cnt || isNaN(cv) || cv < 1)) {
-            App.toast('حدد عدد المواد الأول ⚠️','warning'); return;
+          var nInp = document.getElementById('onb-name');
+          if (nInp) d.name = nInp.value.trim();
+          if (!d.name) {
+            App.toast('يرجى كتابة اسمك للمتابعة ⚠️', 'warning');
+            return;
           }
-          if (cnt && !isNaN(cv)) {
-            if (cv < 1 || cv > 20) { App.toast('اكتب عدد من 1 لـ 20 ⚠️','warning'); return; }
-            d.count = cv;
+        } else if (this.step === 2) {
+          if (!d.role) {
+            App.toast('يرجى تحديد مسارك الأكاديمي للمتابعة ⚠️', 'warning');
+            return;
+          }
+        } else if (d.role === 'teacher') {
+          if (this.step === 3) {
+            var subInp = document.getElementById('onb-teacher-subject');
+            if (subInp) d.teacherSubject = subInp.value.trim();
+            if (!d.teacherSubject) {
+              App.toast('يرجى إدخال اسم المادة التي تدرسها ⚠️', 'warning');
+              return;
+            }
+          } else if (this.step === 4) {
+            if (!d.teacherStages || !d.teacherStages.length) {
+              App.toast('يرجى اختيار مرحلة تدريس واحدة على الأقل ⚠️', 'warning');
+              return;
+            }
           }
         }
-        // المواد
-        var subjN = d.role === 'uni' ? 7 : (isSpec ? 6 : 5);
-        if (this.step === subjN && !d.picked.length) {
-          App.toast('اختار مادة واحدة على الأقل ⚠️','warning'); return;
-        }
-        // هدف الساعات الأسبوعي
-        var goalStep = d.role === 'school' ? (isSpec ? 7 : 6) : -1;
-        if (this.step === goalStep && d.role === 'school') {
-          var goalEl = document.getElementById('onb-goal-input');
-          var goalVal = goalEl ? goalEl.value.trim() : '';
-          var gNum = parseInt(goalVal, 10);
-          if (goalVal && !isNaN(gNum)) {
-            if (gNum < 1 || gNum > 80) { App.toast('حدد عدد الساعات بين 1 و 80 ساعة ⚠️','warning'); return; }
-            d.weeklyGoal = gNum;
-          } else if (!d.weeklyGoal) {
-            App.toast('حدد هدف الساعات الأسبوعي أولاً ⚠️','warning'); return;
-          }
-        }
-        // ===== الانتقال الذكي =====
+
         this.history.push(this.step);
         this.step = this._nextStep(this.step, d, isSpec);
         this.render();
         break;
 
       case 'back':
-        // ===== إصلاح: pop من الـ history بدون || 0 =====
-        if (this.history.length > 0) {
+        if (this.history.length) {
           this.step = this.history.pop();
+          this.render();
         }
-        this.render();
-        break;
-
-      case 'cancel':
-      case 'skip':
-        this.skipAndEnter();
         break;
 
       case 'role':
         d.role = a.v;
-        d.grade = ''; d.specialty = ''; d.faculty = ''; d.year = '';
-        // لا تضيف لـ history عشان الـ role card بتغير في نفس الخطوة
-        this.render(); // re-render نفس الخطوة عشان يظهر "محدد"
+        this.history.push(this.step);
+        this.step = 3;
+        this.render();
+        break;
+
+      case 'teacher-sub-chip':
+        d.teacherSubject = a.v;
+        var tInp = document.getElementById('onb-teacher-subject');
+        if (tInp) tInp.value = a.v;
+        this.render();
+        break;
+
+      case 'teacher-toggle-stage':
+        if (!Array.isArray(d.teacherStages)) d.teacherStages = [];
+        var idx = d.teacherStages.indexOf(a.v);
+        if (idx > -1) {
+          d.teacherStages.splice(idx, 1);
+        } else {
+          if (d.teacherStages.length >= 2) {
+            App.toast('الحد الأقصى هو اختيار مرحلتين فقط ⚠️', 'warning');
+            return;
+          }
+          d.teacherStages.push(a.v);
+        }
+        this.render();
         break;
 
       case 'grade':
         d.grade = a.v;
-        d.specialty = '';
-        if (a.v !== 'g2' && a.v !== 'g3') { d.picked = []; }
         this.history.push(this.step);
-        this.step = 4;
+        if (a.v === 'g2' || a.v === 'g3') {
+          this.step = 4;
+        } else {
+          this.step = 4;
+        }
+        this.render();
+        break;
+
+      case 'spec':
+        d.specialty = a.v;
+        this.history.push(this.step);
+        this.step = 5;
         this.render();
         break;
 
@@ -601,54 +668,10 @@ const Onboarding = {
         this.render();
         break;
 
-      case 'spec':
-        d.specialty = a.v;
-        d.picked = [];
-        this.history.push(this.step);
-        this.step = 5;
-        this.render();
-        break;
-
       case 'faculty':
-        if (a.v === 'other') {
-          var modal = App.showModal(
-            '<h3 class="text-lg font-extrabold mb-3">🎓 اكتب اسم كليتك</h3>' +
-            '<input id="custom-fac" type="text" class="sh-input w-full mb-4" placeholder="مثال: هندسة الإنتاج">' +
-            '<div class="flex gap-2 justify-end">' +
-            '<button class="sh-btn ghost" id="custom-fac-cancel">إلغاء</button>' +
-            '<button class="sh-btn primary" id="custom-fac-save">التالي ←</button></div>'
-          );
-          setTimeout(function() {
-            var x = document.getElementById('custom-fac');
-            if (x) {
-              x.focus();
-              x.addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('custom-fac-save').click(); });
-            }
-          }, 100);
-          document.getElementById('custom-fac-cancel').onclick = function() { App.closeModal(); };
-          document.getElementById('custom-fac-save').onclick = function() {
-            var v2 = document.getElementById('custom-fac').value.trim();
-            if (!v2) { App.toast('اكتب اسم الكلية ⚠️','warning'); return; }
-            self.d.faculty = 'other';
-            self.d.facultyName = v2;
-            self.d.picked = [];
-            App.closeModal();
-            self.history.push(self.step);
-            self.step = 5;
-            self.render();
-          };
-          return;
-        }
         d.faculty = a.v;
-        d.facultyName = '';
-        d.picked = [];
         this.history.push(this.step);
         this.step = 5;
-        this.render();
-        break;
-
-      case 'count':
-        d.count = parseInt(a.v, 10) || 0;
         this.render();
         break;
 
@@ -656,6 +679,11 @@ const Onboarding = {
         d.term = a.v;
         this.history.push(this.step);
         this.step = 6;
+        this.render();
+        break;
+
+      case 'count':
+        d.count = parseInt(a.v, 10) || 0;
         this.render();
         break;
 
@@ -688,8 +716,10 @@ const Onboarding = {
     }
   },
 
-  // ===== انتقال ذكي للخطوة التالية =====
   _nextStep(current, d, isSpec) {
+    if (d.role === 'teacher') {
+      return current + 1;
+    }
     if (d.role === 'school') {
       var map = { 0:1, 1:2, 2:3, 3: (isSpec ? 4 : 4), 4:5, 5:6, 6:7, 7:8 };
       return map[current] !== undefined ? map[current] : current + 1;
@@ -721,75 +751,75 @@ const Onboarding = {
     this.render();
   },
 
-  skipAndEnter() {
-    var st = Store.state;
-    if (!st.user.name) st.user.name = 'طالب متميز';
-    if (!st.user.role) st.user.role = 'school';
-    if (!st.user.grade) st.user.grade = 'g3';
-    st.user.onboardingDone = true;
-    if (!st.subjects.length) {
-      st.subjects = [
-        { id: 'sub-1', name: 'الرياضيات', color: '#6366f1' },
-        { id: 'sub-2', name: 'الفيزياء', color: '#10b981' },
-        { id: 'sub-3', name: 'اللغة الإنجليزية', color: '#f59e0b' },
-        { id: 'sub-4', name: 'اللغة العربية', color: '#3b82f6' }
-      ];
-    }
-    Store.save();
-    this.close();
-    App.toast('مرحباً بك في Student Hub! تم تجهيز حسابك بنجاح 🚀', 'success');
-  },
-
   finish() {
     var d = this.d;
     var st = Store.state;
-    var firstRun = !this.editing;
-    var norm = function(s) { return String(s).replace(/^(ال|الت|الا|الآ)/, ''); };
-    var subs = st.subjects.slice();
 
-    if (firstRun) {
-      subs = d.picked.map(function(n, i) {
-        var found = st.subjects.find(function(s) { return norm(s.name) === norm(n); });
-        return {
-          id: found ? found.id : uid(),
-          name: n,
-          color: found ? found.color : ONB_COLORS[i % ONB_COLORS.length]
-        };
+    // Handle Teacher Finish
+    if (d.role === 'teacher') {
+      var pInp = document.getElementById('onb-planet-name');
+      if (pInp && pInp.value.trim()) d.planetName = pInp.value.trim();
+
+      st.user = {
+        name: d.name,
+        role: 'teacher',
+        teacherSubject: d.teacherSubject || 'عام',
+        teacherStages: d.teacherStages || ['sec'],
+        planetName: d.planetName || 'كوكب ' + d.teacherSubject,
+        onboardingDone: true,
+        xp: 100,
+        level: 1
+      };
+
+      // Create initial Teacher Planet automatically
+      Store.createTeacherPlanet({
+        name: d.planetName || 'كوكب ' + d.teacherSubject,
+        subject: d.teacherSubject,
+        grade: (d.teacherStages || []).join(' + ')
       });
-      st.subjects = subs;
-      var keep = {};
-      subs.forEach(function(s) { keep[s.id] = true; });
-      ['tasks','exams','lectures','resources','grades','pomodoroSessions'].forEach(function(k) {
-        st[k] = (st[k] || []).filter(function(it) { return it && keep[it.subjectId]; });
-      });
-    } else {
-      var names = {};
-      subs.forEach(function(s) { names[norm(s.name)] = true; });
-      d.picked.forEach(function(n) {
-        if (!names[norm(n)]) {
-          subs.push({ id:uid(), name:n, color:ONB_COLORS[subs.length % ONB_COLORS.length] });
-          names[norm(n)] = true;
+
+      Store.save();
+      this.close();
+      App.toast('مرحباً بك يا أستاذنا في Student Hub! تم تجهيز استوديو المجموعات وكوكبك بنجاح 🪐 (+100 XP)', 'success');
+      setTimeout(function() {
+        if (!window.location.pathname.endsWith('subjects.html')) {
+          window.location.href = 'subjects.html';
+        } else {
+          window.location.reload();
         }
-      });
-      st.subjects = subs;
+      }, 400);
+      return;
     }
 
-    Store.update('user','',{
+    // Handle Student Finish
+    var norm = function(s) { return String(s).replace(/^(ال|الت|الا|الآ)/, ''); };
+    var subs = d.picked.map(function(n, i) {
+      return {
+        id: 'sub_' + (Date.now() + i),
+        name: n,
+        color: ONB_COLORS[i % ONB_COLORS.length]
+      };
+    });
+
+    st.user = {
       name: d.name,
       role: d.role,
-      grade: d.grade || '',
-      specialty: d.specialty || '',
-      faculty: d.faculty || '',
-      facultyName: d.facultyName || '',
-      year: d.year || '',
-      term: d.term || '',
-      count: d.count || d.picked.length,
+      grade: d.grade,
+      specialty: d.specialty,
+      faculty: d.faculty,
+      facultyName: d.facultyName,
+      year: d.year,
+      term: d.term,
+      count: d.count || subs.length,
       weeklyGoal: d.weeklyGoal,
-      onboardingDone: true
-    });
+      onboardingDone: true,
+      xp: 50,
+      level: 1
+    };
+
+    st.subjects = subs;
     Store.save();
-    App.toast('تم حفظ إعداداتك 🎉','success');
     this.close();
-    setTimeout(function() { location.reload(); }, 600);
+    App.toast('تم إعداد حسابك الدراسي بنجاح! بالتوفيق والنجاح 🌟 (+50 XP)', 'success');
   }
 };

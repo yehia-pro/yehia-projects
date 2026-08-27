@@ -1,60 +1,66 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark" style="background-color: #0B0F19; color-scheme: dark;">
 <head>
   <meta charset="UTF-8">
-  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='dark'){document.documentElement.classList.add('dark');}}catch(e){}}();</script>
+  <meta name="color-scheme" content="dark light">
+  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='light'){document.documentElement.classList.remove('dark');document.documentElement.style.backgroundColor='#F8FAFC';document.documentElement.style.colorScheme='light';}}catch(e){}}();</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>المهام - Student Hub</title>
-  <meta name="theme-color" content="#4648d4">
+  <title>مركز الإنجاز والتركيز - Student Hub</title>
+  <meta name="theme-color" content="#0B0F19">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon.svg">
-  <!-- Google Fonts: Cairo & Tajawal / Plus Jakarta Sans -->
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/tailwind.css">
   <link rel="stylesheet" href="css/custom.css">
-  <style>
-    .focus-zone { max-width: 960px; margin: 0 auto; }
-  </style>
 </head>
-<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-28 md:pb-12 font-sans antialiased transition-colors">
+<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-12 font-sans antialiased" style="background-color: #0B0F19;">
   <div id="sh-header"></div>
 
-  <main class="focus-zone px-margin-mobile md:px-gutter py-6 space-y-6">
-    <!-- Header Section -->
-    <div class="mb-lg">
-      <h2 class="font-display-lg text-display-lg text-on-background dark:text-white mb-xs" data-label-html="tasksPageTitle">المهام ✅</h2>
-      <p class="text-sm text-on-surface-variant dark:text-slate-400">قم بإدارة وتتبع مهامك الأكاديمية واليومية.</p>
+  <main class="max-w-6xl mx-auto px-4 py-6 md:py-8 space-y-6">
+    
+    <!-- Hero Banner -->
+    <div class="sh-card p-6 md:p-8 rounded-3xl bg-gradient-to-r from-emerald-600/10 via-indigo-600/10 to-amber-500/10 border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-black">
+          <span>🎯</span>
+          <span>مركز الإنجاز والإنتاجية</span>
+        </div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">المهام، بومودورو، والامتحانات</h2>
+        <p class="text-xs text-slate-500 max-w-lg leading-relaxed">
+          خطط لمهامك اليومية، ركز في جلسات بومودورو، وتابع مواعيد ودرجات امتحاناتك أولاً بأول.
+        </p>
+      </div>
+
+      <!-- Action Button Area -->
+      <div id="focus-actions" class="flex gap-2 shrink-0">
+        <!-- Rendered dynamically -->
+      </div>
     </div>
 
-    <!-- Filter Chips -->
-    <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-      <button class="sh-filter active" data-filter="all">الكل</button>
-      <button class="sh-filter" data-filter="open">مفتوحة</button>
-      <button class="sh-filter" data-filter="today">اليوم</button>
-      <button class="sh-filter" data-filter="week">هذا الأسبوع</button>
-      <button class="sh-filter text-error dark:text-red-400" data-filter="overdue">متأخرة</button>
-      <button class="sh-filter" data-filter="done">مكتملة</button>
+    <!-- Navigation Tabs -->
+    <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" id="focus-tabs">
+      <button onclick="Tasks.switchTab('tasks')" id="tab-btn-tasks" class="px-4 py-2.5 rounded-2xl text-xs md:text-sm font-black transition-all active:scale-95 bg-indigo-600 text-white shadow-md flex items-center gap-1.5">
+        <span>📋</span>
+        <span>المهام اليومية</span>
+      </button>
+      <button onclick="Tasks.switchTab('pomodoro')" id="tab-btn-pomodoro" class="px-4 py-2.5 rounded-2xl text-xs md:text-sm font-black transition-all active:scale-95 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+        <span>⏱️</span>
+        <span>ستوديو بومودورو والتركيز</span>
+      </button>
+      <button onclick="Tasks.switchTab('exams')" id="tab-btn-exams" class="px-4 py-2.5 rounded-2xl text-xs md:text-sm font-black transition-all active:scale-95 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+        <span>🏆</span>
+        <span>الامتحانات والدرجات</span>
+      </button>
     </div>
 
-    <!-- Subject Selector -->
-    <div class="flex flex-wrap gap-2 items-center">
-      <span class="text-xs font-bold text-slate-400">تصفية بالمواد:</span>
-      <select id="tasks-subject" class="sh-input !w-auto !py-1 text-xs">
-        <option value="all">كل المواد</option>
-      </select>
-    </div>
+    <!-- Main Dynamic Content Container -->
+    <div id="focus-content" class="min-h-[300px]"></div>
 
-    <!-- Task List Bento Grid -->
-    <div id="tasks-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </main>
-
-  <!-- FAB for adding task -->
-  <button aria-label="Add Task" class="fixed bottom-6 left-6 md:bottom-8 md:left-8 w-14 h-14 bg-indigo-600 text-white rounded-2xl shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-40 text-2xl font-black" onclick="Tasks.openForm()">
-    +
-  </button>
 
   <script src="js/store.js"></script>
   <script src="js/labels.js"></script>
