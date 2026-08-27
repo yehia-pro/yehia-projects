@@ -454,6 +454,47 @@ const PrayerSystem = {
 
   init() {
     this.startLiveTracker();
+    this.scheduleNativeNotifications();
+  },
+
+  scheduleNativeNotifications() {
+    try {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+        const LN = window.Capacitor.Plugins.LocalNotifications;
+        LN.requestPermissions().then(perm => {
+          if (perm.display === 'granted') {
+            const times = this.getTodayTimes();
+            const prayers = [
+              { id: 101, key: 'fajr', title: '🕌 حان الآن موعد أذان الفجر' },
+              { id: 102, key: 'dhuhr', title: '🕌 حان الآن موعد أذان الظهر' },
+              { id: 103, key: 'asr', title: '🕌 حان الآن موعد أذان العصر' },
+              { id: 104, key: 'maghrib', title: '🕌 حان الآن موعد أذان المغرب' },
+              { id: 105, key: 'isha', title: '🕌 حان الآن موعد أذان العشاء' }
+            ];
+            
+            const notifs = [];
+            const now = new Date();
+            prayers.forEach(p => {
+              const pDate = times[p.key];
+              if (pDate && pDate > now) {
+                notifs.push({
+                  id: p.id,
+                  title: p.title,
+                  body: 'حي على الصلاة، حي على الفلاح — تقبل الله طاعتكم 🤲',
+                  schedule: { at: pDate },
+                  sound: 'adhan_makkah.wav',
+                  smallIcon: 'ic_stat_icon_config_sample'
+                });
+              }
+            });
+
+            if (notifs.length) {
+              LN.schedule({ notifications: notifs }).catch(() => {});
+            }
+          }
+        }).catch(() => {});
+      }
+    } catch(e) {}
   },
 
   getSettings() {
@@ -478,6 +519,7 @@ const PrayerSystem = {
     Store.state.prayerSettings = Object.assign({}, cur, patch);
     Store.save();
     this.notifyUpdate();
+    this.scheduleNativeNotifications();
   },
 
   getTodayTimes(date) {
