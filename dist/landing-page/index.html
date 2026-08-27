@@ -2,6 +2,19 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <script>
+    // حذف أي Service Worker قديم ومسح كاش المتصفح تلقائياً
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (regs) {
+        for (var r of regs) { r.unregister(); }
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(function (keys) {
+        for (var k of keys) { caches.delete(k); }
+      });
+    }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تحميل تطبيق Student Hub | رفيق الطالب المتفوق - Developed by Yehia Ayman</title>
   <meta name="description" content="حمّل تطبيق Student Hub للأندرويد — تنظيم المهام، مواقيت الصلاة والأذان، بنك الملخصات بالأكواد، والبطاقات الذكية. تطوير يحيى أيمن.">
