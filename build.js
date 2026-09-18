@@ -27,6 +27,8 @@ const files = [
   ...fs.readdirSync(src).filter(f => f.endsWith('.png')),
   ...fs.readdirSync(src).filter(f => f.endsWith('.ico')),
   ...fs.readdirSync(src).filter(f => f.endsWith('.bat')),
+  ...fs.readdirSync(src).filter(f => f.endsWith('.exe')),
+  ...fs.readdirSync(src).filter(f => f.endsWith('.apk')),
 ];
 
 // Dirs to copy
