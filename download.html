@@ -98,25 +98,71 @@
         </p>
       </div>
 
-      <!-- Main Download Action Box -->
-      <div class="pt-4 flex flex-col items-center justify-center gap-4 max-w-md mx-auto">
+      <!-- Main Dual Download & Access Cards -->
+      <div class="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto text-right">
 
-        <!-- Primary Direct Download Button via GitHub Releases -->
-        <a id="download-apk-btn"
-          href="https://github.com/yehia-pro/yehia-projects/releases/download/3.0-beta/app-debug.apk"
-          download="Student-Hub-v3.0.0.apk"
-          class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-base md:text-lg shadow-xl hover:shadow-indigo-500/25 border border-indigo-400/30 flex items-center justify-center gap-3 transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 group">
-          <span class="text-2xl group-hover:animate-bounce">⬇️</span>
-          <span>تحميل تطبيق الأندرويد المباشر (APK v3.0.0)</span>
-        </a>
+        <!-- Card 1: Student Mobile & Emulator App -->
+        <div class="p-6 rounded-3xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 hover:border-indigo-500/50 shadow-xl transition-all duration-300 flex flex-col justify-between space-y-5 relative overflow-hidden group">
+          <div class="absolute -top-10 -left-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl">📱</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] font-bold border border-indigo-500/20">للموبايل والمحاكي</span>
+            </div>
+            <h3 class="text-xl font-black text-white">تطبيق الطلاب (Android APK)</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              يعمل مباشرة على جميع هواتف الأندرويد ومحاكيات الكمبيوتر (LDPlayer، BlueStacks، Nox): كارت الطالب بالباركود، الورد القرآني، مواقيت الصلاة، والملخصات.
+            </p>
+          </div>
 
-        <!-- Specs Strip -->
-        <div class="flex items-center justify-center gap-4 text-xs font-bold text-slate-400 font-mono">
-          <span class="flex items-center gap-1">📱 Android 7.0+</span>
-          <span>•</span>
-          <span class="flex items-center gap-1">📦 39.3 MB</span>
-          <span>•</span>
-          <span class="flex items-center gap-1 text-emerald-400">🛡️ آمن 100%</span>
+          <div class="space-y-3">
+            <a id="download-apk-btn"
+              href="https://github.com/yehia-pro/yehia-projects/releases/download/3.0-beta/app-debug.apk"
+              download="Student-Hub-v3.0.0.apk"
+              class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm shadow-lg hover:shadow-indigo-500/25 border border-indigo-400/30 flex items-center justify-center gap-2.5 transition-all active:scale-95">
+              <span>⬇️</span>
+              <span>تحميل تطبيق الأندرويد والمحاكي (APK)</span>
+            </a>
+            
+            <div class="flex items-center justify-center gap-3 text-[11px] font-bold text-slate-400 font-mono">
+              <span>📱 Android & Emulators</span>
+              <span>•</span>
+              <span>📦 39.3 MB</span>
+              <span>•</span>
+              <span class="text-emerald-400">🛡️ جاهز للمحاكي</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Admin Windows Desktop Terminal -->
+        <div class="p-6 rounded-3xl bg-gradient-to-b from-slate-900 to-slate-950 border border-sky-500/30 hover:border-sky-400/60 shadow-xl transition-all duration-300 flex flex-col justify-between space-y-5 relative overflow-hidden group">
+          <div class="absolute -top-10 -left-10 w-32 h-32 bg-sky-500/15 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl">💻</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300 text-[10px] font-black border border-sky-500/30">نسخة الويندوز للإدارة</span>
+            </div>
+            <h3 class="text-xl font-black text-white">نسخة الويندوز للكمبيوتر (Desktop)</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              مخصصة لأجهزة كمبيوتر ولابتوب السنتر بنظام Windows: التحضير السريع بماسح الباركود (Barcode Scanner)، إدارة المجموعات، والتقارير بدون محاكي.
+            </p>
+          </div>
+
+          <div class="space-y-3">
+            <a href="index.html"
+              class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-black text-sm shadow-lg hover:shadow-sky-500/25 border border-sky-400/30 flex items-center justify-center gap-2.5 transition-all active:scale-95">
+              <span>🖥️</span>
+              <span>تشغيل نسخة الإدارة للويندوز</span>
+            </a>
+
+            <div class="flex items-center justify-center gap-3 text-[11px] font-bold text-slate-400 font-mono">
+              <span class="text-sky-400">⚡ دعم Barcode Scanner</span>
+              <span>•</span>
+              <span>💻 تثبيت فوري كبرنامج ويندوز</span>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -204,30 +250,50 @@
     </section>
 
     <!-- Installation Steps (دليل التثبيت السهل) -->
-    <section
-      class="p-6 md:p-8 rounded-3xl bg-gradient-to-r from-slate-900 to-indigo-950/40 border border-slate-800 space-y-4">
-      <h3 class="font-black text-lg text-white flex items-center gap-2">
-        <span>📲</span>
-        <span>طريقة التثبيت على الموبايل في خطوتين:</span>
-      </h3>
+    <section class="space-y-6">
+      <div class="text-center space-y-1">
+        <h3 class="text-lg md:text-xl font-black text-white">طريقة التثبيت السريعة ⚡</h3>
+        <p class="text-xs text-slate-400">خطوات بسيطة لتشغيل المنظومة على هاتفك أو كمبيوتر السنتر</p>
+      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-        <div class="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/60 space-y-1.5">
-          <div class="font-black text-indigo-400 flex items-center gap-1.5">
-            <span class="w-5 h-5 rounded-full bg-indigo-500/20 flex items-center justify-center text-[10px]">1</span>
-            <span>تنزيل ملف الـ APK</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+        
+        <!-- Mobile Guide -->
+        <div class="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4">
+          <div class="flex items-center gap-2 text-indigo-400 font-black text-sm">
+            <span class="text-xl">📱</span>
+            <span>تثبيت تطبيق الهاتف (للطلاب):</span>
           </div>
-          <p class="text-slate-300">اضغط على زر التحميل أعلاه ليتم تحميل الملف مباشرة على هاتفك.</p>
+          <div class="space-y-2.5">
+            <div class="p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 space-y-1">
+              <span class="font-bold text-indigo-300 block">1. تنزيل الـ APK المباشر</span>
+              <p class="text-slate-400">اضغط على زر تحميل أندرويد بالأعلى، وسيبدأ التنزيل فوراً.</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 space-y-1">
+              <span class="font-bold text-emerald-400 block">2. التثبيت والفتح</span>
+              <p class="text-slate-400">افتح الملف واضغط "تثبيت". (إن ظهر تحذير حماية، اختر "مزيد من التفاصيل" ثم "التثبيت على أي حال").</p>
+            </div>
+          </div>
         </div>
 
-        <div class="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/60 space-y-1.5">
-          <div class="font-black text-emerald-400 flex items-center gap-1.5">
-            <span class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px]">2</span>
-            <span>التثبيت والموافقة</span>
+        <!-- Desktop Guide -->
+        <div class="p-6 rounded-3xl bg-slate-900/60 border border-sky-900/40 space-y-4">
+          <div class="flex items-center gap-2 text-sky-400 font-black text-sm">
+            <span class="text-xl">💻</span>
+            <span>تثبيت نسخة سطح المكتب (للإدارة والسنتر):</span>
           </div>
-          <p class="text-slate-300">افتح الملف واضغط تثبيت. (لو ظهرت رسالة حماية جوجل، اضغط "مزيد من التفاصيل" ثم
-            "التثبيت على أي حال").</p>
+          <div class="space-y-2.5">
+            <div class="p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 space-y-1">
+              <span class="font-bold text-sky-300 block">1. فتح لوحة الإدارة من Chrome أو Edge</span>
+              <p class="text-slate-400">افتح الرابط على جهاز الكمبيوتر في السنتر باستخدام متصفح كروم أو إيدج.</p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 space-y-1">
+              <span class="font-bold text-emerald-400 block">2. التثبيت كبرنامج ويندوز مستقل (Desktop App)</span>
+              <p class="text-slate-400">اضغط على أيقونة التثبيت 💻 في شريط العنوان أعلى المتصفح، ليصبح برنامجاً رسمياً بأيقونة على سطح المكتب.</p>
+            </div>
+          </div>
         </div>
+
       </div>
     </section>
 
