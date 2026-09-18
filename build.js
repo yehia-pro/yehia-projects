@@ -61,12 +61,23 @@ function copyDir(from, to) {
   }
 }
 
-// Ensure Android public index.html is synced with the App
+// Ensure Android public assets are synced with the latest App
 const androidPublic = path.join(src, 'android/app/src/main/assets/public');
 const appHtml = path.join(src, 'app.html');
-if (fs.existsSync(androidPublic) && fs.existsSync(appHtml)) {
-  fs.copyFileSync(appHtml, path.join(androidPublic, 'index.html'));
-  console.log('  ✓ Synced Android App index.html from app.html');
+if (fs.existsSync(androidPublic)) {
+  if (fs.existsSync(appHtml)) {
+    fs.copyFileSync(appHtml, path.join(androidPublic, 'index.html'));
+  }
+  const syncHtmlFiles = ['app.html', 'admin.html', 'student.html', 'summaries.html', 'prayer.html'];
+  syncHtmlFiles.forEach(h => {
+    const p = path.join(src, h);
+    if (fs.existsSync(p)) fs.copyFileSync(p, path.join(androidPublic, h));
+  });
+  ['js', 'css'].forEach(d => {
+    const s = path.join(src, d);
+    if (fs.existsSync(s)) copyDir(s, path.join(androidPublic, d));
+  });
+  console.log('  ✓ Synced all latest web assets to Android App');
 }
 
 console.log('\nBuild done → dist/');

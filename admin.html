@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة إدارة السنتر - التحضير والطلاب الذكي</title>
+  <title>نظام إدارة السنتر الذكي | Student Hub Desktop</title>
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <script>!function(){try{var t=localStorage.getItem('center_theme')||'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}}();</script>
   
@@ -16,30 +16,40 @@
   
   <script src="https://unpkg.com/feather-icons"></script>
   <script src="js/avatars.js"></script>
+
+  <style>
+    @media print {
+      body { background: white !important; color: black !important; }
+      aside, header, #admin-auth-overlay, .no-print, button, .pill-input, #pending-section-banner { display: none !important; }
+      main { padding: 0 !important; overflow: visible !important; }
+      .print-only { display: block !important; }
+      table { border-collapse: collapse !important; width: 100% !important; }
+      th, td { border: 1px solid #cbd5e1 !important; padding: 6px 10px !important; font-size: 11px !important; color: black !important; }
+      th { background-color: #f1f5f9 !important; }
+    }
+    .print-only { display: none; }
+  </style>
 </head>
-<body class="bg-[#F8FAFC] text-slate-800 min-h-screen font-sans antialiased">
+<body class="bg-[#F8FAFC] dark:bg-[#0B1329] text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased overflow-hidden select-none">
 
   <!-- ============ Luxury Built-in Admin Login Screen Overlay ============ -->
   <div id="admin-auth-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-xl flex items-center justify-center p-4 transition-all duration-300">
     <div class="max-w-md w-full p-8 rounded-3xl bg-slate-900 border border-sky-500/30 shadow-2xl shadow-sky-500/20 text-center space-y-6 relative overflow-hidden">
-      <!-- Glow effect -->
       <div class="absolute -top-16 -left-16 w-40 h-40 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-16 -right-16 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-      <!-- Icon Header -->
       <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center mx-auto text-3xl shadow-lg shadow-sky-500/30">
         🛡️
       </div>
 
       <div class="space-y-1.5">
         <span class="inline-block px-3 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-sky-500/10 text-sky-400 border border-sky-500/30">
-          لوحة الإدارة الرسمية • DESKTOP & WEB
+          لوحة الإدارة الرسمية • DESKTOP APP
         </span>
         <h2 class="font-heading font-black text-2xl text-white">تسجيل دخول إدارة السنتر</h2>
         <p class="text-xs text-slate-400">يرجى إدخال بيانات حساب الإدارة لفتح لوحة التحكم والتحضير</p>
       </div>
 
-      <!-- Form -->
       <form id="admin-login-form" onsubmit="handleAdminLoginSubmit(event)" class="space-y-4 text-right">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1.5">اسم المستخدم أو الهاتف</label>
@@ -65,7 +75,6 @@
         </button>
       </form>
 
-      <!-- Bottom Hint & Links -->
       <div class="pt-2 border-t border-slate-800 text-xs flex items-center justify-between text-slate-400">
         <button type="button" onclick="fillAdminDemo()" class="text-sky-400 hover:underline font-bold text-[11px]">
           🔑 استخدام الحساب الافتراضي
@@ -77,464 +86,535 @@
     </div>
   </div>
 
-  <!-- Desktop Header -->
-  <header class="w-full bg-white dark:bg-[#101b38] border-b border-sky-100 dark:border-[#1e3160] sticky top-0 z-30 px-6 py-3.5 shadow-xs transition-colors">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
+  <!-- ==================== DESKTOP SHELL LAYOUT ==================== -->
+  <div class="flex h-screen w-screen overflow-hidden">
+
+    <!-- 1. PERMANENT DESKTOP SIDEBAR (RIGHT) -->
+    <aside class="w-72 shrink-0 h-full bg-white dark:bg-[#0F1B36] border-l border-slate-200/80 dark:border-slate-800 flex flex-col justify-between z-20 shadow-xs transition-colors select-none">
       
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white flex items-center justify-center shadow-md shadow-sky-500/25">
-          <i data-feather="monitor" class="w-6 h-6"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="font-heading font-black text-lg text-slate-900 dark:text-white leading-none">لوحة تحكم إدارة السنتر</h1>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-sky-100 dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
-              نسخة الكمبيوتر واللابتوب
-            </span>
-            <div class="cloud-status-badge flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
-              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-              <span>جارٍ المزامنة...</span>
+      <!-- Top Branding -->
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800/80">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-sky-500/25 shrink-0">
+            <i data-feather="monitor" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="font-heading font-black text-base text-slate-900 dark:text-white leading-tight">سنتر الحضور الذكي</h1>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="text-[11px] font-bold text-sky-600 dark:text-sky-400">نظام إدارة السنتر v3.0</span>
             </div>
           </div>
-          <p class="text-xs text-slate-400 font-bold mt-1">التحضير السريع بالباركود • إدارة الحضور والتعويض • شؤون الطلاب</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2.5">
-        <!-- Group Selector for Kiosk -->
-        <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/90 py-1.5 px-3 rounded-xl border border-sky-100 dark:border-sky-900 text-xs">
-          <span class="text-slate-400 font-bold text-[11px]">التحضير:</span>
-          <select id="main-group-select" class="bg-transparent font-bold text-slate-800 dark:text-white outline-none cursor-pointer">
+      <!-- Quick Attendance Launcher Button in Sidebar -->
+      <div class="p-4">
+        <button onclick="openKioskMode()"
+          class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-sky-600 via-indigo-600 to-sky-600 hover:from-sky-500 hover:to-indigo-500 text-white font-black text-xs shadow-lg shadow-sky-500/25 border border-sky-400/30 flex items-center justify-between transition-all active:scale-95 group cursor-pointer">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>⚡ بدء التحضير السريع</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-md bg-white/20 text-[10px] font-mono tracking-widest font-bold">F2</span>
+        </button>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+        <a href="#students-section" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-bold text-xs border border-sky-200/60 dark:border-sky-800 transition-all">
+          <div class="flex items-center gap-2.5">
+            <i data-feather="users" class="w-4 h-4 text-sky-600"></i>
+            <span>سجل ودليل الطلاب</span>
+          </div>
+          <span id="nav-badge-students" class="px-2 py-0.5 rounded-full bg-sky-600 text-white text-[10px] font-mono font-bold">0</span>
+        </a>
+
+        <a href="#pending-section-banner" onclick="scrollToPending()" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 font-bold text-xs transition-all">
+          <div class="flex items-center gap-2.5">
+            <i data-feather="clock" class="w-4 h-4 text-amber-500"></i>
+            <span>طلبات التسجيل المعلقة</span>
+          </div>
+          <span id="nav-badge-pending" class="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-mono font-bold">0</span>
+        </a>
+
+        <button onclick="openManageGroupsModal()" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 font-bold text-xs transition-all text-right">
+          <div class="flex items-center gap-2.5">
+            <i data-feather="layers" class="w-4 h-4 text-indigo-500"></i>
+            <span>إدارة وحذف المجموعات</span>
+          </div>
+          <span id="nav-badge-groups" class="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-mono font-bold">0</span>
+        </button>
+
+        <button onclick="window.print()" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 font-bold text-xs transition-all text-right">
+          <i data-feather="printer" class="w-4 h-4 text-emerald-500"></i>
+          <span>طباعة كشف الطلاب (A4)</span>
+        </button>
+
+        <button onclick="exportStudentsToCSV()" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 font-bold text-xs transition-all text-right">
+          <i data-feather="download" class="w-4 h-4 text-teal-500"></i>
+          <span>تصدير ملف Excel (CSV)</span>
+        </button>
+
+        <div class="pt-3 pb-1 px-3.5 text-[10px] font-black uppercase tracking-wider text-slate-400">روابط إضافية</div>
+
+        <a href="summaries.html" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 font-bold text-xs transition-all">
+          <i data-feather="book-open" class="w-4 h-4 text-sky-500"></i>
+          <span>بنك الملخصات والمذكرات</span>
+        </a>
+
+        <a href="prayer.html" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 font-bold text-xs transition-all">
+          <i data-feather="compass" class="w-4 h-4 text-purple-500"></i>
+          <span>الرفيق الإيماني ومواقيت الصلاة</span>
+        </a>
+
+        <a href="app.html" class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 font-bold text-xs transition-all">
+          <i data-feather="smartphone" class="w-4 h-4 text-amber-500"></i>
+          <span>استمارة تسجيل الطلاب (الموبايل)</span>
+        </a>
+      </nav>
+
+      <!-- Bottom Sidebar Bar: Cloud Badge & Logout -->
+      <div class="p-3.5 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5 bg-slate-50/50 dark:bg-slate-900/40">
+        <div class="flex items-center justify-between">
+          <div class="cloud-status-badge flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>السحابة متصلة 🟢</span>
+          </div>
+
+          <button onclick="CenterTheme.toggle()" class="theme-toggle-btn p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="تبديل الوضع الليلي والنهاري">
+            🌙
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 dark:border-slate-800">
+          <div class="flex items-center gap-2 overflow-hidden">
+            <div class="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 flex items-center justify-center font-black text-xs shrink-0">
+              👤
+            </div>
+            <div class="truncate text-right">
+              <div class="text-xs font-black text-slate-800 dark:text-white leading-tight">إدارة السنتر</div>
+              <div class="text-[10px] text-slate-400 font-mono">admin</div>
+            </div>
+          </div>
+
+          <button onclick="logoutAdmin()" class="p-1.5 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors" title="تسجيل الخروج">
+            <i data-feather="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN DESKTOP WORKSPACE (LEFT) -->
+    <div class="flex-1 h-full flex flex-col overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1329]">
+      
+      <!-- Top Sticky Action Bar -->
+      <header class="h-16 border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-[#0F1B36]/80 backdrop-blur-md px-6 flex items-center justify-between z-10 shrink-0 select-none">
+        
+        <!-- Breadcrumb & Title -->
+        <div class="flex items-center gap-3">
+          <h2 class="font-heading font-black text-lg text-slate-900 dark:text-white">لوحة الإدارة والتحضير الذكي</h2>
+          <span class="hidden lg:inline-block text-slate-300 dark:text-slate-700">•</span>
+          <span id="current-date-label" class="hidden lg:inline-block text-xs text-slate-500 dark:text-slate-400 font-bold">
             <!-- Populated by JS -->
-          </select>
-        </div>
-
-        <button onclick="openManageGroupsModal()" class="btn-sky-outline text-xs py-2 px-3 flex items-center gap-1.5" title="إدارة وحذف المجموعات الدراسية">
-          <i data-feather="layers" class="w-3.5 h-3.5"></i>
-          <span>إدارة وحذف المجموعات</span>
-        </button>
-
-        <button onclick="openKioskMode()" class="btn-sky-primary text-xs py-2.5 px-4 shadow-md shadow-sky-500/25 flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="font-black">⚡ بدء التحضير السريع</span>
-        </button>
-
-        <button onclick="CenterTheme.toggle()" class="theme-toggle-btn text-base" title="تبديل الوضع النهاري / الليلي">
-          🌙
-        </button>
-
-        <a href="summaries.html" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 transition-colors" title="الملخصات">
-          <i data-feather="book-open" class="w-4 h-4"></i>
-        </a>
-        <a href="prayer.html" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 transition-colors" title="الرفيق الإيماني">
-          <i data-feather="compass" class="w-4 h-4"></i>
-        </a>
-        <button onclick="logoutAdmin()" class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="تسجيل خروج الأدمن">
-          <i data-feather="log-out" class="w-4 h-4"></i>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
-
-    <!-- KPI STATS CARDS ROW -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      
-      <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-xs flex items-center justify-between">
-        <div>
-          <span class="text-xs font-bold text-slate-400 block mb-1">إجمالي الطلاب المسجلين</span>
-          <div class="text-2xl font-black text-slate-900 font-mono" id="stat-total-students">0</div>
-        </div>
-        <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
-          <i data-feather="users" class="w-6 h-6"></i>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-xs flex items-center justify-between">
-        <div>
-          <span class="text-xs font-bold text-slate-400 block mb-1">الطلاب المعتمدين النشطين</span>
-          <div class="text-2xl font-black text-emerald-600 font-mono" id="stat-approved-students">0</div>
-        </div>
-        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-          <i data-feather="check-square" class="w-6 h-6"></i>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-xs flex items-center justify-between">
-        <div>
-          <span class="text-xs font-bold text-slate-400 block mb-1">طلبات قيد المراجعة</span>
-          <div class="text-2xl font-black text-amber-600 font-mono" id="stat-pending-students">0</div>
-        </div>
-        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-          <i data-feather="clock" class="w-6 h-6"></i>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-xs flex items-center justify-between">
-        <div>
-          <span class="text-xs font-bold text-slate-400 block mb-1">حضور اليوم (جميع المجموعات)</span>
-          <div class="text-2xl font-black text-sky-700 font-mono" id="stat-today-attendance">0</div>
-        </div>
-        <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
-          <i data-feather="activity" class="w-6 h-6"></i>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- QUICK ATTENDANCE LAUNCHER STRIP -->
-    <div class="bg-gradient-to-r from-sky-600 via-sky-700 to-sky-800 rounded-3xl p-6 text-white shadow-lg shadow-sky-900/10 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="space-y-1 text-right max-w-xl">
-        <span class="inline-block px-3 py-1 rounded-full bg-white/15 text-sky-100 text-xs font-bold mb-1">
-          🎯 شاشة تحضير الحصص بالباركود
-        </span>
-        <h3 class="font-heading font-black text-xl">تحديد المجموعة الحالية وبدء استقبال الطلاب</h3>
-        <p class="text-xs text-sky-100">
-          اختر موعد الحصة الآن، والنظام الذكي سيكتشف تلقائياً طلاب المجموعة الأصلية وطلاب التعويض ويطلق التنبيهات الصوتية.
-        </p>
-      </div>
-
-      <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-        <select id="main-group-select" class="pill-input bg-white text-slate-900 font-bold text-xs py-3 px-4 min-w-[280px]">
-          <!-- Populated by JS -->
-        </select>
-        <button onclick="openKioskMode()" class="bg-white text-sky-700 hover:bg-sky-50 font-black text-xs py-3 px-6 rounded-full shadow-md whitespace-nowrap transition-transform active:scale-95 flex items-center gap-2">
-          <span>فتح شاشة التحضير</span>
-          <i data-feather="arrow-left" class="w-4 h-4"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- PENDING REGISTRATIONS ACCORDION / ALERT (If any exist) -->
-    <div id="pending-section-banner" class="bg-amber-50/80 border border-amber-200 rounded-2xl p-5 hidden">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <i data-feather="alert-circle" class="w-5 h-5 text-amber-600"></i>
-          <h4 class="font-heading font-black text-sm text-amber-900">
-            طلبات تسجيل جديدة تنتظر موافقتك (<span id="pending-count-badge">0</span> طلب)
-          </h4>
-        </div>
-      </div>
-      <div id="pending-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        <!-- Populated by JS -->
-      </div>
-    </div>
-
-    <!-- MAIN SECTION: ALL STUDENTS DIRECTORY WITH INSTANT SEARCH & EDIT -->
-    <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-4">
-      
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-        <div>
-          <h3 class="font-heading font-black text-lg text-slate-900">سجل ودليل الطلاب</h3>
-          <p class="text-xs text-slate-400">ابحث بالاسم أو رقم التليفون أو الكود لتعديل البيانات أو متابعة الحضور</p>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="relative w-full md:w-96">
-          <input type="text" id="admin-search-input" oninput="handleStudentSearch()" 
-            placeholder="بحث بالاسم أو رقم الهاتف أو الكود..." 
-            class="pill-input pr-10 pl-4 text-xs font-bold bg-slate-50 border-slate-200 focus:bg-white">
-          <span class="absolute right-3.5 top-3 text-slate-400 pointer-events-none">
-            <i data-feather="search" class="w-4 h-4"></i>
           </span>
         </div>
-      </div>
 
-      <!-- Students Table -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-right text-xs">
-          <thead>
-            <tr class="bg-slate-50/80 text-slate-400 font-bold border-b border-slate-200">
-              <th class="py-3 px-4 rounded-r-xl">الكود</th>
-              <th class="py-3 px-4">اسم الطالب</th>
-              <th class="py-3 px-4">رقم الهاتف</th>
-              <th class="py-3 px-4">رقم ولي الأمر</th>
-              <th class="py-3 px-4">المجموعة المسجل بها</th>
-              <th class="py-3 px-4">رقم الكشف</th>
-              <th class="py-3 px-4">الحالة</th>
-              <th class="py-3 px-4 rounded-l-xl text-center">إجراءات</th>
-            </tr>
-          </thead>
-          <tbody id="students-table-body" class="divide-y divide-slate-100">
-            <!-- Populated by JS -->
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-
-  </main>
-
-  <!-- ========================================================================= -->
-  <!-- KIOSK ATTENDANCE FULLSCREEN MODAL (وضع التحضير السريع عند الباب) -->
-  <!-- ========================================================================= -->
-  <div id="kiosk-modal" class="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-xl p-4 md:p-8 flex flex-col justify-between hidden">
-    
-    <!-- Kiosk Top Navigation -->
-    <div class="flex items-center justify-between border-b border-slate-800 pb-4 text-white">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold shadow-lg shadow-sky-500/30">
-          <i data-feather="zap" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h2 class="font-heading font-black text-lg text-white">وضع التحضير السريع (Kiosk Mode)</h2>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-slate-900 animate-pulse">
-              ● مسح حي مباشر
-            </span>
+        <!-- Header Actions: Quick Group Selector & Actions -->
+        <div class="flex items-center gap-3">
+          
+          <!-- Group Selector for Kiosk -->
+          <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+            <span class="text-slate-400 font-bold text-[11px]">مجموعة الحضور:</span>
+            <select id="main-group-select" class="bg-transparent font-bold text-slate-800 dark:text-white outline-none cursor-pointer max-w-[220px] truncate">
+              <!-- Populated by JS -->
+            </select>
           </div>
-          <p class="text-xs text-sky-400 font-mono font-bold" id="kiosk-active-group-label">المجموعة المحددة: جاري التحميل...</p>
-        </div>
-      </div>
 
-      <!-- Kiosk Live Session Counter -->
-      <div class="flex items-center gap-4">
-        <div class="bg-slate-800/80 rounded-2xl px-4 py-2 border border-slate-700 text-center font-mono">
-          <span class="text-[10px] text-slate-400 block font-sans font-bold">حضور الجلسة الحالية</span>
-          <span class="text-xl font-black text-emerald-400" id="kiosk-session-counter">0</span>
+          <button onclick="openManageGroupsModal()" class="btn-sky-outline text-xs py-2 px-3 flex items-center gap-1.5" title="إدارة المجموعات">
+            <i data-feather="layers" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">المجموعات</span>
+          </button>
+
+          <button onclick="openKioskMode()" class="btn-sky-primary text-xs py-2 px-4 shadow-sm flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+            <span class="font-black">⚡ تحضير الحصة</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Workspace Body -->
+      <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+        <!-- Print-only Title Header -->
+        <div class="print-only text-center pb-4 mb-4 border-b">
+          <h1 class="text-xl font-bold">سنتر الحضور الذكي - كشف حضور وسجل الطلاب</h1>
+          <p class="text-xs text-slate-600 mt-1">تاريخ الطباعة: <span id="print-date"></span></p>
         </div>
 
-        <button onclick="closeKioskMode()" class="px-4 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition-colors flex items-center gap-1.5">
-          <i data-feather="x" class="w-4 h-4"></i>
-          <span>إنهاء الجلسة والخروج</span>
-        </button>
-      </div>
+        <!-- KPI SUMMARY ROW (4 HIGH-DENSITY CARDS) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 no-print">
+          
+          <div class="bg-white dark:bg-slate-800/80 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-between">
+            <div>
+              <span class="text-[11px] font-bold text-slate-400 block mb-1">إجمالي الطلاب المسجلين</span>
+              <div class="text-2xl font-black text-slate-900 dark:text-white font-mono" id="stat-total-students">0</div>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
+              <i data-feather="users" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800/80 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-between">
+            <div>
+              <span class="text-[11px] font-bold text-slate-400 block mb-1">الطلاب المعتمدين النشطين</span>
+              <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono" id="stat-approved-students">0</div>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+              <i data-feather="check-circle" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800/80 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-between">
+            <div>
+              <span class="text-[11px] font-bold text-slate-400 block mb-1">طلبات بانتظار الموافقة</span>
+              <div class="text-2xl font-black text-amber-600 dark:text-amber-400 font-mono" id="stat-pending-students">0</div>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+              <i data-feather="clock" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-800/80 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center justify-between">
+            <div>
+              <span class="text-[11px] font-bold text-slate-400 block mb-1">حضور اليوم (جميع المجموعات)</span>
+              <div class="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-mono" id="stat-today-attendance">0</div>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+              <i data-feather="activity" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PENDING REGISTRATIONS ALERT BANNER (If any exist) -->
+        <div id="pending-section-banner" class="bg-amber-500/10 border border-amber-500/30 rounded-3xl p-5 space-y-4 hidden no-print">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="w-3 h-3 rounded-full bg-amber-500 animate-ping"></span>
+              <h4 class="font-heading font-black text-sm text-amber-800 dark:text-amber-300">
+                طلبات تسجيل جديدة تنتظر اعتمادك (<span id="pending-count-badge">0</span> طالب)
+              </h4>
+            </div>
+            <span class="text-xs text-amber-700/80 dark:text-amber-300/80 font-bold">قبول الطالب يولد كارت الباركود فورياً له</span>
+          </div>
+
+          <div id="pending-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- WIDESCREEN DATA GRID & DIRECTORY -->
+        <div class="bg-white dark:bg-[#0F1B36] rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-5">
+          
+          <!-- Filter & Search Toolbar -->
+          <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800 no-print">
+            
+            <!-- Left: Title & Quick Stats -->
+            <div>
+              <div class="flex items-center gap-3">
+                <h3 class="font-heading font-black text-lg text-slate-900 dark:text-white">سجل ودليل الطلاب الشامل</h3>
+                <span id="filtered-count-badge" class="px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 text-xs font-mono font-bold">
+                  0 طالب
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">البحث الفوري، الفلترة حسب المراحل والمجموعات، استخراج كروت الباركود، وتعديل البيانات</p>
+            </div>
+
+            <!-- Right: Search Input & Quick Filters -->
+            <div class="flex flex-wrap items-center gap-2.5">
+              
+              <!-- Fast Search Bar with Ctrl+K Hint -->
+              <div class="relative w-full sm:w-72">
+                <input type="text" id="admin-search-input" oninput="handleStudentSearch()" 
+                  placeholder="بحث بالاسم أو الهاتف أو الكود..." 
+                  class="w-full py-2.5 pr-9 pl-12 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-xs font-bold focus:border-sky-500 focus:bg-white dark:focus:bg-slate-800 outline-none transition-all">
+                <span class="absolute right-3 top-2.5 text-slate-400 pointer-events-none">
+                  <i data-feather="search" class="w-4 h-4"></i>
+                </span>
+                <span class="absolute left-2.5 top-2.5 px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-500 text-[10px] font-mono pointer-events-none">
+                  Ctrl+K
+                </span>
+              </div>
+
+              <!-- Year Filter Select -->
+              <select id="filter-year-select" onchange="handleStudentSearch()" class="py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer">
+                <option value="all">جميع المراحل</option>
+                <option value="الصف الثالث الثانوي">الصف الثالث الثانوي (3ث)</option>
+                <option value="الصف الثاني الثانوي">الصف الثاني الثانوي (2ث)</option>
+                <option value="الصف الأول الثانوي">الصف الأول الثانوي (1ث)</option>
+              </select>
+
+              <!-- Group Filter Select -->
+              <select id="filter-group-select" onchange="handleStudentSearch()" class="py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer max-w-[180px] truncate">
+                <option value="all">جميع المجموعات</option>
+              </select>
+
+              <!-- Print & Export Buttons -->
+              <button onclick="window.print()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-colors" title="طباعة الكشف">
+                <i data-feather="printer" class="w-4 h-4"></i>
+                <span class="hidden md:inline">طباعة</span>
+              </button>
+
+              <button onclick="exportStudentsToCSV()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-1.5 transition-colors" title="تصدير Excel">
+                <i data-feather="download" class="w-4 h-4"></i>
+                <span class="hidden md:inline">Excel</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Students Widescreen Table -->
+          <div class="overflow-x-auto rounded-2xl border border-slate-200/80 dark:border-slate-800">
+            <table class="w-full text-right text-xs">
+              <thead>
+                <tr class="bg-slate-50/90 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 font-bold border-b border-slate-200/80 dark:border-slate-700">
+                  <th class="py-3 px-4 rounded-r-xl">الكود</th>
+                  <th class="py-3 px-4">اسم الطالب</th>
+                  <th class="py-3 px-4">المرحلة الدراسية</th>
+                  <th class="py-3 px-4">المجموعة المسجلة</th>
+                  <th class="py-3 px-4">هاتف الطالب</th>
+                  <th class="py-3 px-4">هاتف ولي الأمر</th>
+                  <th class="py-3 px-4 text-center">رقم الكشف</th>
+                  <th class="py-3 px-4 text-center">حالة الحساب</th>
+                  <th class="py-3 px-4 text-center">الاشتراك</th>
+                  <th class="py-3 px-4 text-center rounded-l-xl no-print">إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="students-table-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </main>
     </div>
-
-    <!-- Kiosk Center Action Zone (The Scanner & Flash Feedback) -->
-    <div class="flex-1 max-w-2xl w-full mx-auto flex flex-col items-center justify-center py-6">
-      
-      <!-- Live Status Card (Flashes on scan) -->
-      <div id="kiosk-status-card" class="w-full bg-slate-800/90 rounded-3xl p-6 md:p-8 border-2 border-slate-700 text-center shadow-2xl transition-all duration-300 mb-6 relative overflow-hidden">
-        
-        <div id="kiosk-status-icon-box" class="w-20 h-20 rounded-3xl bg-slate-700 text-slate-300 flex items-center justify-center mx-auto mb-4 text-3xl font-black shadow-inner">
-          <i data-feather="maximize" class="w-10 h-10"></i>
-        </div>
-
-        <div id="kiosk-status-badge" class="inline-block px-4 py-1 rounded-full text-xs font-black bg-slate-700 text-slate-300 mb-3">
-          جاهز لاستقبال الباركود
-        </div>
-
-        <h3 id="kiosk-student-name" class="font-heading font-black text-2xl md:text-3xl text-white mb-2">
-          امسح باركود الطالب الآن
-        </h3>
-
-        <p id="kiosk-status-message" class="text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
-          وجه جهاز قارئ الباركود (Barcode Gun) نحو شاشة هاتف الطالب أو اكتب كود الطالب واضغط Enter.
-        </p>
-
-        <div id="kiosk-extra-details" class="mt-4 pt-4 border-t border-slate-700/60 hidden text-xs flex justify-around text-slate-300">
-          <div>رقم الكشف: <span id="kiosk-sheet-val" class="font-bold text-white">-</span></div>
-          <div>المجموعة الأصلية: <span id="kiosk-orig-group-val" class="font-bold text-white">-</span></div>
-        </div>
-
-      </div>
-
-      <!-- Real-time Scanner Input Field (Always auto-focused) -->
-      <form onsubmit="handleKioskManualScan(event)" class="w-full max-w-md relative">
-        <input type="text" id="kiosk-barcode-input" autocomplete="off" autofocus
-          placeholder="امسح الباركود أو اكتب الكود هنا..." 
-          class="w-full bg-slate-800 text-white placeholder-slate-500 rounded-full py-4 pr-6 pl-12 font-mono text-center text-lg font-bold border-2 border-sky-500/50 focus:border-sky-400 outline-none shadow-lg shadow-sky-500/20">
-        <button type="submit" class="absolute left-2.5 top-2.5 w-10 h-10 rounded-full bg-sky-600 hover:bg-sky-500 text-white flex items-center justify-center transition-transform active:scale-95">
-          <i data-feather="corner-down-left" class="w-4 h-4"></i>
-        </button>
-      </form>
-      <p class="text-[11px] text-slate-500 mt-2 font-mono">يدعم أجهزة الباركود USB والليزر والكيبورد مباشرة وبدون نقرات ماوس</p>
-
-    </div>
-
-    <!-- Kiosk Bottom Live Stream Table (Last 5 checked students in this session) -->
-    <div class="max-w-4xl w-full mx-auto bg-slate-800/70 rounded-2xl p-4 border border-slate-700/60 text-xs">
-      <div class="flex justify-between items-center text-slate-400 font-bold mb-2 px-2">
-        <span>آخر الطلاب المسجلين في هذه الجلسة</span>
-        <span id="kiosk-stream-count">0 مسجل</span>
-      </div>
-      <div id="kiosk-live-stream" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
-        <!-- Populated dynamically -->
-      </div>
-    </div>
-
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- MODAL: EDIT STUDENT DETAILS (تعديل بيانات أي طالب) -->
-  <!-- ========================================================================= -->
-  <div id="edit-student-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-sky-100 modal-content max-h-[90vh] overflow-y-auto">
-      
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-        <div class="flex items-center gap-2">
-          <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
-            <i data-feather="edit" class="w-5 h-5"></i>
-          </div>
-          <h3 class="font-heading font-black text-lg text-slate-900">تعديل بيانات الطالب</h3>
-        </div>
-        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600">
-          <i data-feather="x" class="w-5 h-5"></i>
-        </button>
+  <!-- ============ EDIT STUDENT MODAL ============ -->
+  <div id="edit-student-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-sky-100 dark:border-slate-800 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h3 class="font-heading font-black text-base text-slate-900 dark:text-white">تعديل بيانات الطالب والاشتراك</h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
       </div>
 
-      <form id="edit-student-form" onsubmit="handleSaveStudentEdit(event)" class="space-y-3.5">
+      <form id="edit-student-form" onsubmit="handleSaveStudentEdit(event)" class="space-y-3 text-xs">
         <input type="hidden" id="edit-student-id">
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">اسم الطالب رباعي</label>
-          <input type="text" id="edit-name" class="pill-input text-xs" required>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">اسم الطالب الكامل</label>
+          <input type="text" id="edit-name" required class="w-full py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف</label>
-            <input type="tel" id="edit-phone" class="pill-input text-xs" dir="ltr" required>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">رقم هاتف الطالب</label>
+            <input type="tel" id="edit-phone" required class="w-full py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-bold" dir="ltr">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">رقم ولي الأمر</label>
-            <input type="tel" id="edit-parent-phone" class="pill-input text-xs" dir="ltr" required>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">هاتف ولي الأمر</label>
+            <input type="tel" id="edit-parent-phone" required class="w-full py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono font-bold" dir="ltr">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">السنة الدراسية</label>
-            <select id="edit-year" class="pill-input text-xs" required>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">المرحلة الدراسية</label>
+            <select id="edit-year" class="w-full py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold">
               <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
               <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
               <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الكشف</label>
-            <input type="text" id="edit-sheet" class="pill-input text-xs">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">رقم الكشف الورقي</label>
+            <input type="text" id="edit-sheet" placeholder="مثال: A-42" class="w-full py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold font-mono">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">المجموعة الأساسية</label>
-          <select id="edit-group" class="pill-input text-xs" required>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">المجموعة الأساسية</label>
+          <select id="edit-group" class="w-full py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold">
             <!-- Populated by JS -->
           </select>
         </div>
 
-        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
-          <span class="text-xs font-bold text-slate-700">حالة اشتراك الشهر الحالي:</span>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" id="edit-unpaid-sub" class="w-4 h-4 rounded text-rose-600 focus:ring-rose-500">
-            <span class="text-xs text-rose-700 font-bold">تنبيه: متبقي عليه اشتراك ⚠️</span>
+        <!-- Subscription Toggle -->
+        <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-slate-800 dark:text-white text-xs">حالة اشتراك الشهر</div>
+            <div class="text-[11px] text-slate-400">تنبيه ماسح الباركود عند وجود مستحقات</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="edit-unpaid-sub" class="sr-only peer">
+            <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>
           </label>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 pt-3">
-          <button type="button" onclick="closeEditModal()" class="btn-sky-outline text-xs py-2.5">
-            إلغاء
-          </button>
-          <button type="submit" class="btn-sky-primary text-xs py-2.5">
-            حفظ التعديلات ✅
-          </button>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="closeEditModal()" class="btn-sky-outline text-xs py-2 px-4">إلغاء</button>
+          <button type="submit" class="btn-sky-primary text-xs py-2 px-5 font-bold">حفظ التعديلات ✅</button>
         </div>
       </form>
-
     </div>
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- MODAL: ADD NEW GROUP (إضافة مجموعة دراسية جديدة) -->
-  <!-- ========================================================================= -->
-  <!-- ========================================================================= -->
-  <!-- MODAL: MANAGE GROUPS & DELETE (إدارة وحذف المجموعات الدراسية) -->
-  <!-- ========================================================================= -->
-  <div id="manage-groups-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
-    <div class="bg-white dark:bg-[#101b38] rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-sky-100 dark:border-[#1e3160] modal-content max-h-[90vh] overflow-y-auto space-y-5">
-      
-      <!-- Modal Top Header -->
+  <!-- ============ MANAGE GROUPS MODAL ============ -->
+  <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-sky-100 dark:border-slate-800 space-y-4 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
-            <i data-feather="layers" class="w-5 h-5"></i>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
+            <i data-feather="layers" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-heading font-black text-lg text-slate-900 dark:text-white">إدارة المجموعات الدراسية</h3>
-            <p class="text-xs text-slate-400 font-bold">عرض، حذف، وإضافة المجموعات الحالية في السنتر</p>
+            <h3 class="font-heading font-black text-base text-slate-900 dark:text-white">إدارة وحذف المجموعات الدراسية</h3>
+            <span id="groups-manager-count" class="text-xs text-slate-400 font-bold">0 مجموعات</span>
           </div>
         </div>
-        <button onclick="closeManageGroupsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-xl">
-          <i data-feather="x" class="w-5 h-5"></i>
-        </button>
+        <button onclick="closeManageGroupsModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
       </div>
 
-      <!-- Section 1: Current Groups & Delete Action -->
-      <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-            <span>📋 المجموعات الحالية</span>
-            <span id="groups-manager-count" class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">0 مجموعات</span>
-          </span>
-          <span class="text-[11px] text-slate-400">اضغط "حذف المجموعة" لإزالتها من النظام</span>
-        </div>
-
-        <div id="groups-manager-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
-          <!-- Rendered dynamically by JS -->
-        </div>
+      <!-- Existing Groups List -->
+      <div class="flex-1 overflow-y-auto space-y-2.5 pr-1" id="groups-manager-list">
+        <!-- Populated by JS -->
       </div>
 
-      <!-- Section 2: Form to Add New Group -->
-      <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
-        <span class="text-xs font-black text-sky-700 dark:text-sky-400 flex items-center gap-1">
-          <span>➕</span>
-          <span>إضافة مجموعة جديدة إلى السنتر</span>
-        </span>
-
-        <form onsubmit="handleCreateGroup(event)" class="space-y-3 bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200/70 dark:border-slate-700">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">اسم المجموعة</label>
-            <input type="text" id="new-group-name" class="pill-input text-xs" placeholder="مثال: 3ث - الجمعة 2 ظهراً (السنتر الرئيسي)" required>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">السنة الدراسية</label>
-            <select id="new-group-year" class="pill-input text-xs" required>
+      <!-- Add New Group Form inside Modal -->
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+        <h4 class="font-bold text-xs text-slate-800 dark:text-white mb-2">+ إضافة مجموعة جديدة الآن:</h4>
+        <form onsubmit="handleCreateGroup(event)" class="space-y-2.5 text-xs">
+          <input type="text" id="new-group-name" required placeholder="اسم المجموعة (مثال: 3ث - الجمعة 2 ظهراً)" 
+            class="w-full py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold">
+          
+          <div class="grid grid-cols-3 gap-2">
+            <select id="new-group-year" class="py-2 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-xs">
               <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
               <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
               <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
             </select>
+            <select id="new-group-day" class="py-2 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-xs">
+              <option value="السبت">السبت</option>
+              <option value="الأحد">الأحد</option>
+              <option value="الإثنين">الإثنين</option>
+              <option value="الثلاثاء">الثلاثاء</option>
+              <option value="الأربعاء">الأربعاء</option>
+              <option value="الخميس">الخميس</option>
+              <option value="الجمعة">الجمعة</option>
+            </select>
+            <input type="text" id="new-group-time" required placeholder="الساعة (مثال: 04:00 م)" 
+              class="py-2 px-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-xs">
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">يوم الحصة</label>
-              <select id="new-group-day" class="pill-input text-xs" required>
-                <option value="السبت">السبت</option>
-                <option value="الأحد">الأحد</option>
-                <option value="الإثنين">الإثنين</option>
-                <option value="الثلاثاء">الثلاثاء</option>
-                <option value="الأربعاء">الأربعاء</option>
-                <option value="الخميس">الخميس</option>
-                <option value="الجمعة">الجمعة</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">موعد الحصة</label>
-              <input type="text" id="new-group-time" class="pill-input text-xs" placeholder="04:00 م" required>
-            </div>
-          </div>
-
-          <div class="flex justify-end gap-2 pt-2">
-            <button type="submit" class="btn-sky-primary text-xs py-2.5 px-5">
-              + إضافة المجموعة الآن ✅
+          <div class="flex justify-end gap-2 pt-1">
+            <button type="submit" class="btn-sky-primary text-xs py-2 px-5 font-bold w-full sm:w-auto">
+              + إضافة المجموعة للسيرفر
             </button>
           </div>
         </form>
       </div>
-
     </div>
   </div>
 
-  <!-- Firebase Cloud SDK -->
+  <!-- ============ FULLSCREEN KIOSK ATTENDANCE MODAL ============ -->
+  <div id="kiosk-modal" class="fixed inset-0 z-50 bg-slate-950/95 flex flex-col justify-between p-6 hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black">
+          ⚡
+        </div>
+        <div>
+          <h2 class="font-heading font-black text-lg text-white">نظام التحضير الذكي الفوري (Kiosk Mode)</h2>
+          <span id="kiosk-active-group-label" class="text-xs text-emerald-400 font-bold">المجموعة النشطة</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-2xl text-xs">
+          <span class="text-slate-400">حضور الجلسة:</span>
+          <span id="kiosk-session-counter" class="font-mono font-black text-emerald-400 text-sm">0</span>
+        </div>
+        <button onclick="closeKioskMode()" class="py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-colors">
+          إنهاء والعودة للوحة ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Stage: Scanner Input & Status Card -->
+    <div class="max-w-2xl w-full mx-auto my-auto space-y-6 text-center">
+      
+      <!-- Barcode Input Box -->
+      <div class="relative">
+        <form onsubmit="handleKioskManualScan(event)">
+          <input type="text" id="kiosk-barcode-input" autofocus autocomplete="off"
+            placeholder="وجّه ماسح الباركود الآن أو اكتب الكود واضغط Enter..."
+            class="w-full py-4 pr-6 pl-24 rounded-3xl bg-slate-900/90 border-2 border-sky-500/50 text-white font-mono text-center text-xl placeholder-slate-500 focus:border-sky-400 focus:ring-4 focus:ring-sky-500/20 outline-none shadow-2xl transition-all">
+          <button type="submit" class="absolute left-2.5 top-2.5 bottom-2.5 px-5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-2xl transition-colors">
+            تسجيل
+          </button>
+        </form>
+      </div>
+
+      <!-- Big Visual Status Display -->
+      <div id="kiosk-status-card" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl transition-all duration-300 relative overflow-hidden">
+        <div id="kiosk-status-icon-box" class="w-20 h-20 rounded-3xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-4 text-3xl font-black">
+          📷
+        </div>
+        <div id="kiosk-status-badge" class="inline-block px-4 py-1 rounded-full text-xs font-black bg-slate-800 text-slate-400 mb-3">
+          جاهز للمسح
+        </div>
+        <h3 id="kiosk-student-name" class="font-heading font-black text-2xl text-white mb-2">في انتظار المسح...</h3>
+        <p id="kiosk-status-message" class="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+          قم بمسح باركود بطاقة الطالب لتسجيل الحضور فوراً، وسيتم التعرف التلقائي على حالته ومجموعته.
+        </p>
+
+        <!-- Extra Details if Scanned -->
+        <div id="kiosk-extra-details" class="mt-6 pt-4 border-t border-slate-800 grid grid-cols-2 gap-4 text-xs hidden">
+          <div class="text-right">
+            <span class="text-slate-500 block text-[11px]">رقم الكشف الورقي:</span>
+            <span id="kiosk-sheet-val" class="font-mono font-bold text-slate-200">-</span>
+          </div>
+          <div class="text-left">
+            <span class="text-slate-500 block text-[11px]">مجموعة الطالب الأصلية:</span>
+            <span id="kiosk-orig-group-val" class="font-bold text-sky-400">-</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Live Stream History at bottom -->
+    <div class="max-w-4xl w-full mx-auto border-t border-slate-800 pt-3">
+      <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+        <span class="font-bold">سجل الحضور المباشر للجلسة الحالية:</span>
+        <span id="kiosk-stream-count" class="font-mono">0 مسجل</span>
+      </div>
+      <div id="kiosk-live-stream" class="flex gap-3 overflow-x-auto pb-2">
+        <!-- Live tags appended here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS & ENGINE ==================== -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/center-store.js"></script>
+
+  <script>
     let activeKioskGroupId = null;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -547,6 +627,9 @@
         hideAdminAuthOverlay();
         loadAdminDashboard();
       }
+
+      // Display live Arabic date
+      updateLiveDateHeader();
 
       // Real-time Cloud Listeners (instant sync when students register or groups change)
       window.addEventListener('center_students_updated', () => {
@@ -561,7 +644,39 @@
       window.addEventListener('center_attendance_updated', () => {
         if (CenterStore.isAdmin()) renderStats();
       });
+
+      // Desktop Keyboard Shortcuts
+      document.addEventListener('keydown', (e) => {
+        // F2 -> Open Kiosk Mode
+        if (e.key === 'F2') {
+          e.preventDefault();
+          openKioskMode();
+        }
+        // Ctrl + K -> Focus Search Bar
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+          e.preventDefault();
+          const searchInput = document.getElementById('admin-search-input');
+          if (searchInput) searchInput.focus();
+        }
+        // Esc -> Close modals
+        if (e.key === 'Escape') {
+          closeKioskMode();
+          closeManageGroupsModal();
+          closeEditModal();
+        }
+      });
     });
+
+    function updateLiveDateHeader() {
+      try {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const todayStr = new Date().toLocaleDateString('ar-EG', options);
+        const label = document.getElementById('current-date-label');
+        if (label) label.textContent = todayStr;
+        const printDate = document.getElementById('print-date');
+        if (printDate) printDate.textContent = todayStr;
+      } catch (e) {}
+    }
 
     function showAdminAuthOverlay() {
       const overlay = document.getElementById('admin-auth-overlay');
@@ -604,6 +719,11 @@
       showAdminAuthOverlay();
     }
 
+    function scrollToPending() {
+      const el = document.getElementById('pending-section-banner');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
     function openManageGroupsModal() {
       document.getElementById('manage-groups-modal').classList.remove('hidden');
       renderGroupsManagerList();
@@ -614,21 +734,15 @@
       document.getElementById('manage-groups-modal').classList.add('hidden');
     }
 
-    function openAddGroupModal() {
-      openManageGroupsModal();
-    }
-
-    function closeAddGroupModal() {
-      closeManageGroupsModal();
-    }
-
     function renderGroupsManagerList() {
       const groups = CenterStore.getGroups();
       const students = CenterStore.getStudents();
       const listEl = document.getElementById('groups-manager-list');
       const countEl = document.getElementById('groups-manager-count');
+      const badgeEl = document.getElementById('nav-badge-groups');
       
       if (countEl) countEl.textContent = `${groups.length} مجموعات`;
+      if (badgeEl) badgeEl.textContent = groups.length;
       if (!listEl) return;
 
       if (groups.length === 0) {
@@ -726,12 +840,18 @@
       document.getElementById('stat-approved-students').textContent = approved.length;
       document.getElementById('stat-pending-students').textContent = pending.length;
       document.getElementById('stat-today-attendance').textContent = todayAttendance.length;
+
+      const navStudents = document.getElementById('nav-badge-students');
+      if (navStudents) navStudents.textContent = students.length;
+      const navPending = document.getElementById('nav-badge-pending');
+      if (navPending) navPending.textContent = pending.length;
     }
 
     function renderGroupsSelects() {
       const groups = CenterStore.getGroups();
       const mainSelect = document.getElementById('main-group-select');
       const editSelect = document.getElementById('edit-group');
+      const filterGroup = document.getElementById('filter-group-select');
 
       if (mainSelect) {
         const prevVal = mainSelect.value;
@@ -760,6 +880,20 @@
           editSelect.value = prevVal;
         }
       }
+
+      if (filterGroup) {
+        const prevVal = filterGroup.value;
+        filterGroup.innerHTML = '<option value="all">جميع المجموعات</option>';
+        groups.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g.id;
+          opt.textContent = `${g.name}`;
+          filterGroup.appendChild(opt);
+        });
+        if (prevVal && (prevVal === 'all' || groups.some(g => g.id === prevVal))) {
+          filterGroup.value = prevVal;
+        }
+      }
     }
 
     function renderPendingRequests() {
@@ -779,28 +913,28 @@
       list.innerHTML = pending.map(s => {
         const group = CenterStore.getGroupById(s.groupId);
         return `
-          <div class="bg-white rounded-2xl p-3.5 border border-amber-200 shadow-xs flex flex-col justify-between gap-3 text-xs">
+          <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-amber-300 dark:border-amber-500/30 shadow-sm flex flex-col justify-between gap-3 text-xs">
             <div>
               <div class="flex justify-between items-center mb-1">
-                <span class="font-mono font-bold text-sky-700">#${s.code}</span>
-                <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full font-bold text-[10px]">قيد المراجعة</span>
+                <span class="font-mono font-black text-sky-700 dark:text-sky-400">#${s.code}</span>
+                <span class="px-2 py-0.5 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 rounded-full font-bold text-[10px]">قيد المراجعة</span>
               </div>
               <div class="flex items-center gap-2.5 mb-1.5">
-                <div class="w-8 h-8 rounded-xl bg-sky-50 dark:bg-slate-800 flex items-center justify-center shrink-0 shadow-2xs">
+                <div class="w-8 h-8 rounded-xl bg-sky-50 dark:bg-slate-700 flex items-center justify-center shrink-0 shadow-2xs">
                   ${typeof CenterAvatars !== 'undefined' ? CenterAvatars.renderAvatar(s.avatarId || (s.gender === 'female' ? 'girl_1' : 'boy_1'), 30) : ''}
                 </div>
                 <div>
                   <div class="font-bold text-slate-900 dark:text-white text-sm leading-tight">${s.name}</div>
-                  <div class="text-[11px] text-slate-500 font-mono" dir="ltr">${s.phone}</div>
+                  <div class="text-[11px] text-slate-500 dark:text-slate-400 font-mono" dir="ltr">${s.phone}</div>
                 </div>
               </div>
-              <div class="text-slate-600 dark:text-slate-400 mt-1 font-bold">${group ? group.name : '-'}</div>
+              <div class="text-slate-600 dark:text-slate-400 mt-1 font-bold truncate">${group ? group.name : '-'}</div>
             </div>
-            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <button onclick="approveStudent('${s.id}')" class="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-colors">
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+              <button onclick="approveStudent('${s.id}')" class="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-colors shadow-xs">
                 قبول وتفعيل ✅
               </button>
-              <button onclick="rejectStudent('${s.id}')" class="py-1.5 px-3 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-bold transition-colors">
+              <button onclick="rejectStudent('${s.id}')" class="py-2 px-3 bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 rounded-xl font-bold transition-colors">
                 رفض ❌
               </button>
             </div>
@@ -815,8 +949,8 @@
     }
 
     function rejectStudent(id) {
-      if (confirm('هل أنت متأكد من رفض هذا الطالب؟')) {
-        CenterStore.rejectStudent(id);
+      if (confirm('هل أنت متأكد من حذف هذا الطالب نهائياً؟')) {
+        CenterStore.deleteStudent(id);
         loadAdminDashboard();
       }
     }
@@ -824,71 +958,155 @@
     function renderStudentsTable(studentsList = null) {
       const students = studentsList || CenterStore.getStudents();
       const tbody = document.getElementById('students-table-body');
+      const countBadge = document.getElementById('filtered-count-badge');
+
+      if (countBadge) countBadge.textContent = `${students.length} طالب`;
 
       if (students.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="8" class="text-center py-12 text-slate-400">
+            <td colspan="10" class="text-center py-14 text-slate-400">
               <div class="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto mb-3 text-2xl">
                 👥
               </div>
-              <h4 class="font-heading font-bold text-sm text-slate-700 dark:text-slate-300">لا يوجد طلاب مسجلين حتى الآن</h4>
-              <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">النظام جاهز ونظيف تماماً بدون بيانات وهمية لاستقبال تسجيلات الطلاب الحقيقية بالسنتر.</p>
-              <div class="mt-4 flex items-center justify-center gap-3">
-                <a href="index.html" class="btn-sky-primary text-xs py-2 px-5">
-                  <span>+ تسجيل أول طالب الآن</span>
-                </a>
-              </div>
+              <h4 class="font-heading font-bold text-sm text-slate-700 dark:text-slate-300">لا يوجد طلاب مطابقين للبحث</h4>
+              <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">تأكد من كتابة الاسم أو الكود بشكل صحيح، أو اضغط زر الكل لمشاهدة جميع الطلاب.</p>
             </td>
           </tr>
         `;
         return;
       }
 
-      tbody.innerHTML = students.map(s => {
+      tbody.innerHTML = students.map((s, idx) => {
         const group = CenterStore.getGroupById(s.groupId);
         const isApproved = s.status === 'approved';
+        const isUnpaid = !!s.hasUnpaidSubscription;
 
         return `
-          <tr class="hover:bg-sky-50/40 dark:hover:bg-slate-800/40 transition-colors">
-            <td class="py-3 px-4 font-mono font-bold text-sky-700 dark:text-sky-400">#${s.code}</td>
-            <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">
+          <tr class="hover:bg-sky-50/50 dark:hover:bg-slate-800/50 transition-colors ${idx % 2 === 1 ? 'bg-slate-50/30 dark:bg-slate-900/20' : ''}">
+            <!-- Code -->
+            <td class="py-3 px-4 font-mono font-black text-sky-700 dark:text-sky-400 whitespace-nowrap">#${s.code}</td>
+            
+            <!-- Name & Photo -->
+            <td class="py-3 px-4 font-bold text-slate-900 dark:text-white whitespace-nowrap">
               <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl ${s.photo ? 'overflow-hidden' : (s.gender === 'female' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700')} flex items-center justify-center shrink-0 shadow-2xs">
-                  ${s.photo ? `<img src="${s.photo}" class="w-full h-full object-cover">` : `<span class="text-sm">${s.gender === 'female' ? '👩‍🎓' : '👨‍🎓'}</span>`}
+                <div class="w-8 h-8 rounded-xl ${s.photo ? 'overflow-hidden' : (s.gender === 'female' ? 'bg-pink-100 dark:bg-pink-950 text-pink-700' : 'bg-sky-100 dark:bg-sky-950 text-sky-700')} flex items-center justify-center shrink-0 shadow-2xs border border-slate-200/60 dark:border-slate-700">
+                  ${s.photo ? `<img src="${s.photo}" class="w-full h-full object-cover">` : `<span class="text-xs">${s.gender === 'female' ? '👩‍🎓' : '👨‍🎓'}</span>`}
                 </div>
                 <span>${s.name}</span>
               </div>
             </td>
-            <td class="py-3 px-4 font-mono text-slate-600" dir="ltr">${s.phone}</td>
-            <td class="py-3 px-4 font-mono text-slate-600" dir="ltr">${s.parentPhone}</td>
-            <td class="py-3 px-4 text-slate-700 font-bold">${group ? group.name : '-'}</td>
-            <td class="py-3 px-4 font-bold text-slate-600">${s.sheetNo || '-'}</td>
-            <td class="py-3 px-4">
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-black ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                ${isApproved ? 'معتمد نشط' : 'قيد المراجعة'}
+
+            <!-- Year -->
+            <td class="py-3 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">${s.year || '-'}</td>
+
+            <!-- Group -->
+            <td class="py-3 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-bold text-[11px] text-slate-700 dark:text-slate-200">
+                ${group ? group.name : 'غير محددة'}
               </span>
             </td>
-            <td class="py-3 px-4 text-center">
+
+            <!-- Student Phone -->
+            <td class="py-3 px-4 font-mono font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap" dir="ltr">${s.phone}</td>
+
+            <!-- Parent Phone -->
+            <td class="py-3 px-4 font-mono font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap" dir="ltr">${s.parentPhone}</td>
+
+            <!-- Sheet No -->
+            <td class="py-3 px-4 text-center font-mono font-bold whitespace-nowrap text-slate-600 dark:text-slate-300">${s.sheetNo || '-'}</td>
+
+            <!-- Status -->
+            <td class="py-3 px-4 text-center whitespace-nowrap">
+              <span class="inline-block px-2.5 py-1 rounded-full font-black text-[10px] ${isApproved ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'}">
+                ${isApproved ? 'معتمد نشط ✅' : 'قيد المراجعة ⏳'}
+              </span>
+            </td>
+
+            <!-- Subscription -->
+            <td class="py-3 px-4 text-center whitespace-nowrap">
+              <span class="inline-block px-2 py-0.5 rounded-full font-bold text-[10px] ${isUnpaid ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}">
+                ${isUnpaid ? 'متبقي ⚠️' : 'مدفوع ✓'}
+              </span>
+            </td>
+
+            <!-- Actions -->
+            <td class="py-3 px-4 text-center whitespace-nowrap no-print">
               <div class="flex items-center justify-center gap-1.5">
-                <button onclick="openEditModal('${s.id}')" class="p-1.5 rounded-lg text-sky-600 hover:bg-sky-100 transition-colors" title="تعديل البيانات">
-                  <i data-feather="edit-2" class="w-4 h-4"></i>
+                <button onclick="viewStudentCard('${s.id}')" class="p-1.5 rounded-lg bg-sky-50 dark:bg-slate-800 hover:bg-sky-100 text-sky-600 dark:text-sky-400 transition-colors" title="عرض وطباعة كارت الباركود">
+                  <i data-feather="credit-card" class="w-3.5 h-3.5"></i>
                 </button>
-                <button onclick="viewStudentCard('${s.id}')" class="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors" title="فتح كارت الطالب">
-                  <i data-feather="credit-card" class="w-4 h-4"></i>
+                <button onclick="openEditModal('${s.id}')" class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 transition-colors" title="تعديل بيانات الطالب">
+                  <i data-feather="edit-2" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="rejectStudent('${s.id}')" class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 transition-colors" title="حذف الطالب">
+                  <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
             </td>
           </tr>
         `;
       }).join('');
+
       feather.replace();
     }
 
     function handleStudentSearch() {
-      const query = document.getElementById('admin-search-input').value;
-      const filtered = CenterStore.searchStudents(query);
-      renderStudentsTable(filtered);
+      const query = document.getElementById('admin-search-input').value.trim();
+      const yearFilter = document.getElementById('filter-year-select').value;
+      const groupFilter = document.getElementById('filter-group-select').value;
+
+      let list = CenterStore.getStudents();
+
+      if (yearFilter !== 'all') {
+        list = list.filter(s => s.year === yearFilter);
+      }
+
+      if (groupFilter !== 'all') {
+        list = list.filter(s => s.groupId === groupFilter);
+      }
+
+      if (query) {
+        const q = query.toLowerCase();
+        list = list.filter(s => 
+          s.name.toLowerCase().includes(q) ||
+          s.phone.includes(q) ||
+          s.parentPhone.includes(q) ||
+          String(s.code).includes(q) ||
+          (s.sheetNo && s.sheetNo.toLowerCase().includes(q))
+        );
+      }
+
+      renderStudentsTable(list);
+    }
+
+    function exportStudentsToCSV() {
+      const students = CenterStore.getStudents();
+      if (students.length === 0) {
+        alert('لا يوجد طلاب لتصديرهم!');
+        return;
+      }
+
+      let csvContent = "\uFEFF"; // UTF-8 BOM for Arabic Excel support
+      csvContent += "الكود,اسم الطالب,المرحلة الدراسية,المجموعة,هاتف الطالب,هاتف ولي الأمر,رقم الكشف,الحالة,الاشتراك\r\n";
+
+      students.forEach(s => {
+        const group = CenterStore.getGroupById(s.groupId);
+        const groupName = group ? group.name.replace(/,/g, ' ') : '-';
+        const status = s.status === 'approved' ? 'معتمد' : 'قيد المراجعة';
+        const sub = s.hasUnpaidSubscription ? 'متبقي' : 'مدفوع';
+
+        csvContent += `"${s.code}","${s.name}","${s.year || ''}","${groupName}","${s.phone}","${s.parentPhone}","${s.sheetNo || ''}","${status}","${sub}"\r\n`;
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `كشف_طلاب_السنتر_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     // ============ EDIT STUDENT MODAL ============
@@ -940,16 +1158,12 @@
     function openKioskMode() {
       activeKioskGroupId = document.getElementById('main-group-select').value;
       const group = CenterStore.getGroupById(activeKioskGroupId);
-      
-      document.getElementById('kiosk-active-group-label').textContent = 
-        group ? `المجموعة الحالية: ${group.name} (${group.day} ${group.time})` : 'المجموعة المحددة';
-
+      document.getElementById('kiosk-active-group-label').textContent = group ? `المجموعة الحالية: ${group.name} (${group.day} ${group.time})` : 'المجموعة المحددة';
       document.getElementById('kiosk-modal').classList.remove('hidden');
       
       const input = document.getElementById('kiosk-barcode-input');
       input.value = '';
       setTimeout(() => input.focus(), 150);
-
       updateKioskCounter();
       feather.replace();
     }
@@ -1040,14 +1254,14 @@
       const isMakeup = result.isMakeup;
 
       const item = document.createElement('div');
-      item.className = `flex justify-between items-center p-2 rounded-xl border ${isMakeup ? 'bg-amber-900/30 border-amber-600/40 text-amber-200' : 'bg-slate-700/60 border-slate-600 text-slate-200'} text-xs animate-fadeIn`;
+      item.className = `flex justify-between items-center p-2 rounded-xl border shrink-0 ${isMakeup ? 'bg-amber-900/30 border-amber-600/40 text-amber-200' : 'bg-slate-700/60 border-slate-600 text-slate-200'} text-xs animate-fadeIn`;
       item.innerHTML = `
         <div class="flex items-center gap-2">
           <span class="font-bold">${isMakeup ? '🔁 تعويض' : '✅ نظامي'}</span>
           <span class="font-bold text-white">${result.student.name}</span>
           <span class="text-[10px] text-slate-400 font-mono">#${result.student.code}</span>
         </div>
-        <div class="font-mono text-[11px] text-slate-400">${new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</div>
+        <div class="font-mono text-[11px] text-slate-400 mr-2">${new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</div>
       `;
 
       stream.insertBefore(item, stream.firstChild);
