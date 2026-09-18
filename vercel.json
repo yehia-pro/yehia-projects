@@ -2,5 +2,19 @@
   "version": 2,
   "buildCommand": "node build.js",
   "outputDirectory": "dist",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/download.html"
+    },
+    {
+      "source": "/app",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/index.html"
+    }
+  ]
 }
