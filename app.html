@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الطلاب - نظام السنتر والتحضير الذكي</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <script>!function(){try{var t=localStorage.getItem('center_theme')||'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}}();</script>
+  
+  <!-- Fonts: Cairo & Tajawal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/tailwind.css">
+  <link rel="stylesheet" href="css/custom.css">
+  
+  <!-- Feather Icons / Minimal SVG Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="js/avatars.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 min-h-screen font-sans flex flex-col justify-between antialiased selection:bg-sky-500 selection:text-white">
+
+  <!-- Top Decorative Header with Center Brand & Navigation -->
+  <header class="w-full bg-white/90 backdrop-blur-md border-b border-sky-100 sticky top-0 z-30 px-4 py-3 shadow-xs">
+    <div class="max-w-xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-400 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-heading font-black text-lg text-slate-900 leading-tight">سنتر الحضور الذكي</h1>
+          <p class="text-xs text-sky-600 font-bold">بوابة تسجيل ومتابعة الطلاب</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="CenterTheme.toggle()" class="theme-toggle-btn text-base" title="تبديل الوضع النهاري / الليلي">
+          🌙
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-xl w-full mx-auto px-4 py-6 md:py-8">
+
+    <!-- View 1: Register Form -->
+    <div id="register-section" class="luxury-textured-card p-6 md:p-8 relative">
+      
+      <!-- Welcome Header -->
+      <div class="text-center mb-7">
+        <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-sky-50 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 text-xs font-bold mb-2.5 border border-sky-200/60 dark:border-sky-800">
+          ✨ فتح باب التسجيل للفصل الدراسي
+        </span>
+        <h2 class="font-heading font-black text-2xl text-slate-900 dark:text-white">إنشاء حساب طالب جديد</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">سجل بياناتك وسيتم اعتماد حسابك واستخراج الباركود الذكي لدخول السنتر</p>
+      </div>
+
+      <form id="student-reg-form" onsubmit="handleRegistrationSubmit(event)" class="space-y-4">
+
+        <!-- Full Name -->
+        <div class="luxury-underline-wrapper">
+          <label for="reg-name">الاسم رباعي</label>
+          <input type="text" id="reg-name" class="luxury-underline-input" placeholder="اسم الطالب رباعي كما في شهادة الميلاد" required>
+          <span class="luxury-underline-icon">
+            <i data-feather="user"></i>
+          </span>
+        </div>
+
+        <!-- Student Phone -->
+        <div class="luxury-underline-wrapper">
+          <label for="reg-phone">رقم الهاتف الشخصي</label>
+          <input type="tel" id="reg-phone" class="luxury-underline-input font-mono" placeholder="010xxxxxxxx" dir="ltr" style="text-align: right;" required>
+          <span class="luxury-underline-icon">
+            <i data-feather="phone"></i>
+          </span>
+        </div>
+
+        <!-- Parent Phone -->
+        <div class="luxury-underline-wrapper">
+          <label for="reg-parent-phone">رقم هاتف ولي الأمر (لإشعارات الحضور)</label>
+          <input type="tel" id="reg-parent-phone" class="luxury-underline-input font-mono" placeholder="011xxxxxxxx" dir="ltr" style="text-align: right;" required>
+          <span class="luxury-underline-icon">
+            <i data-feather="phone-call"></i>
+          </span>
+        </div>
+
+        <!-- Optional Sheet Number -->
+        <div class="luxury-underline-wrapper">
+          <label for="reg-sheet">رقم الكشف بالسنتر (اختياري)</label>
+          <input type="text" id="reg-sheet" class="luxury-underline-input font-mono" placeholder="رقم كود الكشف بالسنتر إن وجد">
+          <span class="luxury-underline-icon">
+            <i data-feather="hash"></i>
+          </span>
+        </div>
+
+        <!-- Password -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="luxury-underline-wrapper">
+            <label for="reg-pass">كلمة المرور</label>
+            <input type="password" id="reg-pass" class="luxury-underline-input" placeholder="******" required minlength="4">
+            <span class="luxury-underline-icon">
+              <i data-feather="lock"></i>
+            </span>
+          </div>
+
+          <div class="luxury-underline-wrapper">
+            <label for="reg-pass-confirm">تأكيد كلمة المرور</label>
+            <input type="password" id="reg-pass-confirm" class="luxury-underline-input" placeholder="******" required minlength="4">
+            <span class="luxury-underline-icon">
+              <i data-feather="check-circle"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- Birth Date (Pill) -->
+        <div class="space-y-1.5 pt-1">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">تاريخ الميلاد</label>
+          <div class="relative">
+            <input type="date" id="reg-birth" class="pill-input pr-4 pl-10 font-mono" value="2008-01-01" required>
+            <span class="absolute left-4 top-3 text-slate-400 pointer-events-none">
+              <i data-feather="calendar" class="w-4 h-4"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- Academic Year (Pill Select) -->
+        <div class="space-y-1.5 pt-1">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">اختر السنة الدراسية</label>
+          <div class="relative">
+            <select id="reg-year" class="pill-input appearance-none pr-4 pl-10" onchange="filterGroupsByYear()" required>
+              <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+              <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+              <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+            </select>
+            <span class="absolute left-4 top-3.5 text-slate-400 pointer-events-none">
+              <i data-feather="chevron-down" class="w-4 h-4"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- Group (Pill Select) -->
+        <div class="space-y-1.5 pt-1">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">اختر المجموعة الدراسية</label>
+          <div class="relative">
+            <select id="reg-group" class="pill-input appearance-none pr-4 pl-10" required>
+              <!-- Populated by JS -->
+            </select>
+            <span class="absolute left-4 top-3.5 text-slate-400 pointer-events-none">
+              <i data-feather="chevron-down" class="w-4 h-4"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- Gender & Photo / Avatar Upload -->
+        <div class="space-y-3 pt-2">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">النوع والصورة الشخصية (اختياري)</label>
+
+          <!-- Gender Pills Toggle -->
+          <div class="grid grid-cols-2 gap-3 p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+            <button type="button" id="gender-male-btn" onclick="selectGender('male')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-white dark:bg-sky-600 text-sky-700 dark:text-white shadow-xs">
+              <span class="text-lg">👨‍🎓</span>
+              <span>طالب (بنين)</span>
+            </button>
+            <button type="button" id="gender-female-btn" onclick="selectGender('female')" class="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-sky-600">
+              <span class="text-lg">👩‍🎓</span>
+              <span>طالبة (بنات)</span>
+            </button>
+          </div>
+
+          <!-- Photo Upload & Modern Card Preview Box -->
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div id="avatar-preview-box" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500 to-sky-400 text-white flex items-center justify-center font-bold text-2xl shadow-md overflow-hidden relative">
+                <span id="avatar-preview-icon">👨‍🎓</span>
+                <img id="avatar-preview-img" class="w-full h-full object-cover hidden" alt="Avatar">
+              </div>
+              <div>
+                <h4 class="font-heading font-black text-xs text-slate-800 dark:text-slate-200">الصورة أو الأفاتار الشخصي</h4>
+                <p class="text-[11px] text-slate-400">اختر صورتك أو أي أفاتار يعجبك للكارت</p>
+              </div>
+            </div>
+
+            <div>
+              <label for="avatar-file-input" class="cursor-pointer px-3.5 py-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-bold transition-colors inline-flex items-center gap-1.5 active:scale-95">
+                <i data-feather="upload-cloud" class="w-4 h-4"></i>
+                <span>رفع صورة</span>
+              </label>
+              <input type="file" id="avatar-file-input" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+            </div>
+          </div>
+
+          <input type="hidden" id="reg-gender" value="male">
+          <input type="hidden" id="reg-photo-data" value="">
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-4">
+          <button type="submit" class="w-full btn-sky-primary text-base py-3.5 shadow-lg shadow-sky-500/25">
+            <span>مراجعة وتأكيد البيانات</span>
+            <i data-feather="arrow-left" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Switch to Login -->
+        <div class="text-center pt-3">
+          <button type="button" onclick="showLoginView()" class="text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-800 transition-colors">
+            هل لديك حساب بالفعل أو ترغب بتسجيل الدخول؟ <span class="underline">اضغط هنا</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- View 2: Login Section (Hidden by default) -->
+    <div id="login-section" class="luxury-textured-card p-6 md:p-8 relative hidden">
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto mb-3 border border-sky-200 dark:border-sky-800 shadow-sm">
+          <i data-feather="lock" class="w-6 h-6"></i>
+        </div>
+        <h2 class="font-heading font-black text-2xl text-slate-900 dark:text-white">تسجيل الدخول الموحد</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">ادخل برقم الهاتف أو كود الطالب أو حساب الإدارة</p>
+      </div>
+
+      <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div class="luxury-underline-wrapper">
+          <label for="login-ident">رقم الهاتف أو كود الطالب أو اسم المستخدم</label>
+          <input type="text" id="login-ident" class="luxury-underline-input" placeholder="010xxxxxxx أو 1001" required>
+          <span class="luxury-underline-icon"><i data-feather="user"></i></span>
+        </div>
+
+        <div class="luxury-underline-wrapper">
+          <label for="login-pass">كلمة المرور</label>
+          <input type="password" id="login-pass" class="luxury-underline-input" placeholder="******" required>
+          <span class="luxury-underline-icon"><i data-feather="lock"></i></span>
+        </div>
+
+        <button type="submit" class="w-full btn-sky-primary py-3.5 mt-2">
+          <span>دخول للنظام</span>
+          <i data-feather="arrow-left" class="w-4 h-4"></i>
+        </button>
+
+        <div class="text-center pt-4">
+          <button type="button" onclick="showRegisterView()" class="text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-sky-600">
+            طالب جديد؟ <span class="text-sky-600 dark:text-sky-400 underline">إنشاء حساب جديد هنا</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- View 3: Pending Approval Notice Screen (Hidden by default) -->
+    <div id="pending-section" class="bg-white rounded-3xl p-6 md:p-8 shadow-xl shadow-sky-950/5 border border-sky-100/80 text-center hidden">
+      <div class="w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto mb-4 animate-pulse">
+        <i data-feather="clock" class="w-8 h-8"></i>
+      </div>
+      <span class="inline-block px-3 py-1 bg-amber-50 text-amber-700 text-xs font-extrabold rounded-full mb-2">
+        طلب قيد المراجعة 🕒
+      </span>
+      <h2 class="font-heading font-black text-2xl text-slate-900 mb-2">تم استلام بياناتك بنجاح!</h2>
+      <p class="text-slate-600 text-sm max-w-md mx-auto leading-relaxed mb-6">
+        بياناتك مسجلة حالياً في قائمة الانتظار، وسيقوم مسؤول السنتر بمطابقتها وتفعيل حسابك واستخراج الباركود الذكي الخاص بك.
+      </p>
+
+      <div class="bg-sky-50/70 border border-sky-100 rounded-2xl p-4 text-right mb-6 space-y-2">
+        <div class="text-xs text-slate-500 font-bold">كود المتابعة المخصص لك:</div>
+        <div class="text-2xl font-black text-sky-700 font-mono tracking-wider" id="pending-student-code">#1005</div>
+        <div class="text-xs text-slate-600" id="pending-student-name">أحمد علي</div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <button onclick="showRegisterView()" class="btn-sky-outline text-xs py-2.5">
+          تسجيل طالب آخر
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============ Modal: Review & Confirmation Sheet ============ -->
+  <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-sky-100 modal-content">
+      
+      <div class="text-center mb-5">
+        <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center mx-auto mb-2.5">
+          <i data-feather="clipboard" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-heading font-black text-xl text-slate-900">مراجعة وتأكيد البيانات</h3>
+        <p class="text-xs text-slate-500">يرجى التأكد من صحة بياناتك قبل إرسالها لإدارة السنتر</p>
+      </div>
+
+      <!-- 3D Avatar Preview in Modal -->
+      <div class="flex items-center gap-3.5 p-3 rounded-2xl bg-sky-50/70 dark:bg-slate-800/80 border border-sky-100 dark:border-slate-700 mb-4">
+        <div id="modal-avatar-box" class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shadow-xs shrink-0"></div>
+        <div>
+          <span class="text-[11px] text-slate-400 font-bold block">شخصية كارت الطالب</span>
+          <h4 class="font-heading font-black text-sm text-slate-900 dark:text-white" id="modal-avatar-title">-</h4>
+        </div>
+      </div>
+
+      <!-- Details Summary Card -->
+      <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/70 dark:border-slate-700 space-y-3 text-sm">
+        
+        <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-slate-700 pb-2">
+          <span class="text-slate-500 text-xs font-bold">اسم الطالب:</span>
+          <span class="font-bold text-slate-900 dark:text-white" id="modal-name">-</span>
+        </div>
+
+        <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-slate-700 pb-2">
+          <span class="text-slate-500 text-xs font-bold">رقم الهاتف:</span>
+          <span class="font-bold text-slate-900 dark:text-white font-mono" id="modal-phone" dir="ltr">-</span>
+        </div>
+
+        <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-slate-700 pb-2">
+          <span class="text-slate-500 text-xs font-bold">رقم ولي الأمر:</span>
+          <span class="font-bold text-slate-900 dark:text-white font-mono" id="modal-parent-phone" dir="ltr">-</span>
+        </div>
+
+        <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-slate-700 pb-2">
+          <span class="text-slate-500 text-xs font-bold">السنة الدراسية:</span>
+          <span class="font-bold text-sky-700 dark:text-sky-400" id="modal-year">-</span>
+        </div>
+
+        <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-slate-700 pb-2">
+          <span class="text-slate-500 text-xs font-bold">المجموعة المختارة:</span>
+          <span class="font-bold text-slate-900 dark:text-white" id="modal-group">-</span>
+        </div>
+
+        <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-slate-700 pb-2" id="modal-sheet-row">
+          <span class="text-slate-500 text-xs font-bold">رقم الكشف:</span>
+          <span class="font-bold text-slate-800 dark:text-slate-200" id="modal-sheet">-</span>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <span class="text-slate-500 text-xs font-bold">النوع:</span>
+          <span class="font-bold text-slate-800 dark:text-slate-200" id="modal-gender">طالب</span>
+        </div>
+
+      </div>
+
+      <div class="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200/60 dark:border-amber-800/60 mt-4 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+        <i data-feather="info" class="w-4 h-4 text-amber-600 mt-0.5 shrink-0"></i>
+        <span>يرجى التأكد أن رقم ولي الأمر صحيح لتصل إليه إشعارات الحضور والغياب والدرجات أولاً بأول.</span>
+      </div>
+
+      <!-- Modal Action Buttons -->
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button type="button" onclick="closeConfirmModal()" class="btn-sky-outline text-xs py-3">
+          تعديل البيانات
+        </button>
+        <button type="button" onclick="finalizeRegistration()" class="btn-sky-primary text-xs py-3">
+          تأكيد وإرسال ✅
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom Clean Footer -->
+  <footer class="w-full border-t border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 py-4 px-4 text-center text-xs text-slate-400">
+    <div class="max-w-xl mx-auto flex items-center justify-center">
+      <span>© 2026 سنتر الحضور الذكي • جميع الحقوق محفوظة</span>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/center-store.js"></script>
+  <script>
+    let temporaryFormData = null;
+    let selectedGender = 'male';
+    let uploadedAvatarBase64 = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      feather.replace();
+      loadGroups();
+    });
+
+    function handleAvatarUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (file.size > 4 * 1024 * 1024) {
+        alert('حجم الصورة كبير، يرجى اختيار صورة أقل من 4 ميجابايت.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedAvatarBase64 = e.target.result;
+        document.getElementById('reg-photo-data').value = uploadedAvatarBase64;
+        
+        const previewImg = document.getElementById('avatar-preview-img');
+        const previewIcon = document.getElementById('avatar-preview-icon');
+        previewImg.src = uploadedAvatarBase64;
+        previewImg.classList.remove('hidden');
+        previewIcon.classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function selectGender(gender) {
+      selectedGender = gender;
+      document.getElementById('reg-gender').value = gender;
+      
+      const maleBtn = document.getElementById('gender-male-btn');
+      const femaleBtn = document.getElementById('gender-female-btn');
+
+      if (gender === 'male') {
+        maleBtn.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-white dark:bg-sky-600 text-sky-700 dark:text-white shadow-xs";
+        femaleBtn.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-sky-600";
+        if (!uploadedAvatarBase64) {
+          document.getElementById('avatar-preview-icon').textContent = '👨‍🎓';
+        }
+      } else {
+        femaleBtn.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-white dark:bg-sky-600 text-sky-700 dark:text-white shadow-xs";
+        maleBtn.className = "py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-sky-600";
+        if (!uploadedAvatarBase64) {
+          document.getElementById('avatar-preview-icon').textContent = '👩‍🎓';
+        }
+      }
+    }
+
+    function loadGroups() {
+      const groups = CenterStore.getGroups();
+      const groupSelect = document.getElementById('reg-group');
+      const yearSelect = document.getElementById('reg-year').value;
+      
+      groupSelect.innerHTML = '';
+      const filtered = groups.filter(g => g.year === yearSelect);
+      
+      if (filtered.length === 0) {
+        groups.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g.id;
+          opt.textContent = `${g.name} (${g.day} ${g.time})`;
+          groupSelect.appendChild(opt);
+        });
+      } else {
+        filtered.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g.id;
+          opt.textContent = `${g.name} (${g.day} ${g.time})`;
+          groupSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function filterGroupsByYear() {
+      loadGroups();
+    }
+
+    function handleRegistrationSubmit(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('reg-name').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const parentPhone = document.getElementById('reg-parent-phone').value.trim();
+      const sheetNo = document.getElementById('reg-sheet').value.trim();
+      const pass = document.getElementById('reg-pass').value;
+      const passConfirm = document.getElementById('reg-pass-confirm').value;
+      const birthDate = document.getElementById('reg-birth').value;
+      const year = document.getElementById('reg-year').value;
+      const groupId = document.getElementById('reg-group').value;
+
+      if (pass !== passConfirm) {
+        alert('كلمة المرور وتأكيد كلمة المرور غير متطابقين!');
+        return;
+      }
+
+      if (phone.length < 10 || parentPhone.length < 10) {
+        alert('يرجى التأكد من إدخال أرقام هواتف صحيحة.');
+        return;
+      }
+
+      const groupObj = CenterStore.getGroupById(groupId);
+
+      // Save temp data including chosen photo
+      temporaryFormData = {
+        name,
+        phone,
+        parentPhone,
+        sheetNo,
+        password: pass,
+        birthDate,
+        year,
+        groupId,
+        groupName: groupObj ? groupObj.name : 'المجموعة المحددة',
+        gender: selectedGender,
+        photo: uploadedAvatarBase64
+      };
+
+      // Populate Modal Review Sheet
+      document.getElementById('modal-name').textContent = name;
+      document.getElementById('modal-phone').textContent = phone;
+      document.getElementById('modal-parent-phone').textContent = parentPhone;
+      document.getElementById('modal-year').textContent = year;
+      document.getElementById('modal-group').textContent = temporaryFormData.groupName;
+      document.getElementById('modal-gender').textContent = selectedGender === 'male' ? 'طالب 👨‍🎓' : 'طالبة 👩‍🎓';
+
+      const modalAvatarBox = document.getElementById('modal-avatar-box');
+      if (uploadedAvatarBase64) {
+        modalAvatarBox.innerHTML = `<img src="${uploadedAvatarBase64}" class="w-full h-full object-cover">`;
+        document.getElementById('modal-avatar-title').textContent = 'صورة شخصية مخصصة ✅';
+      } else {
+        modalAvatarBox.innerHTML = `<span>${selectedGender === 'male' ? '👨‍🎓' : '👩‍🎓'}</span>`;
+        document.getElementById('modal-avatar-title').textContent = selectedGender === 'male' ? 'طالب (افتراضي)' : 'طالبة (افتراضي)';
+      }
+
+      const sheetRow = document.getElementById('modal-sheet-row');
+      if (sheetNo) {
+        sheetRow.classList.remove('hidden');
+        document.getElementById('modal-sheet').textContent = sheetNo;
+      } else {
+        sheetRow.classList.add('hidden');
+      }
+
+      // Show modal
+      document.getElementById('confirm-modal').classList.remove('hidden');
+      feather.replace();
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+    }
+
+    function finalizeRegistration() {
+      if (!temporaryFormData) return;
+      
+      const newStudent = CenterStore.registerStudent(temporaryFormData);
+      closeConfirmModal();
+
+      // Show Pending section
+      document.getElementById('register-section').classList.add('hidden');
+      document.getElementById('login-section').classList.add('hidden');
+      
+      const pendingSec = document.getElementById('pending-section');
+      pendingSec.classList.remove('hidden');
+      document.getElementById('pending-student-code').textContent = `#${newStudent.code}`;
+      document.getElementById('pending-student-name').textContent = `الطالب: ${newStudent.name}`;
+      
+      feather.replace();
+    }
+
+    function showLoginView() {
+      document.getElementById('register-section').classList.add('hidden');
+      document.getElementById('pending-section').classList.add('hidden');
+      document.getElementById('login-section').classList.remove('hidden');
+      feather.replace();
+    }
+
+    function showRegisterView() {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('pending-section').classList.add('hidden');
+      document.getElementById('register-section').classList.remove('hidden');
+      feather.replace();
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const ident = document.getElementById('login-ident').value.trim();
+      const pass = document.getElementById('login-pass').value;
+
+      const result = CenterStore.login(ident, pass);
+
+      if (result.success) {
+        if (result.role === 'admin') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'student.html';
+        }
+      } else {
+        if (result.error === 'pending') {
+          alert(`حساب الطالب (${result.student.name}) قيد المراجعة لدى إدارة السنتر حتى الآن.`);
+        } else {
+          alert('بيانات الدخول غير صحيحة! تأكد من رقم الهاتف أو الكود أو اسم المستخدم وكلمة المرور.');
+        }
+      }
+    }
+  </script>
+</body>
+</html>
