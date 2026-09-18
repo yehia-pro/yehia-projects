@@ -12,8 +12,8 @@ namespace StudentHub
         {
             try
             {
-                // Standalone native window mode pointing to Admin Dashboard
-                string targetUrl = "https://yehia-projects.vercel.app/admin.html";
+                // Standalone native window mode pointing to Admin Dashboard with cache-buster
+                string targetUrl = "https://yehia-projects.vercel.app/admin?v=3.0.2&desktop=1";
                 string edgeArgs = string.Format("--app=\"{0}\" --window-size=1366,850", targetUrl);
 
                 // 1. Try Microsoft Edge (built-in on every Windows 10/11)
