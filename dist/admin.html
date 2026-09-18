@@ -19,6 +19,64 @@
 </head>
 <body class="bg-[#F8FAFC] text-slate-800 min-h-screen font-sans antialiased">
 
+  <!-- ============ Luxury Built-in Admin Login Screen Overlay ============ -->
+  <div id="admin-auth-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-xl flex items-center justify-center p-4 transition-all duration-300">
+    <div class="max-w-md w-full p-8 rounded-3xl bg-slate-900 border border-sky-500/30 shadow-2xl shadow-sky-500/20 text-center space-y-6 relative overflow-hidden">
+      <!-- Glow effect -->
+      <div class="absolute -top-16 -left-16 w-40 h-40 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -right-16 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Icon Header -->
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center mx-auto text-3xl shadow-lg shadow-sky-500/30">
+        🛡️
+      </div>
+
+      <div class="space-y-1.5">
+        <span class="inline-block px-3 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-sky-500/10 text-sky-400 border border-sky-500/30">
+          لوحة الإدارة الرسمية • DESKTOP & WEB
+        </span>
+        <h2 class="font-heading font-black text-2xl text-white">تسجيل دخول إدارة السنتر</h2>
+        <p class="text-xs text-slate-400">يرجى إدخال بيانات حساب الإدارة لفتح لوحة التحكم والتحضير</p>
+      </div>
+
+      <!-- Form -->
+      <form id="admin-login-form" onsubmit="handleAdminLoginSubmit(event)" class="space-y-4 text-right">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">اسم المستخدم أو الهاتف</label>
+          <input type="text" id="admin-auth-ident" required value="admin"
+            placeholder="admin أو 01000000000"
+            class="w-full py-3 px-4 rounded-xl bg-slate-800/90 border border-slate-700 text-white placeholder-slate-500 font-bold text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition-all">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">كلمة المرور</label>
+          <input type="password" id="admin-auth-pass" required value="admin"
+            placeholder="كلمة المرور"
+            class="w-full py-3 px-4 rounded-xl bg-slate-800/90 border border-slate-700 text-white placeholder-slate-500 font-bold text-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition-all">
+        </div>
+
+        <div id="admin-auth-error" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold text-center">
+          بيانات الدخول غير صحيحة!
+        </div>
+
+        <button type="submit"
+          class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-black text-sm shadow-lg shadow-sky-500/25 border border-sky-400/30 flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer">
+          <span>⚡ تسجيل الدخول ومتابعة العمل</span>
+        </button>
+      </form>
+
+      <!-- Bottom Hint & Links -->
+      <div class="pt-2 border-t border-slate-800 text-xs flex items-center justify-between text-slate-400">
+        <button type="button" onclick="fillAdminDemo()" class="text-sky-400 hover:underline font-bold text-[11px]">
+          🔑 استخدام الحساب الافتراضي
+        </button>
+        <a href="app.html" class="text-slate-400 hover:text-white transition-colors font-bold text-[11px]">
+          بوابة الطلاب ←
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- Desktop Header -->
   <header class="w-full bg-white dark:bg-[#101b38] border-b border-sky-100 dark:border-[#1e3160] sticky top-0 z-30 px-6 py-3.5 shadow-xs transition-colors">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
@@ -477,40 +535,73 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/center-store.js"></script>
-  <script>
-    // Access Guard
-    if (!CenterStore.isAdmin()) {
-      alert('هذه الصفحة مخصصة لإدارة السنتر فقط.');
-      window.location.href = 'index.html';
-    }
-
     let activeKioskGroupId = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Security Guard: Only authenticated Admins can access
-      if (!CenterStore.isAdmin()) {
-        window.location.href = 'index.html';
-        return;
-      }
       feather.replace();
-      loadAdminDashboard();
+
+      // Check Admin Authentication smoothly without kicking out
+      if (!CenterStore.isAdmin()) {
+        showAdminAuthOverlay();
+      } else {
+        hideAdminAuthOverlay();
+        loadAdminDashboard();
+      }
 
       // Real-time Cloud Listeners (instant sync when students register or groups change)
       window.addEventListener('center_students_updated', () => {
-        loadAdminDashboard();
+        if (CenterStore.isAdmin()) loadAdminDashboard();
       });
       window.addEventListener('center_groups_updated', () => {
-        loadAdminDashboard();
-        renderGroupsManagerList();
+        if (CenterStore.isAdmin()) {
+          loadAdminDashboard();
+          renderGroupsManagerList();
+        }
       });
       window.addEventListener('center_attendance_updated', () => {
-        renderStats();
+        if (CenterStore.isAdmin()) renderStats();
       });
     });
 
+    function showAdminAuthOverlay() {
+      const overlay = document.getElementById('admin-auth-overlay');
+      if (overlay) overlay.classList.remove('hidden');
+      const identInput = document.getElementById('admin-auth-ident');
+      if (identInput) identInput.focus();
+    }
+
+    function hideAdminAuthOverlay() {
+      const overlay = document.getElementById('admin-auth-overlay');
+      if (overlay) overlay.classList.add('hidden');
+    }
+
+    function handleAdminLoginSubmit(e) {
+      e.preventDefault();
+      const ident = document.getElementById('admin-auth-ident').value.trim();
+      const pass = document.getElementById('admin-auth-pass').value;
+      const errorBox = document.getElementById('admin-auth-error');
+
+      const result = CenterStore.login(ident, pass);
+      if (result.success && result.role === 'admin') {
+        errorBox.classList.add('hidden');
+        CenterAudio.playSuccess();
+        hideAdminAuthOverlay();
+        loadAdminDashboard();
+      } else {
+        CenterAudio.playAlert();
+        errorBox.classList.remove('hidden');
+        errorBox.textContent = 'بيانات الدخول غير صحيحة! تأكد من اسم المستخدم أو الهاتف وكلمة المرور.';
+      }
+    }
+
+    function fillAdminDemo() {
+      document.getElementById('admin-auth-ident').value = 'admin';
+      document.getElementById('admin-auth-pass').value = 'admin';
+    }
+
     function logoutAdmin() {
       CenterStore.logout();
-      window.location.href = 'index.html';
+      showAdminAuthOverlay();
     }
 
     function openManageGroupsModal() {
