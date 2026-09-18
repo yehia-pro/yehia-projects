@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="dark" style="background-color: #0B0F19; color-scheme: dark;">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="color-scheme" content="dark light">
-  <script>!function(){try{var d=JSON.parse(localStorage.getItem('studentHub_v2')||'{}');if(d&&d.user&&d.user.theme==='light'){document.documentElement.classList.remove('dark');document.documentElement.style.backgroundColor='#F8FAFC';document.documentElement.style.colorScheme='light';}}catch(e){}}();</script>
+  <script>!function(){try{var t=localStorage.getItem('center_theme')||'light';if(t==='dark'){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}catch(e){}}();</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مواقيت الصلاة والأذكار والورد القرآني - Student Hub</title>
+  <title>الرفيق الإيماني ومواقيت الصلاة - سنتر الحضور الذكي</title>
   <meta name="theme-color" content="#0B0F19">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -46,7 +46,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-28 md:pb-12 font-sans antialiased" style="background-color: #0B0F19;">
+<body class="bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 min-h-screen pb-28 md:pb-12 font-sans antialiased">
   <div id="sh-header"></div>
 
   <main class="focus-zone px-4 py-6 md:py-8 space-y-6">
@@ -141,13 +141,10 @@
         <span>📿</span><span>الأذكار والأدعية</span>
       </button>
       <button class="sh-filter !px-4 !py-2 text-xs font-black flex items-center gap-1.5" onclick="PrayerPage.switchTab('quran')" id="tab-btn-quran">
-        <span>📖</span><span>الورد والختمة القرآنية</span>
+        <span>📖</span><span>احتساب الورد والختمة</span>
       </button>
       <button class="sh-filter !px-4 !py-2 text-xs font-black flex items-center gap-1.5" onclick="PrayerPage.switchTab('tasbeeh')" id="tab-btn-tasbeeh">
-        <span>🔘</span><span>السبحة والقبلة</span>
-      </button>
-      <button class="sh-filter !px-4 !py-2 text-xs font-black flex items-center gap-1.5" onclick="PrayerPage.switchTab('settings')" id="tab-btn-settings">
-        <span>⚙️</span><span>أصوات الشيوخ والأذان</span>
+        <span>🔘</span><span>السبحة الإلكترونية</span>
       </button>
     </div>
 
@@ -223,11 +220,9 @@
       <div id="athkar-list" class="space-y-3"></div>
     </div>
 
-    <!-- TAB 3: المصحف الشريف المعتمد والورد القرآني -->
+    <!-- TAB 3: احتساب الورد والختمة القرآنية -->
     <div id="tab-content-quran" class="space-y-6 hidden">
       
-      <!-- Quran Reader Component Container -->
-      <div id="quran-reader-container" class="space-y-4"></div>
       <div class="sh-card p-6 rounded-3xl bg-gradient-to-r from-emerald-500/10 via-indigo-500/10 to-transparent border border-emerald-500/30 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
@@ -241,10 +236,6 @@
               </h3>
             </div>
           </div>
-          <a id="quran-online-link" href="https://quran.com/18/1" target="_blank" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-all">
-            <span>📖 فتح المصحف الإلكتروني</span>
-            <span>↗</span>
-          </a>
         </div>
       </div>
 
@@ -407,205 +398,45 @@
           <div class="flex items-center justify-center gap-4">
             <button onclick="PrayerPage.changeQuranPages(-1)" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 text-lg font-bold active:scale-95">-</button>
             <span class="text-4xl font-black text-slate-900 dark:text-white font-mono" id="quran-pages-read">0</span>
-            <button onclick="PrayerPage.changeQuranPages(1)" class="w-10 h-10 rounded-full bg-indigo-600 text-white text-lg font-bold active:scale-95 shadow-md">+</button>
+            <button onclick="PrayerPage.changeQuranPages(1)" class="w-10 h-10 rounded-full bg-sky-500 text-white text-lg font-bold active:scale-95">+</button>
           </div>
-          <div class="text-xs text-slate-500">
-            الهدف اليومي: <input type="number" id="quran-goal-input" min="1" max="604" value="4" onchange="PrayerPage.updateQuranGoal(this.value)" class="w-14 text-center px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-transparent font-bold"> صفحة
-          </div>
+          <p class="text-[11px] text-slate-400">الهدف اليومي الموصى به: <span id="quran-daily-goal">20</span> صفحة</p>
         </div>
 
-        <div class="space-y-1">
-          <div class="flex justify-between text-xs font-bold">
-            <span id="quran-percent-text">0% مكتمل</span>
-            <span id="quran-ratio-text">0 / 4 صفحات</span>
-          </div>
-          <div class="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-            <div id="quran-progress-bar" class="h-full bg-gradient-to-r from-indigo-600 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
-          </div>
-        </div>
-
-        <button onclick="PrayerPage.toggleQuranDone()" id="quran-done-btn" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all active:scale-95">
-          ✓ تم إتمام الورد اليومي
+        <button onclick="PrayerPage.markQuranDone()" id="quran-done-btn" class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md active:scale-95 transition-all">
+          تم إتمام ورد اليوم بنجاح 🤲
         </button>
       </div>
-
     </div>
 
-    <!-- TAB 4: السبحة الإلكترونية والقبلة -->
-    <div id="tab-content-tasbeeh" class="space-y-6 hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Digital Tasbeeh Card -->
-        <div class="sh-card p-6 rounded-3xl text-center space-y-6">
-          <h3 class="font-black text-slate-900 dark:text-white text-lg">السبحة الإلكترونية الذكية 🔘</h3>
+    <!-- TAB 4: السبحة الإلكترونية -->
+    <div id="tab-content-tasbeeh" class="space-y-6 hidden max-w-xl mx-auto">
+      <div class="sh-card p-6 md:p-8 rounded-3xl text-center space-y-6 border border-slate-200/80 dark:border-slate-800">
+        <h3 class="font-black text-slate-900 dark:text-white text-xl">السبحة الإلكترونية الذكية 🔘</h3>
 
-          <!-- Phrase Selector -->
-          <div class="flex flex-wrap justify-center gap-2">
-            <button onclick="PrayerPage.setTasbeehPhrase('سبحان الله')" class="sh-filter active text-xs font-bold" data-phrase="سبحان الله">سبحان الله</button>
-            <button onclick="PrayerPage.setTasbeehPhrase('الحمد لله')" class="sh-filter text-xs font-bold" data-phrase="الحمد لله">الحمد لله</button>
-            <button onclick="PrayerPage.setTasbeehPhrase('الله أكبر')" class="sh-filter text-xs font-bold" data-phrase="الله أكبر">الله أكبر</button>
-            <button onclick="PrayerPage.setTasbeehPhrase('لا إله إلا الله')" class="sh-filter text-xs font-bold" data-phrase="لا إله إلا الله">لا إله إلا الله</button>
-            <button onclick="PrayerPage.setTasbeehPhrase('أستغفر الله')" class="sh-filter text-xs font-bold" data-phrase="أستغفر الله">أستغفر الله</button>
-            <button onclick="PrayerPage.setTasbeehPhrase('اللهم صل وسلم على نبينا محمد')" class="sh-filter text-xs font-bold" data-phrase="اللهم صل وسلم على نبينا محمد">الصلاة على النبي</button>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold text-sm" id="tasbeeh-cur-phrase">
-            سبحان الله
-          </div>
-
-          <!-- Big Clicker Button -->
-          <div class="flex flex-col items-center justify-center">
-            <button onclick="PrayerPage.clickTasbeeh()" class="w-40 h-40 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-2xl flex flex-col items-center justify-center gap-1 active:scale-90 transition-all select-none cursor-pointer border-4 border-white/20">
-              <span class="text-4xl font-black font-mono" id="tasbeeh-counter">0</span>
-              <span class="text-[11px] font-bold opacity-80">اضغط للتسبيح</span>
-            </button>
-          </div>
-
-          <div class="flex justify-between items-center px-4">
-            <span class="text-xs text-slate-500">الدورات: <strong id="tasbeeh-loops" class="font-mono text-slate-900 dark:text-white">0</strong> (33 مرة)</span>
-            <button onclick="PrayerPage.resetTasbeeh()" class="px-3 py-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold hover:bg-slate-300 active:scale-95">تصفير</button>
-          </div>
+        <div class="flex flex-wrap justify-center gap-2">
+          <button onclick="PrayerPage.setTasbeehPhrase('سبحان الله')" class="sh-filter active text-xs font-bold" data-phrase="سبحان الله">سبحان الله</button>
+          <button onclick="PrayerPage.setTasbeehPhrase('الحمد لله')" class="sh-filter text-xs font-bold" data-phrase="الحمد لله">الحمد لله</button>
+          <button onclick="PrayerPage.setTasbeehPhrase('الله أكبر')" class="sh-filter text-xs font-bold" data-phrase="الله أكبر">الله أكبر</button>
+          <button onclick="PrayerPage.setTasbeehPhrase('لا إله إلا الله')" class="sh-filter text-xs font-bold" data-phrase="لا إله إلا الله">لا إله إلا الله</button>
+          <button onclick="PrayerPage.setTasbeehPhrase('أستغفر الله')" class="sh-filter text-xs font-bold" data-phrase="أستغفر الله">أستغفر الله</button>
+          <button onclick="PrayerPage.setTasbeehPhrase('اللهم صل وسلم على نبينا محمد')" class="sh-filter text-xs font-bold" data-phrase="اللهم صل وسلم على نبينا محمد">الصلاة على النبي</button>
         </div>
 
-        <!-- Qibla Compass Card -->
-        <div class="sh-card p-6 rounded-3xl text-center space-y-6">
-          <h3 class="font-black text-slate-900 dark:text-white text-lg">اتجاه القبلة 🕋</h3>
-          <p class="text-xs text-slate-500">زاوية الكعبة المشرفة من موقعك الحالي</p>
-
-          <!-- Compass Dial -->
-          <div class="relative w-52 h-52 mx-auto flex items-center justify-center">
-            <div class="w-full h-full rounded-full border-4 border-dashed border-indigo-400/40 absolute inset-0 animate-[spin_60s_linear_infinite]"></div>
-            <div class="w-44 h-44 rounded-full bg-slate-100 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center shadow-inner relative">
-              
-              <!-- Needle -->
-              <div id="qibla-needle" class="absolute w-1.5 h-36 bg-transparent transition-transform duration-700" style="transform: rotate(136deg);">
-                <div class="w-3.5 h-3.5 bg-rose-500 rounded-full mx-auto -mt-1 shadow-md"></div>
-                <div class="w-0.5 h-16 bg-rose-500 mx-auto"></div>
-              </div>
-
-              <span class="text-3xl mb-1 z-10">🕋</span>
-              <span class="text-2xl font-black text-slate-900 dark:text-white font-mono z-10" id="qibla-bearing">136°</span>
-              <span class="text-[10px] text-slate-400 z-10">من اتجاه الشمال</span>
-            </div>
-          </div>
-
-          <div class="text-xs text-slate-500">
-            الموقع: <span class="font-bold text-slate-900 dark:text-white" id="qibla-city-name">القاهرة</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 5: إعدادات أصوات الشيوخ للأذان والتنبيهات الصوتية الحقيقية (Local Sheikh Audio) -->
-    <div id="tab-content-settings" class="space-y-6 hidden">
-      <div class="sh-card p-6 rounded-3xl space-y-6">
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-          <div>
-            <h3 class="font-black text-slate-900 dark:text-white text-lg">أصوات الأذان الحقيقية لكبار الشيوخ 🔊</h3>
-            <p class="text-xs text-slate-500">ملفات صوتية عالية الجودة مدمجة محلياً وتعمل 100% بدون إنترنت.</p>
-          </div>
-          <span class="px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-black">أصوات حقيقية 🎵</span>
+        <div class="p-4 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-700 dark:text-sky-300 font-bold text-sm" id="tasbeeh-cur-phrase">
+          سبحان الله
         </div>
 
-        <!-- Sheikh Adhan Selection Cards -->
-        <div class="space-y-3 border-b border-slate-200 dark:border-slate-800 pb-5">
-          <label class="block text-xs font-black text-slate-700 dark:text-slate-300">اختر صوت الأذان المفضل عند حلول وقت الصلاة:</label>
-          <div id="sheikh-reciters-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <!-- Rendered dynamically -->
-          </div>
-
-          <div class="flex items-center gap-2 pt-2">
-            <button onclick="PrayerPage.testPlayAdhan()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-md flex items-center gap-2 active:scale-95 transition-all">
-              <span>▶️</span>
-              <span>استماع للأذان المختار</span>
-            </button>
-            <button onclick="PrayerSystem.stopAudio()" class="px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-300 active:scale-95 transition-all">
-              <span>⏹️ إيقاف الصوت</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Push Notification Permission Banner -->
-        <div class="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div class="space-y-0.5">
-            <div class="flex items-center gap-2">
-              <span class="text-base">🔔</span>
-              <h4 class="font-black text-slate-900 dark:text-white text-xs md:text-sm">إشعارات وأذان الموبايل التلقائي</h4>
-            </div>
-            <p class="text-[11px] text-slate-500">اسمَح للتطبيق بإرسال إشعارات الأذان والتنبيهات العاجلة عند حلول وقت الصلاة.</p>
-          </div>
-          <button id="prayer-notif-btn" onclick="PrayerPage.requestNotificationPermission()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow active:scale-95 transition shrink-0 flex items-center gap-1.5">
-            <span>🔔 تفعيل الإشعارات والأذان</span>
+        <div class="flex flex-col items-center justify-center py-2">
+          <button onclick="PrayerPage.clickTasbeeh()" class="w-44 h-44 rounded-full bg-gradient-to-tr from-sky-600 via-sky-500 to-indigo-500 hover:from-sky-500 hover:to-indigo-400 text-white shadow-2xl flex flex-col items-center justify-center gap-1 active:scale-90 transition-all select-none cursor-pointer border-4 border-white/20">
+            <span class="text-5xl font-black font-mono" id="tasbeeh-counter">0</span>
+            <span class="text-xs font-bold opacity-90">اضغط للتسبيح</span>
           </button>
         </div>
 
-        <!-- Urgent Reminder Toggle -->
-        <div class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-5">
-          <div class="flex items-center justify-between">
-            <div>
-              <h4 class="font-bold text-slate-900 dark:text-white text-xs">التنبيه الصوتي العاجل قبل خروج الصلاة ⚠️</h4>
-              <p class="text-[11px] text-slate-500">إشعار صوتي ونغمي قبل أذان الصلاة التالية بـ 15 دقيقة إذا لم تسجل صلاتك.</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <button onclick="PrayerSystem.playVoiceReminder('الظهر')" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 text-[11px] font-bold">تجربة النغمة 🔔</button>
-              <input type="checkbox" id="prayer-urgent-toggle" onchange="PrayerPage.toggleUrgentReminder(this.checked)" class="w-5 h-5 accent-indigo-600">
-            </div>
-          </div>
-          <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300 space-y-1">
-            <strong>💡 شرح التنبيه العاجل (لماذا هذا الخيار مهم؟):</strong>
-            <p class="text-slate-600 dark:text-slate-400">يفحص التطبيق سجل صلواتك؛ فإذا انشغلت في المذاكرة واقترب أذان الصلاة التالية (متبقي 15 دقيقة فقط) وأنت لم تؤدِ صلاتك الحالية بعد، يُطلق الموبايل نغمة تنبيه وإشعاراً عاجلاً لتلحق بالصلاة قبل فوات وقتها.</p>
-          </div>
-        </div>
-
-        <!-- Calculation Method -->
-        <div class="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-5">
-          <label class="block text-xs font-black text-slate-700 dark:text-slate-300">طريقة الحساب الفلكي:</label>
-          <select id="prayer-method-select" onchange="PrayerPage.setMethod(this.value)" class="sh-input text-xs">
-            <option value="Egypt">الهيئة المصرية العامة للمساحة (مصر)</option>
-            <option value="Makkah">جامعة أم القرى (مكة المكرمة)</option>
-            <option value="MWL">رابطة العالم الإسلامي</option>
-            <option value="Dubai">الهيئة العامة للشؤون الإسلامية (الإمارات)</option>
-            <option value="ISNA">الجمعية الإسلامية لأمريكا الشمالية (ISNA)</option>
-            <option value="Karachi">جامعة العلوم الإسلامية بكراتشي</option>
-          </select>
-          <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
-            <strong>💡 ما هي طريقة الحساب الفلكي؟</strong>
-            <p>تختلف الهيئات الإسلامية في زوايا انخفاض الشمس لحساب صلاتي الفجر والعشاء. في مصر نعتمد رسمياً (الهيئة المصرية العامة للمساحة)، وفي السعودية (أم القرى). اختر الهيئة المطابقة لدولتك لضمان دقة المواعيد بنسبة 100%.</p>
-          </div>
-        </div>
-
-        <!-- Fine Minute Calibration -->
-        <div class="space-y-3">
-          <div>
-            <h4 class="font-bold text-slate-900 dark:text-white text-xs">المعايرة الدقيقة بالدقائق (+/-)</h4>
-            <p class="text-[11px] text-slate-500">لمطابقة توقيت مسجد منطقتك تماماً بالدقيقة.</p>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
-            <strong>💡 ما هي المعايرة الدقيقة وكيف تستخدمها؟</strong>
-            <p>إذا كان المسجد القريب من منزلك أو قريتك يرفع الأذان بتقديم دقيقة أو تأخير دقيقتين عن الموعد الرسمي للمحافظة، يمكنك كتابة (+1 أو -1) لكل صلاة ليتطابق التطبيق مع ميكروفون مسجدك ثانية بثانية.</p>
-          </div>
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
-            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center">
-              <span class="block text-slate-500 mb-1">الفجر</span>
-              <input type="number" id="adj-fajr" onchange="PrayerPage.setAdjustment('fajr', this.value)" class="w-16 text-center px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-transparent font-bold">
-            </div>
-            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center">
-              <span class="block text-slate-500 mb-1">الظهر</span>
-              <input type="number" id="adj-dhuhr" onchange="PrayerPage.setAdjustment('dhuhr', this.value)" class="w-16 text-center px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-transparent font-bold">
-            </div>
-            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center">
-              <span class="block text-slate-500 mb-1">العصر</span>
-              <input type="number" id="adj-asr" onchange="PrayerPage.setAdjustment('asr', this.value)" class="w-16 text-center px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-transparent font-bold">
-            </div>
-            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center">
-              <span class="block text-slate-500 mb-1">المغرب</span>
-              <input type="number" id="adj-maghrib" onchange="PrayerPage.setAdjustment('maghrib', this.value)" class="w-16 text-center px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-transparent font-bold">
-            </div>
-            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center col-span-2 sm:col-span-1">
-              <span class="block text-slate-500 mb-1">العشاء</span>
-              <input type="number" id="adj-isha" onchange="PrayerPage.setAdjustment('isha', this.value)" class="w-16 text-center px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700 bg-transparent font-bold">
-            </div>
-          </div>
+        <div class="flex justify-between items-center px-4">
+          <span class="text-xs text-slate-500">الدورات: <strong id="tasbeeh-loops" class="font-mono text-slate-900 dark:text-white">0</strong> (33 مرة)</span>
+          <button onclick="PrayerPage.resetTasbeeh()" class="px-4 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold hover:bg-slate-300 active:scale-95">تصفير العداد</button>
         </div>
       </div>
     </div>
@@ -661,11 +492,18 @@
   <script src="js/labels.js"></script>
   <script src="js/prayer.js"></script>
   <script src="js/quran-reader.js"></script>
+  <script src="js/center-store.js"></script>
   <script src="js/onboarding.js"></script>
   <script src="js/app.js"></script>
 
   <!-- Dedicated Prayer Page Controller Logic -->
   <script>
+    // Access Guard: Only logged in students or admins
+    if (typeof CenterStore !== 'undefined' && !CenterStore.isAdmin() && !CenterStore.isStudent()) {
+      alert('هذا القسم مخصص للطلاب المشتركين بالسنتر. يرجى تسجيل الدخول أولاً.');
+      window.location.href = 'index.html';
+    }
+
     const PrayerPage = {
       curTab: 'prayers',
       curAthkarCat: 'morning',
@@ -680,7 +518,6 @@
         this.renderSunnahPrayers();
         this.renderAthkar();
         this.renderQuranWard();
-        this.renderSettingsTab();
 
         PrayerSystem.onUpdate(() => {
           this.renderHero();
@@ -693,7 +530,7 @@
 
       switchTab(tab) {
         this.curTab = tab;
-        ['prayers', 'athkar', 'quran', 'tasbeeh', 'settings'].forEach(t => {
+        ['prayers', 'athkar', 'quran', 'tasbeeh'].forEach(t => {
           const btn = document.getElementById('tab-btn-' + t);
           const content = document.getElementById('tab-content-' + t);
           if (btn) btn.classList.toggle('active', t === tab);
@@ -701,13 +538,7 @@
         });
 
         if (tab === 'athkar') this.renderAthkar();
-        if (tab === 'quran') {
-          this.renderQuranWard();
-          if (typeof QuranReader !== 'undefined') {
-            QuranReader.init('quran-reader-container');
-          }
-        }
-        if (tab === 'settings') this.renderSettingsTab();
+        if (tab === 'quran') this.renderQuranWard();
       },
 
       renderHero() {

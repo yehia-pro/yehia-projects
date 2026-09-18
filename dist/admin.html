@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة إدارة السنتر - التحضير والطلاب الذكي</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <script>!function(){try{var t=localStorage.getItem('center_theme')||'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}}();</script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/tailwind.css">
+  <link rel="stylesheet" href="css/custom.css">
+  
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="js/avatars.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 min-h-screen font-sans antialiased">
+
+  <!-- Desktop Header -->
+  <header class="w-full bg-white dark:bg-[#101b38] border-b border-sky-100 dark:border-[#1e3160] sticky top-0 z-30 px-6 py-3.5 shadow-xs transition-colors">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white flex items-center justify-center shadow-md shadow-sky-500/25">
+          <i data-feather="monitor" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-heading font-black text-lg text-slate-900 dark:text-white leading-none">لوحة تحكم إدارة السنتر</h1>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-sky-100 dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+              نسخة الكمبيوتر واللابتوب
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-bold mt-1">التحضير السريع بالباركود • إدارة الحضور والتعويض • شؤون الطلاب</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <!-- Group Selector for Kiosk -->
+        <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/90 py-1.5 px-3 rounded-xl border border-sky-100 dark:border-sky-900 text-xs">
+          <span class="text-slate-400 font-bold text-[11px]">التحضير:</span>
+          <select id="main-group-select" class="bg-transparent font-bold text-slate-800 dark:text-white outline-none cursor-pointer">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+
+        <button onclick="openManageGroupsModal()" class="btn-sky-outline text-xs py-2 px-3 flex items-center gap-1.5" title="إدارة وحذف المجموعات الدراسية">
+          <i data-feather="layers" class="w-3.5 h-3.5"></i>
+          <span>إدارة وحذف المجموعات</span>
+        </button>
+
+        <button onclick="openKioskMode()" class="btn-sky-primary text-xs py-2.5 px-4 shadow-md shadow-sky-500/25 flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="font-black">⚡ بدء التحضير السريع</span>
+        </button>
+
+        <button onclick="CenterTheme.toggle()" class="theme-toggle-btn text-base" title="تبديل الوضع النهاري / الليلي">
+          🌙
+        </button>
+
+        <a href="summaries.html" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 transition-colors" title="الملخصات">
+          <i data-feather="book-open" class="w-4 h-4"></i>
+        </a>
+        <a href="prayer.html" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 transition-colors" title="الرفيق الإيماني">
+          <i data-feather="compass" class="w-4 h-4"></i>
+        </a>
+        <button onclick="logoutAdmin()" class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" title="تسجيل خروج الأدمن">
+          <i data-feather="log-out" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
+
+    <!-- KPI STATS CARDS ROW -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      
+      <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-xs flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold text-slate-400 block mb-1">إجمالي الطلاب المسجلين</span>
+          <div class="text-2xl font-black text-slate-900 font-mono" id="stat-total-students">0</div>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
+          <i data-feather="users" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-xs flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold text-slate-400 block mb-1">الطلاب المعتمدين النشطين</span>
+          <div class="text-2xl font-black text-emerald-600 font-mono" id="stat-approved-students">0</div>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+          <i data-feather="check-square" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-xs flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold text-slate-400 block mb-1">طلبات قيد المراجعة</span>
+          <div class="text-2xl font-black text-amber-600 font-mono" id="stat-pending-students">0</div>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+          <i data-feather="clock" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-xs flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold text-slate-400 block mb-1">حضور اليوم (جميع المجموعات)</span>
+          <div class="text-2xl font-black text-sky-700 font-mono" id="stat-today-attendance">0</div>
+        </div>
+        <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
+          <i data-feather="activity" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- QUICK ATTENDANCE LAUNCHER STRIP -->
+    <div class="bg-gradient-to-r from-sky-600 via-sky-700 to-sky-800 rounded-3xl p-6 text-white shadow-lg shadow-sky-900/10 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="space-y-1 text-right max-w-xl">
+        <span class="inline-block px-3 py-1 rounded-full bg-white/15 text-sky-100 text-xs font-bold mb-1">
+          🎯 شاشة تحضير الحصص بالباركود
+        </span>
+        <h3 class="font-heading font-black text-xl">تحديد المجموعة الحالية وبدء استقبال الطلاب</h3>
+        <p class="text-xs text-sky-100">
+          اختر موعد الحصة الآن، والنظام الذكي سيكتشف تلقائياً طلاب المجموعة الأصلية وطلاب التعويض ويطلق التنبيهات الصوتية.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+        <select id="main-group-select" class="pill-input bg-white text-slate-900 font-bold text-xs py-3 px-4 min-w-[280px]">
+          <!-- Populated by JS -->
+        </select>
+        <button onclick="openKioskMode()" class="bg-white text-sky-700 hover:bg-sky-50 font-black text-xs py-3 px-6 rounded-full shadow-md whitespace-nowrap transition-transform active:scale-95 flex items-center gap-2">
+          <span>فتح شاشة التحضير</span>
+          <i data-feather="arrow-left" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- PENDING REGISTRATIONS ACCORDION / ALERT (If any exist) -->
+    <div id="pending-section-banner" class="bg-amber-50/80 border border-amber-200 rounded-2xl p-5 hidden">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <i data-feather="alert-circle" class="w-5 h-5 text-amber-600"></i>
+          <h4 class="font-heading font-black text-sm text-amber-900">
+            طلبات تسجيل جديدة تنتظر موافقتك (<span id="pending-count-badge">0</span> طلب)
+          </h4>
+        </div>
+      </div>
+      <div id="pending-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- MAIN SECTION: ALL STUDENTS DIRECTORY WITH INSTANT SEARCH & EDIT -->
+    <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-4">
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="font-heading font-black text-lg text-slate-900">سجل ودليل الطلاب</h3>
+          <p class="text-xs text-slate-400">ابحث بالاسم أو رقم التليفون أو الكود لتعديل البيانات أو متابعة الحضور</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative w-full md:w-96">
+          <input type="text" id="admin-search-input" oninput="handleStudentSearch()" 
+            placeholder="بحث بالاسم أو رقم الهاتف أو الكود..." 
+            class="pill-input pr-10 pl-4 text-xs font-bold bg-slate-50 border-slate-200 focus:bg-white">
+          <span class="absolute right-3.5 top-3 text-slate-400 pointer-events-none">
+            <i data-feather="search" class="w-4 h-4"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Students Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-right text-xs">
+          <thead>
+            <tr class="bg-slate-50/80 text-slate-400 font-bold border-b border-slate-200">
+              <th class="py-3 px-4 rounded-r-xl">الكود</th>
+              <th class="py-3 px-4">اسم الطالب</th>
+              <th class="py-3 px-4">رقم الهاتف</th>
+              <th class="py-3 px-4">رقم ولي الأمر</th>
+              <th class="py-3 px-4">المجموعة المسجل بها</th>
+              <th class="py-3 px-4">رقم الكشف</th>
+              <th class="py-3 px-4">الحالة</th>
+              <th class="py-3 px-4 rounded-l-xl text-center">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="students-table-body" class="divide-y divide-slate-100">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- KIOSK ATTENDANCE FULLSCREEN MODAL (وضع التحضير السريع عند الباب) -->
+  <!-- ========================================================================= -->
+  <div id="kiosk-modal" class="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-xl p-4 md:p-8 flex flex-col justify-between hidden">
+    
+    <!-- Kiosk Top Navigation -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4 text-white">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold shadow-lg shadow-sky-500/30">
+          <i data-feather="zap" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="font-heading font-black text-lg text-white">وضع التحضير السريع (Kiosk Mode)</h2>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-slate-900 animate-pulse">
+              ● مسح حي مباشر
+            </span>
+          </div>
+          <p class="text-xs text-sky-400 font-mono font-bold" id="kiosk-active-group-label">المجموعة المحددة: جاري التحميل...</p>
+        </div>
+      </div>
+
+      <!-- Kiosk Live Session Counter -->
+      <div class="flex items-center gap-4">
+        <div class="bg-slate-800/80 rounded-2xl px-4 py-2 border border-slate-700 text-center font-mono">
+          <span class="text-[10px] text-slate-400 block font-sans font-bold">حضور الجلسة الحالية</span>
+          <span class="text-xl font-black text-emerald-400" id="kiosk-session-counter">0</span>
+        </div>
+
+        <button onclick="closeKioskMode()" class="px-4 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition-colors flex items-center gap-1.5">
+          <i data-feather="x" class="w-4 h-4"></i>
+          <span>إنهاء الجلسة والخروج</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Kiosk Center Action Zone (The Scanner & Flash Feedback) -->
+    <div class="flex-1 max-w-2xl w-full mx-auto flex flex-col items-center justify-center py-6">
+      
+      <!-- Live Status Card (Flashes on scan) -->
+      <div id="kiosk-status-card" class="w-full bg-slate-800/90 rounded-3xl p-6 md:p-8 border-2 border-slate-700 text-center shadow-2xl transition-all duration-300 mb-6 relative overflow-hidden">
+        
+        <div id="kiosk-status-icon-box" class="w-20 h-20 rounded-3xl bg-slate-700 text-slate-300 flex items-center justify-center mx-auto mb-4 text-3xl font-black shadow-inner">
+          <i data-feather="maximize" class="w-10 h-10"></i>
+        </div>
+
+        <div id="kiosk-status-badge" class="inline-block px-4 py-1 rounded-full text-xs font-black bg-slate-700 text-slate-300 mb-3">
+          جاهز لاستقبال الباركود
+        </div>
+
+        <h3 id="kiosk-student-name" class="font-heading font-black text-2xl md:text-3xl text-white mb-2">
+          امسح باركود الطالب الآن
+        </h3>
+
+        <p id="kiosk-status-message" class="text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+          وجه جهاز قارئ الباركود (Barcode Gun) نحو شاشة هاتف الطالب أو اكتب كود الطالب واضغط Enter.
+        </p>
+
+        <div id="kiosk-extra-details" class="mt-4 pt-4 border-t border-slate-700/60 hidden text-xs flex justify-around text-slate-300">
+          <div>رقم الكشف: <span id="kiosk-sheet-val" class="font-bold text-white">-</span></div>
+          <div>المجموعة الأصلية: <span id="kiosk-orig-group-val" class="font-bold text-white">-</span></div>
+        </div>
+
+      </div>
+
+      <!-- Real-time Scanner Input Field (Always auto-focused) -->
+      <form onsubmit="handleKioskManualScan(event)" class="w-full max-w-md relative">
+        <input type="text" id="kiosk-barcode-input" autocomplete="off" autofocus
+          placeholder="امسح الباركود أو اكتب الكود هنا..." 
+          class="w-full bg-slate-800 text-white placeholder-slate-500 rounded-full py-4 pr-6 pl-12 font-mono text-center text-lg font-bold border-2 border-sky-500/50 focus:border-sky-400 outline-none shadow-lg shadow-sky-500/20">
+        <button type="submit" class="absolute left-2.5 top-2.5 w-10 h-10 rounded-full bg-sky-600 hover:bg-sky-500 text-white flex items-center justify-center transition-transform active:scale-95">
+          <i data-feather="corner-down-left" class="w-4 h-4"></i>
+        </button>
+      </form>
+      <p class="text-[11px] text-slate-500 mt-2 font-mono">يدعم أجهزة الباركود USB والليزر والكيبورد مباشرة وبدون نقرات ماوس</p>
+
+    </div>
+
+    <!-- Kiosk Bottom Live Stream Table (Last 5 checked students in this session) -->
+    <div class="max-w-4xl w-full mx-auto bg-slate-800/70 rounded-2xl p-4 border border-slate-700/60 text-xs">
+      <div class="flex justify-between items-center text-slate-400 font-bold mb-2 px-2">
+        <span>آخر الطلاب المسجلين في هذه الجلسة</span>
+        <span id="kiosk-stream-count">0 مسجل</span>
+      </div>
+      <div id="kiosk-live-stream" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: EDIT STUDENT DETAILS (تعديل بيانات أي طالب) -->
+  <!-- ========================================================================= -->
+  <div id="edit-student-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-sky-100 modal-content max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
+            <i data-feather="edit" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-heading font-black text-lg text-slate-900">تعديل بيانات الطالب</h3>
+        </div>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-feather="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="edit-student-form" onsubmit="handleSaveStudentEdit(event)" class="space-y-3.5">
+        <input type="hidden" id="edit-student-id">
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">اسم الطالب رباعي</label>
+          <input type="text" id="edit-name" class="pill-input text-xs" required>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف</label>
+            <input type="tel" id="edit-phone" class="pill-input text-xs" dir="ltr" required>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">رقم ولي الأمر</label>
+            <input type="tel" id="edit-parent-phone" class="pill-input text-xs" dir="ltr" required>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">السنة الدراسية</label>
+            <select id="edit-year" class="pill-input text-xs" required>
+              <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+              <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+              <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الكشف</label>
+            <input type="text" id="edit-sheet" class="pill-input text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">المجموعة الأساسية</label>
+          <select id="edit-group" class="pill-input text-xs" required>
+            <!-- Populated by JS -->
+          </select>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
+          <span class="text-xs font-bold text-slate-700">حالة اشتراك الشهر الحالي:</span>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="edit-unpaid-sub" class="w-4 h-4 rounded text-rose-600 focus:ring-rose-500">
+            <span class="text-xs text-rose-700 font-bold">تنبيه: متبقي عليه اشتراك ⚠️</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-3">
+          <button type="button" onclick="closeEditModal()" class="btn-sky-outline text-xs py-2.5">
+            إلغاء
+          </button>
+          <button type="submit" class="btn-sky-primary text-xs py-2.5">
+            حفظ التعديلات ✅
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: ADD NEW GROUP (إضافة مجموعة دراسية جديدة) -->
+  <!-- ========================================================================= -->
+  <!-- ========================================================================= -->
+  <!-- MODAL: MANAGE GROUPS & DELETE (إدارة وحذف المجموعات الدراسية) -->
+  <!-- ========================================================================= -->
+  <div id="manage-groups-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay hidden">
+    <div class="bg-white dark:bg-[#101b38] rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-sky-100 dark:border-[#1e3160] modal-content max-h-[90vh] overflow-y-auto space-y-5">
+      
+      <!-- Modal Top Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
+            <i data-feather="layers" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-heading font-black text-lg text-slate-900 dark:text-white">إدارة المجموعات الدراسية</h3>
+            <p class="text-xs text-slate-400 font-bold">عرض، حذف، وإضافة المجموعات الحالية في السنتر</p>
+          </div>
+        </div>
+        <button onclick="closeManageGroupsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-xl">
+          <i data-feather="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Section 1: Current Groups & Delete Action -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+            <span>📋 المجموعات الحالية</span>
+            <span id="groups-manager-count" class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">0 مجموعات</span>
+          </span>
+          <span class="text-[11px] text-slate-400">اضغط "حذف المجموعة" لإزالتها من النظام</span>
+        </div>
+
+        <div id="groups-manager-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+          <!-- Rendered dynamically by JS -->
+        </div>
+      </div>
+
+      <!-- Section 2: Form to Add New Group -->
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+        <span class="text-xs font-black text-sky-700 dark:text-sky-400 flex items-center gap-1">
+          <span>➕</span>
+          <span>إضافة مجموعة جديدة إلى السنتر</span>
+        </span>
+
+        <form onsubmit="handleCreateGroup(event)" class="space-y-3 bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200/70 dark:border-slate-700">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">اسم المجموعة</label>
+            <input type="text" id="new-group-name" class="pill-input text-xs" placeholder="مثال: 3ث - الجمعة 2 ظهراً (السنتر الرئيسي)" required>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">السنة الدراسية</label>
+            <select id="new-group-year" class="pill-input text-xs" required>
+              <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+              <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+              <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">يوم الحصة</label>
+              <select id="new-group-day" class="pill-input text-xs" required>
+                <option value="السبت">السبت</option>
+                <option value="الأحد">الأحد</option>
+                <option value="الإثنين">الإثنين</option>
+                <option value="الثلاثاء">الثلاثاء</option>
+                <option value="الأربعاء">الأربعاء</option>
+                <option value="الخميس">الخميس</option>
+                <option value="الجمعة">الجمعة</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">موعد الحصة</label>
+              <input type="text" id="new-group-time" class="pill-input text-xs" placeholder="04:00 م" required>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="submit" class="btn-sky-primary text-xs py-2.5 px-5">
+              + إضافة المجموعة الآن ✅
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/center-store.js"></script>
+  <script>
+    // Access Guard
+    if (!CenterStore.isAdmin()) {
+      alert('هذه الصفحة مخصصة لإدارة السنتر فقط.');
+      window.location.href = 'index.html';
+    }
+
+    let activeKioskGroupId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Security Guard: Only authenticated Admins can access
+      if (!CenterStore.isAdmin()) {
+        window.location.href = 'index.html';
+        return;
+      }
+      feather.replace();
+      loadAdminDashboard();
+    });
+
+    function logoutAdmin() {
+      CenterStore.logout();
+      window.location.href = 'index.html';
+    }
+
+    function openManageGroupsModal() {
+      document.getElementById('manage-groups-modal').classList.remove('hidden');
+      renderGroupsManagerList();
+      feather.replace();
+    }
+
+    function closeManageGroupsModal() {
+      document.getElementById('manage-groups-modal').classList.add('hidden');
+    }
+
+    function openAddGroupModal() {
+      openManageGroupsModal();
+    }
+
+    function closeAddGroupModal() {
+      closeManageGroupsModal();
+    }
+
+    function renderGroupsManagerList() {
+      const groups = CenterStore.getGroups();
+      const students = CenterStore.getStudents();
+      const listEl = document.getElementById('groups-manager-list');
+      const countEl = document.getElementById('groups-manager-count');
+      
+      if (countEl) countEl.textContent = `${groups.length} مجموعات`;
+      if (!listEl) return;
+
+      if (groups.length === 0) {
+        listEl.innerHTML = `
+          <div class="text-center py-8 text-slate-400 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+            <p class="text-xs font-bold">لا توجد أي مجموعات حالياً. أضف مجموعة جديدة بالأسفل.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = groups.map(g => {
+        const studentCount = students.filter(s => s.groupId === g.id).length;
+        const safeName = (g.name || '').replace(/'/g, "\\'");
+        return `
+          <div class="p-3 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div class="space-y-1 text-right">
+              <div class="flex items-center gap-2">
+                <span class="font-heading font-black text-xs text-slate-900 dark:text-white">${g.name}</span>
+                <span class="px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/70 text-sky-700 dark:text-sky-300 text-[10px] font-bold">
+                  ${g.year}
+                </span>
+              </div>
+              <div class="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                <span>🗓️ ${g.day}</span>
+                <span>•</span>
+                <span>⏰ ${g.time}</span>
+                <span>•</span>
+                <span class="text-sky-600 dark:text-sky-400 font-sans font-bold">👥 ${studentCount} طلاب</span>
+              </div>
+            </div>
+
+            <button type="button" onclick="handleDeleteGroup('${g.id}', '${safeName}')" 
+              class="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 shrink-0" 
+              title="حذف هذه المجموعة">
+              <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
+              <span>حذف المجموعة</span>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      feather.replace();
+    }
+
+    function handleDeleteGroup(groupId, groupName) {
+      const students = CenterStore.getStudents();
+      const enrolled = students.filter(s => s.groupId === groupId);
+      
+      let confirmMsg = `هل أنت متأكد من حذف مجموعة "${groupName}" نهائياً؟`;
+      if (enrolled.length > 0) {
+        confirmMsg = `⚠️ تنبيه هام:\nيوجد (${enrolled.length}) طالب مسجلين في مجموعة "${groupName}" حالياً!\nعند حذف المجموعة سيبقى هؤلاء الطلاب بدون مجموعة مسجلة.\n\nهل تريد المتابعة وحذف المجموعة بالتأكيد؟`;
+      }
+
+      if (!confirm(confirmMsg)) return;
+
+      CenterStore.deleteGroup(groupId);
+      renderGroupsManagerList();
+      loadAdminDashboard();
+      alert(`تم حذف مجموعة "${groupName}" بنجاح 🗑️`);
+    }
+
+    function handleCreateGroup(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-group-name').value.trim();
+      const year = document.getElementById('new-group-year').value;
+      const day = document.getElementById('new-group-day').value;
+      const time = document.getElementById('new-group-time').value.trim();
+
+      CenterStore.addGroup({ name, year, day, time });
+      document.getElementById('new-group-name').value = '';
+      document.getElementById('new-group-time').value = '';
+      renderGroupsManagerList();
+      loadAdminDashboard();
+      alert('تمت إضافة المجموعة الجديدة بنجاح ✅');
+    }
+
+    function loadAdminDashboard() {
+      renderStats();
+      renderGroupsSelects();
+      renderPendingRequests();
+      renderStudentsTable();
+      feather.replace();
+    }
+
+    function renderStats() {
+      const students = CenterStore.getStudents();
+      const approved = students.filter(s => s.status === 'approved');
+      const pending = students.filter(s => s.status === 'pending');
+      const attendance = CenterStore.getData().attendance || [];
+      const today = new Date().toISOString().split('T')[0];
+      const todayAttendance = attendance.filter(a => a.date === today);
+
+      document.getElementById('stat-total-students').textContent = students.length;
+      document.getElementById('stat-approved-students').textContent = approved.length;
+      document.getElementById('stat-pending-students').textContent = pending.length;
+      document.getElementById('stat-today-attendance').textContent = todayAttendance.length;
+    }
+
+    function renderGroupsSelects() {
+      const groups = CenterStore.getGroups();
+      const mainSelect = document.getElementById('main-group-select');
+      const editSelect = document.getElementById('edit-group');
+
+      if (mainSelect) {
+        const prevVal = mainSelect.value;
+        mainSelect.innerHTML = '';
+        groups.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g.id;
+          opt.textContent = `${g.name} (${g.day} ${g.time})`;
+          mainSelect.appendChild(opt);
+        });
+        if (prevVal && groups.some(g => g.id === prevVal)) {
+          mainSelect.value = prevVal;
+        }
+      }
+
+      if (editSelect) {
+        const prevVal = editSelect.value;
+        editSelect.innerHTML = '';
+        groups.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g.id;
+          opt.textContent = `${g.name} (${g.day} ${g.time})`;
+          editSelect.appendChild(opt);
+        });
+        if (prevVal && groups.some(g => g.id === prevVal)) {
+          editSelect.value = prevVal;
+        }
+      }
+    }
+
+    function renderPendingRequests() {
+      const pending = CenterStore.getPendingStudents();
+      const banner = document.getElementById('pending-section-banner');
+      const list = document.getElementById('pending-list');
+      const badge = document.getElementById('pending-count-badge');
+
+      if (pending.length === 0) {
+        banner.classList.add('hidden');
+        return;
+      }
+
+      banner.classList.remove('hidden');
+      badge.textContent = pending.length;
+
+      list.innerHTML = pending.map(s => {
+        const group = CenterStore.getGroupById(s.groupId);
+        return `
+          <div class="bg-white rounded-2xl p-3.5 border border-amber-200 shadow-xs flex flex-col justify-between gap-3 text-xs">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-mono font-bold text-sky-700">#${s.code}</span>
+                <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full font-bold text-[10px]">قيد المراجعة</span>
+              </div>
+              <div class="flex items-center gap-2.5 mb-1.5">
+                <div class="w-8 h-8 rounded-xl bg-sky-50 dark:bg-slate-800 flex items-center justify-center shrink-0 shadow-2xs">
+                  ${typeof CenterAvatars !== 'undefined' ? CenterAvatars.renderAvatar(s.avatarId || (s.gender === 'female' ? 'girl_1' : 'boy_1'), 30) : ''}
+                </div>
+                <div>
+                  <div class="font-bold text-slate-900 dark:text-white text-sm leading-tight">${s.name}</div>
+                  <div class="text-[11px] text-slate-500 font-mono" dir="ltr">${s.phone}</div>
+                </div>
+              </div>
+              <div class="text-slate-600 dark:text-slate-400 mt-1 font-bold">${group ? group.name : '-'}</div>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button onclick="approveStudent('${s.id}')" class="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-colors">
+                قبول وتفعيل ✅
+              </button>
+              <button onclick="rejectStudent('${s.id}')" class="py-1.5 px-3 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-bold transition-colors">
+                رفض ❌
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function approveStudent(id) {
+      CenterStore.approveStudent(id);
+      loadAdminDashboard();
+    }
+
+    function rejectStudent(id) {
+      if (confirm('هل أنت متأكد من رفض هذا الطالب؟')) {
+        CenterStore.rejectStudent(id);
+        loadAdminDashboard();
+      }
+    }
+
+    function renderStudentsTable(studentsList = null) {
+      const students = studentsList || CenterStore.getStudents();
+      const tbody = document.getElementById('students-table-body');
+
+      if (students.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-12 text-slate-400">
+              <div class="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto mb-3 text-2xl">
+                👥
+              </div>
+              <h4 class="font-heading font-bold text-sm text-slate-700 dark:text-slate-300">لا يوجد طلاب مسجلين حتى الآن</h4>
+              <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">النظام جاهز ونظيف تماماً بدون بيانات وهمية لاستقبال تسجيلات الطلاب الحقيقية بالسنتر.</p>
+              <div class="mt-4 flex items-center justify-center gap-3">
+                <a href="index.html" class="btn-sky-primary text-xs py-2 px-5">
+                  <span>+ تسجيل أول طالب الآن</span>
+                </a>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = students.map(s => {
+        const group = CenterStore.getGroupById(s.groupId);
+        const isApproved = s.status === 'approved';
+
+        return `
+          <tr class="hover:bg-sky-50/40 dark:hover:bg-slate-800/40 transition-colors">
+            <td class="py-3 px-4 font-mono font-bold text-sky-700 dark:text-sky-400">#${s.code}</td>
+            <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl ${s.photo ? 'overflow-hidden' : (s.gender === 'female' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700')} flex items-center justify-center shrink-0 shadow-2xs">
+                  ${s.photo ? `<img src="${s.photo}" class="w-full h-full object-cover">` : `<span class="text-sm">${s.gender === 'female' ? '👩‍🎓' : '👨‍🎓'}</span>`}
+                </div>
+                <span>${s.name}</span>
+              </div>
+            </td>
+            <td class="py-3 px-4 font-mono text-slate-600" dir="ltr">${s.phone}</td>
+            <td class="py-3 px-4 font-mono text-slate-600" dir="ltr">${s.parentPhone}</td>
+            <td class="py-3 px-4 text-slate-700 font-bold">${group ? group.name : '-'}</td>
+            <td class="py-3 px-4 font-bold text-slate-600">${s.sheetNo || '-'}</td>
+            <td class="py-3 px-4">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-black ${isApproved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                ${isApproved ? 'معتمد نشط' : 'قيد المراجعة'}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="openEditModal('${s.id}')" class="p-1.5 rounded-lg text-sky-600 hover:bg-sky-100 transition-colors" title="تعديل البيانات">
+                  <i data-feather="edit-2" class="w-4 h-4"></i>
+                </button>
+                <button onclick="viewStudentCard('${s.id}')" class="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors" title="فتح كارت الطالب">
+                  <i data-feather="credit-card" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      feather.replace();
+    }
+
+    function handleStudentSearch() {
+      const query = document.getElementById('admin-search-input').value;
+      const filtered = CenterStore.searchStudents(query);
+      renderStudentsTable(filtered);
+    }
+
+    // ============ EDIT STUDENT MODAL ============
+    function openEditModal(studentId) {
+      const s = CenterStore.getStudentById(studentId);
+      if (!s) return;
+
+      document.getElementById('edit-student-id').value = s.id;
+      document.getElementById('edit-name').value = s.name;
+      document.getElementById('edit-phone').value = s.phone;
+      document.getElementById('edit-parent-phone').value = s.parentPhone;
+      document.getElementById('edit-year').value = s.year;
+      document.getElementById('edit-sheet').value = s.sheetNo || '';
+      document.getElementById('edit-group').value = s.groupId;
+      document.getElementById('edit-unpaid-sub').checked = !!s.hasUnpaidSubscription;
+
+      document.getElementById('edit-student-modal').classList.remove('hidden');
+      feather.replace();
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-student-modal').classList.add('hidden');
+    }
+
+    function handleSaveStudentEdit(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-student-id').value;
+      const updates = {
+        name: document.getElementById('edit-name').value.trim(),
+        phone: document.getElementById('edit-phone').value.trim(),
+        parentPhone: document.getElementById('edit-parent-phone').value.trim(),
+        year: document.getElementById('edit-year').value,
+        sheetNo: document.getElementById('edit-sheet').value.trim(),
+        groupId: document.getElementById('edit-group').value,
+        hasUnpaidSubscription: document.getElementById('edit-unpaid-sub').checked
+      };
+
+      CenterStore.updateStudent(id, updates);
+      closeEditModal();
+      loadAdminDashboard();
+    }
+
+    function viewStudentCard(studentId) {
+      localStorage.setItem('center_active_student_id', studentId);
+      window.location.href = 'student.html';
+    }
+
+    // ============ KIOSK ATTENDANCE MODE ============
+    function openKioskMode() {
+      activeKioskGroupId = document.getElementById('main-group-select').value;
+      const group = CenterStore.getGroupById(activeKioskGroupId);
+      
+      document.getElementById('kiosk-active-group-label').textContent = 
+        group ? `المجموعة الحالية: ${group.name} (${group.day} ${group.time})` : 'المجموعة المحددة';
+
+      document.getElementById('kiosk-modal').classList.remove('hidden');
+      
+      const input = document.getElementById('kiosk-barcode-input');
+      input.value = '';
+      setTimeout(() => input.focus(), 150);
+
+      updateKioskCounter();
+      feather.replace();
+    }
+
+    function closeKioskMode() {
+      document.getElementById('kiosk-modal').classList.add('hidden');
+      loadAdminDashboard();
+    }
+
+    function handleKioskManualScan(e) {
+      e.preventDefault();
+      const input = document.getElementById('kiosk-barcode-input');
+      const code = input.value.trim();
+      if (!code) return;
+
+      processKioskBarcode(code);
+      input.value = '';
+      input.focus();
+    }
+
+    function processKioskBarcode(code) {
+      const result = CenterStore.recordAttendance(code, activeKioskGroupId);
+      const card = document.getElementById('kiosk-status-card');
+      const iconBox = document.getElementById('kiosk-status-icon-box');
+      const badge = document.getElementById('kiosk-status-badge');
+      const title = document.getElementById('kiosk-student-name');
+      const msg = document.getElementById('kiosk-status-message');
+      const extra = document.getElementById('kiosk-extra-details');
+
+      // Reset any animation class
+      card.classList.remove('kiosk-flash-success', 'kiosk-flash-makeup', 'kiosk-flash-alert');
+      void card.offsetWidth; // trigger reflow
+
+      if (!result.success) {
+        card.classList.add('kiosk-flash-alert');
+        iconBox.className = "w-20 h-20 rounded-3xl bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-4 text-3xl font-black";
+        iconBox.innerHTML = "⚠️";
+        badge.className = "inline-block px-4 py-1 rounded-full text-xs font-black bg-rose-500/20 text-rose-300 mb-3";
+        badge.textContent = "خطأ في التسجيل";
+        title.textContent = result.student ? result.student.name : "طالب غير مسجل!";
+        msg.textContent = result.message;
+        extra.classList.add('hidden');
+        return;
+      }
+
+      // Success branch
+      extra.classList.remove('hidden');
+      document.getElementById('kiosk-sheet-val').textContent = result.student.sheetNo ? `#${result.student.sheetNo}` : 'غير محدد';
+      document.getElementById('kiosk-orig-group-val').textContent = result.studentOriginalGroup ? result.studentOriginalGroup.name : 'غير محددة';
+
+      if (result.isMakeup) {
+        // Makeup student
+        card.classList.add('kiosk-flash-makeup');
+        iconBox.className = "w-20 h-20 rounded-3xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-4 text-3xl font-black";
+        iconBox.innerHTML = "🔁";
+        badge.className = "inline-block px-4 py-1 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 mb-3 animate-bounce";
+        badge.textContent = "حضور تعويض لمجموعة أخرى 🔁";
+        title.textContent = result.student.name;
+        msg.innerHTML = `تم تسجيل الحضور كـ <span class="text-amber-300 font-bold">تعويض</span> لمجموعته الأصلية (${result.studentOriginalGroup ? result.studentOriginalGroup.name : ''})`;
+      } else {
+        // Regular student
+        card.classList.add('kiosk-flash-success');
+        iconBox.className = "w-20 h-20 rounded-3xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4 text-3xl font-black";
+        iconBox.innerHTML = "✅";
+        badge.className = "inline-block px-4 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 mb-3";
+        badge.textContent = "حضور نظامي معتمد ✅";
+        title.textContent = result.student.name;
+        msg.textContent = "تم تسجيل الحضور بنجاح في موعد المجموعة الأساسي.";
+      }
+
+      // If unpaid subscription alert
+      if (result.hasUnpaidSubscription) {
+        msg.innerHTML += `<br><span class="inline-block mt-2 px-3 py-1 bg-rose-500 text-white rounded-full font-bold text-xs">⚠️ تنبيه: متبقي اشتراك الشهر</span>`;
+      }
+
+      updateKioskCounter();
+      appendLiveStream(result);
+    }
+
+    function updateKioskCounter() {
+      const todayAttendance = CenterStore.getTodayGroupAttendance(activeKioskGroupId);
+      document.getElementById('kiosk-session-counter').textContent = todayAttendance.length;
+      document.getElementById('kiosk-stream-count').textContent = `${todayAttendance.length} مسجل`;
+    }
+
+    function appendLiveStream(result) {
+      const stream = document.getElementById('kiosk-live-stream');
+      const isMakeup = result.isMakeup;
+
+      const item = document.createElement('div');
+      item.className = `flex justify-between items-center p-2 rounded-xl border ${isMakeup ? 'bg-amber-900/30 border-amber-600/40 text-amber-200' : 'bg-slate-700/60 border-slate-600 text-slate-200'} text-xs animate-fadeIn`;
+      item.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="font-bold">${isMakeup ? '🔁 تعويض' : '✅ نظامي'}</span>
+          <span class="font-bold text-white">${result.student.name}</span>
+          <span class="text-[10px] text-slate-400 font-mono">#${result.student.code}</span>
+        </div>
+        <div class="font-mono text-[11px] text-slate-400">${new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</div>
+      `;
+
+      stream.insertBefore(item, stream.firstChild);
+    }
+
+    // Keep scanner input focused in kiosk mode
+    document.addEventListener('click', (e) => {
+      const kioskModal = document.getElementById('kiosk-modal');
+      if (!kioskModal.classList.contains('hidden')) {
+        const input = document.getElementById('kiosk-barcode-input');
+        if (document.activeElement !== input && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+          input.focus();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

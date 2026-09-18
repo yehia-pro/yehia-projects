@@ -58,11 +58,11 @@ function copyDir(from, to) {
   }
 }
 
-// Ensure Android public index.html is the real Student Hub app (app.html)
+// Ensure Android public index.html is synced
 const androidPublic = path.join(src, 'android/app/src/main/assets/public');
-if (fs.existsSync(androidPublic) && fs.existsSync(path.join(src, 'app.html'))) {
-  fs.copyFileSync(path.join(src, 'app.html'), path.join(androidPublic, 'index.html'));
-  console.log('  ✓ Synced Android App index.html → app.html');
+if (fs.existsSync(androidPublic) && fs.existsSync(path.join(src, 'index.html'))) {
+  fs.copyFileSync(path.join(src, 'index.html'), path.join(androidPublic, 'index.html'));
+  console.log('  ✓ Synced Android App index.html');
 }
 
 console.log('\nBuild done → dist/');

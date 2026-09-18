@@ -1,9 +1,8 @@
 const NAV_ITEMS = [
-  { href: 'index.html', label: 'الرئيسية', icon: '🏠', key: 'dashboard' },
-  { href: 'subjects.html', label: 'المركز الأكاديمي', icon: '📚', key: 'subjects' },
-  { href: 'tasks.html', label: 'مركز الإنجاز', icon: '🎯', key: 'tasks' },
-  { href: 'resources.html', label: 'مكتبة الـ PDF والملخصات', icon: '💡', key: 'resources' },
-  { href: 'prayer.html', label: 'الرفيق الإيماني والرتب', icon: '🕌', key: 'prayer' }
+  { href: 'student.html', label: 'بطاقة الطالب', icon: '🪪', key: 'student' },
+  { href: 'summaries.html', label: 'الملخصات', icon: '📚', key: 'summaries' },
+  { href: 'prayer.html', label: 'الرفيق الإيماني', icon: '🕌', key: 'prayer' },
+  { href: 'admin.html', label: 'لوحة الإدارة', icon: '💻', key: 'admin' }
 ];
 
 const App = {
@@ -71,41 +70,70 @@ const App = {
   renderHeader() {
     const el = document.getElementById('sh-header');
     if (!el) return;
-    const links = NAV_ITEMS.map(function (n) {
-      return '<a href="' + n.href + '" data-nav="' + n.key + '" class="sh-nav-item px-3.5 py-2 rounded-2xl font-bold text-xs md:text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">' + n.icon + ' ' + n.label + '</a>';
-    }).join('');
 
-    let prayerHeaderBadge = '';
-    if (typeof PrayerSystem !== 'undefined') {
-      try {
-        const pStatus = PrayerSystem.getSequentialStatus();
-        prayerHeaderBadge = '<a href="prayer.html" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:scale-105 transition" title="الصلاة القادمة">' +
-          '<span>🕌 ' + pStatus.next.name + ':</span><span class="font-mono text-amber-600 dark:text-amber-400">' + pStatus.countdownText + '</span></a>';
-      } catch(e) {}
+    const role = localStorage.getItem('center_user_role');
+    const isAdmin = role === 'admin';
+    const isStudent = role === 'student';
+
+    let portalBtnHtml = '';
+    if (isAdmin) {
+      portalBtnHtml = `
+        <a href="admin.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-50 dark:bg-sky-950/70 hover:bg-sky-100 text-sky-700 dark:text-sky-300 text-xs font-bold transition-all border border-sky-200 dark:border-sky-800">
+          <span>💻 لوحة الإدارة</span>
+        </a>
+      `;
+    } else if (isStudent) {
+      portalBtnHtml = `
+        <a href="student.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all border border-slate-200 dark:border-slate-700">
+          <span>🪪 بطاقة الطالب</span>
+        </a>
+      `;
+    } else {
+      portalBtnHtml = `
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all border border-slate-200 dark:border-slate-700">
+          <span>دخول</span>
+        </a>
+      `;
     }
 
-    let xpBadge = '';
-    if (typeof Store !== 'undefined' && Store.getUserXP) {
-      const uXP = Store.getUserXP();
-      xpBadge = `<a href="stats.html" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-xs font-black text-amber-600 dark:text-amber-400 hover:scale-105 transition shadow-sm" title="نقاط الخبرة والرتبة"><span>⭐</span><span>${uXP.xp} XP</span><span class="text-[10px] text-slate-500 font-bold">(${uXP.rank.badge})</span></a>`;
-    }
+    const homeHref = isAdmin ? 'admin.html' : (isStudent ? 'student.html' : 'index.html');
 
-    el.innerHTML =
-      '<div class="sticky top-0 z-40 bg-white/90 dark:bg-[#0B0F19]/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">' +
-      '<div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">' +
-      '<a href="index.html" class="flex items-center gap-2.5 font-black text-lg text-indigo-600 dark:text-indigo-400 shrink-0 hover:opacity-90 transition">' +
-      '<div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-600 to-slate-900 p-1.5 shadow-md flex items-center justify-center">' +
-      '<img src="logo/student_hub_logo.png" alt="Logo" class="h-full w-full object-contain filter drop-shadow" width="32" height="32" style="max-width: 32px; max-height: 32px;" onerror="this.outerHTML=\'<span class=\\\'text-lg\\\'>🎓</span>\'">' +
-      '</div>' +
-      '<span class="tracking-tight text-slate-900 dark:text-white">Student Hub</span></a>' +
-      prayerHeaderBadge +
-      xpBadge +
-      '<div class="flex items-center gap-2 ms-auto">' +
-      '<button id="sh-theme-btn" title="الوضع الليلي" class="sh-btn ghost !p-2.5 rounded-2xl">🌙</button>' +
-      '<button id="sh-settings-btn" title="الإعدادات" class="sh-btn ghost !p-2.5 rounded-2xl">⚙️</button>' +
-      '</div></div>' +
-      '<div class="max-w-6xl mx-auto px-4 pb-2.5 overflow-x-auto flex gap-1.5 scrollbar-hide" id="sh-nav-links">' + links + '</div>' +
-      '</div>';
+    el.innerHTML = `
+      <header class="w-full bg-white dark:bg-[#101b38] border-b border-sky-100 dark:border-[#1e3160] sticky top-0 z-40 px-4 py-3 shadow-xs transition-colors">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+          
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white flex items-center justify-center shadow-md shadow-sky-500/25">
+              <span class="text-xl">🕌</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <a href="${homeHref}" class="font-heading font-black text-base text-slate-900 dark:text-white leading-tight hover:text-sky-600 dark:hover:text-sky-400">
+                  سنتر الحضور الذكي
+                </a>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                  الرفيق الإيماني
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">مواقيت الصلاة والأذكار والمصحف الشريف</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            ${portalBtnHtml}
+            <a href="summaries.html" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all border border-slate-200 dark:border-slate-700">
+              <span>📚 الملخصات</span>
+            </a>
+            <button onclick="CenterTheme.toggle()" class="theme-toggle-btn text-base" title="تبديل الوضع النهاري / الليلي">
+              🌙
+            </button>
+          </div>
+
+        </div>
+      </header>
+    `;
+
+    CenterTheme.updateIcons(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
   },
 
   renderBottomNav() {
