@@ -1,6 +1,7 @@
 /**
- * CenterStore - Offline-first Storage Engine for Tutoring Centers
- * Production-Ready Clean Storage with Dark/Light Theme Manager
+ * CenterStore - Cloud-Synced & Offline-First Storage Engine for Tutoring Centers
+ * Integrated with Firebase Firestore (Project: student-hub-10909)
+ * With zero-latency local cache fallback and live real-time sync.
  */
 
 const CENTER_STORAGE_KEY = 'center_attendance_v2';
@@ -116,9 +117,12 @@ const CenterTheme = {
   }
 };
 
-// ============ Production Clean Database Store ============
+// ============ Production Cloud-Synced Center Store ============
 const CenterStore = {
-  // Clean default data without fake students
+  isCloudReady: false,
+  cloudSyncInitialized: false,
+
+  // Clean default data
   defaultData: {
     groups: [
       { id: 'g_301', name: '3ث - الأحد 4 عصراً (السنتر الرئيسي)', year: 'الصف الثالث الثانوي', day: 'الأحد', time: '04:00 م' },
@@ -126,9 +130,9 @@ const CenterStore = {
       { id: 'g_201', name: '2ث - الإثنين 5 مساءً (السنتر الرئيسي)', year: 'الصف الثاني الثانوي', day: 'الإثنين', time: '05:00 م' },
       { id: 'g_101', name: '1ث - الثلاثاء 4 عصراً (السنتر الرئيسي)', year: 'الصف الأول الثانوي', day: 'الثلاثاء', time: '04:00 م' }
     ],
-    students: [],     // Starts completely clean for real production use
-    attendance: [],   // Starts clean
-    examGrades: [],   // Starts clean
+    students: [],
+    attendance: [],
+    examGrades: [],
     summaries: [
       {
         id: 'sum_1',
@@ -185,7 +189,177 @@ const CenterStore = {
     }
   },
 
-  // Groups
+  // ============ Cloud Synchronization (Firebase Firestore) ============
+  initCloudSync() {
+    if (this.cloudSyncInitialized) return;
+    this.cloudSyncInitialized = true;
+
+    if (typeof FirebaseManager === 'undefined') {
+      console.log('Running in Local Storage Mode (FirebaseManager not loaded)');
+      this.updateCloudStatusBadge(false);
+      return;
+    }
+
+    const db = FirebaseManager.init();
+    if (!db) {
+      this.updateCloudStatusBadge(false);
+      return;
+    }
+
+    this.isCloudReady = true;
+    this.updateCloudStatusBadge(true);
+
+    // 1. Groups Real-time Sync
+    try {
+      db.collection('groups').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          const cloudGroups = [];
+          snapshot.forEach(doc => {
+            cloudGroups.push({ id: doc.id, ...doc.data() });
+          });
+          const data = this.getData();
+          data.groups = cloudGroups;
+          this.saveData(data);
+          window.dispatchEvent(new CustomEvent('center_groups_updated', { detail: cloudGroups }));
+        } else {
+          // If Firestore groups are completely empty, seed with default groups
+          const localGroups = this.getGroups();
+          localGroups.forEach(g => {
+            this.cloudSet('groups', g.id, g);
+          });
+        }
+      }, err => {
+        console.warn('Firestore groups sync notice:', err.message);
+        this.updateCloudStatusBadge(false);
+      });
+    } catch (err) {
+      console.warn('Groups listener error:', err);
+    }
+
+    // 2. Students Real-time Sync
+    try {
+      let initialStudentsLoad = true;
+      db.collection('students').onSnapshot(snapshot => {
+        const cloudStudents = [];
+        let newPendingFound = false;
+
+        snapshot.forEach(doc => {
+          cloudStudents.push({ id: doc.id, ...doc.data() });
+        });
+
+        const data = this.getData();
+        const prevStudents = data.students || [];
+
+        if (!initialStudentsLoad) {
+          cloudStudents.forEach(cs => {
+            if (cs.status === 'pending' && !prevStudents.some(ps => ps.id === cs.id)) {
+              newPendingFound = true;
+            }
+          });
+          if (newPendingFound) {
+            CenterAudio.playAlert();
+          }
+        }
+        initialStudentsLoad = false;
+
+        if (cloudStudents.length > 0 || !snapshot.metadata.fromCache) {
+          data.students = cloudStudents;
+          this.saveData(data);
+          window.dispatchEvent(new CustomEvent('center_students_updated', { detail: cloudStudents }));
+        }
+      }, err => {
+        console.warn('Firestore students sync notice:', err.message);
+        this.updateCloudStatusBadge(false);
+      });
+    } catch (err) {
+      console.warn('Students listener error:', err);
+    }
+
+    // 3. Attendance Real-time Sync
+    try {
+      db.collection('attendance').limit(500).onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+          const cloudAttendance = [];
+          snapshot.forEach(doc => {
+            cloudAttendance.push({ id: doc.id, ...doc.data() });
+          });
+          cloudAttendance.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+          const data = this.getData();
+          data.attendance = cloudAttendance;
+          this.saveData(data);
+          window.dispatchEvent(new CustomEvent('center_attendance_updated', { detail: cloudAttendance }));
+        }
+      }, err => {
+        console.warn('Firestore attendance sync notice:', err.message);
+      });
+    } catch (err) {
+      console.warn('Attendance listener error:', err);
+    }
+
+    // Listen to network changes
+    FirebaseManager.onStatusChange(online => {
+      this.updateCloudStatusBadge(online);
+    });
+  },
+
+  cloudSet(collection, docId, docData) {
+    if (typeof FirebaseManager !== 'undefined' && FirebaseManager.db) {
+      try {
+        FirebaseManager.db.collection(collection).doc(docId).set(docData).catch(err => {
+          console.warn(`Firestore set (${collection}/${docId}) notice:`, err.message);
+        });
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  },
+
+  cloudUpdate(collection, docId, updates) {
+    if (typeof FirebaseManager !== 'undefined' && FirebaseManager.db) {
+      try {
+        FirebaseManager.db.collection(collection).doc(docId).update(updates).catch(err => {
+          console.warn(`Firestore update (${collection}/${docId}) notice:`, err.message);
+        });
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  },
+
+  cloudDelete(collection, docId) {
+    if (typeof FirebaseManager !== 'undefined' && FirebaseManager.db) {
+      try {
+        FirebaseManager.db.collection(collection).doc(docId).delete().catch(err => {
+          console.warn(`Firestore delete (${collection}/${docId}) notice:`, err.message);
+        });
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  },
+
+  updateCloudStatusBadge(isOnline) {
+    document.querySelectorAll('.cloud-status-badge').forEach(badge => {
+      if (isOnline) {
+        badge.className = "cloud-status-badge flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition-all";
+        badge.innerHTML = `
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>السحابة متصلة 🟢</span>
+        `;
+        badge.setAttribute('title', 'قاعدة بيانات فايربيس السحابية متصلة ومزامنة لحظياً');
+      } else {
+        badge.className = "cloud-status-badge flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 transition-all";
+        badge.innerHTML = `
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+          <span>وضع محلي 🟡</span>
+        `;
+        badge.setAttribute('title', 'البيانات تُحفظ في الذاكرة المحلية (Offline Fallback)');
+      }
+    });
+  },
+
+  // ============ Groups ============
   getGroups() {
     return this.getData().groups || [];
   },
@@ -194,7 +368,35 @@ const CenterStore = {
     return this.getGroups().find(g => g.id === id) || null;
   },
 
-  // Students
+  addGroup(groupData) {
+    const data = this.getData();
+    data.groups = data.groups || [];
+    const newGroup = {
+      id: 'g_' + Date.now(),
+      name: groupData.name.trim(),
+      year: groupData.year,
+      day: groupData.day,
+      time: groupData.time
+    };
+    data.groups.push(newGroup);
+    this.saveData(data);
+
+    // Sync to Cloud Firestore
+    this.cloudSet('groups', newGroup.id, newGroup);
+    return newGroup;
+  },
+
+  deleteGroup(groupId) {
+    const data = this.getData();
+    data.groups = (data.groups || []).filter(g => g.id !== groupId);
+    this.saveData(data);
+
+    // Delete from Cloud Firestore
+    this.cloudDelete('groups', groupId);
+    return true;
+  },
+
+  // ============ Students ============
   getStudents() {
     return this.getData().students || [];
   },
@@ -250,6 +452,9 @@ const CenterStore = {
 
     data.students.push(newStudent);
     this.saveData(data);
+
+    // Sync to Cloud Firestore
+    this.cloudSet('students', newStudent.id, newStudent);
     return newStudent;
   },
 
@@ -259,6 +464,9 @@ const CenterStore = {
     if (student) {
       student.status = 'approved';
       this.saveData(data);
+
+      // Sync to Cloud Firestore
+      this.cloudUpdate('students', studentId, { status: 'approved' });
       return student;
     }
     return null;
@@ -270,9 +478,22 @@ const CenterStore = {
     if (student) {
       student.status = 'rejected';
       this.saveData(data);
+
+      // Sync to Cloud Firestore
+      this.cloudUpdate('students', studentId, { status: 'rejected' });
       return student;
     }
     return null;
+  },
+
+  deleteStudent(studentId) {
+    const data = this.getData();
+    data.students = (data.students || []).filter(s => s.id !== studentId);
+    this.saveData(data);
+
+    // Delete from Cloud Firestore
+    this.cloudDelete('students', studentId);
+    return true;
   },
 
   updateStudent(studentId, updates) {
@@ -281,6 +502,9 @@ const CenterStore = {
     if (index !== -1) {
       data.students[index] = { ...data.students[index], ...updates };
       this.saveData(data);
+
+      // Sync to Cloud Firestore
+      this.cloudUpdate('students', studentId, updates);
       return data.students[index];
     }
     return null;
@@ -361,6 +585,9 @@ const CenterStore = {
 
     data.attendance.unshift(record);
     this.saveData(data);
+
+    // Sync to Cloud Firestore
+    this.cloudSet('attendance', record.id, record);
 
     if (isMakeup) {
       CenterAudio.playMakeup();
@@ -469,37 +696,21 @@ const CenterStore = {
     return localStorage.getItem('center_user_role') === 'student';
   },
 
-  // Groups Management
-  addGroup(groupData) {
-    const data = this.getData();
-    data.groups = data.groups || [];
-    const newGroup = {
-      id: 'g_' + Date.now(),
-      name: groupData.name.trim(),
-      year: groupData.year,
-      day: groupData.day,
-      time: groupData.time
-    };
-    data.groups.push(newGroup);
-    this.saveData(data);
-    return newGroup;
-  },
-
-  deleteGroup(groupId) {
-    const data = this.getData();
-    data.groups = (data.groups || []).filter(g => g.id !== groupId);
-    this.saveData(data);
-    return true;
-  },
-
   // Reset database to completely empty
   clearAllData() {
     this.saveData(this.defaultData);
   }
 };
 
-// Initialize Theme immediately on script load to prevent any flash
+// Initialize Theme immediately on script load
 CenterTheme.init();
+
+// Auto-initialize Cloud Sync when document or script is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => CenterStore.initCloudSync());
+} else {
+  CenterStore.initCloudSync();
+}
 
 window.CenterStore = CenterStore;
 window.CenterAudio = CenterAudio;

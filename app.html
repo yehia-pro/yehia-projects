@@ -37,6 +37,10 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <div class="cloud-status-badge flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+          <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+          <span>جارٍ المزامنة...</span>
+        </div>
         <button onclick="CenterTheme.toggle()" class="theme-toggle-btn text-base" title="تبديل الوضع النهاري / الليلي">
           🌙
         </button>
@@ -365,7 +369,10 @@
     </div>
   </footer>
 
-  <!-- Scripts -->
+  <!-- Firebase Cloud SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
   <script src="js/center-store.js"></script>
   <script>
     let temporaryFormData = null;
@@ -375,6 +382,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       feather.replace();
       loadGroups();
+
+      // Listen for real-time group changes from admin
+      window.addEventListener('center_groups_updated', () => {
+        loadGroups();
+      });
     });
 
     function handleAvatarUpload(event) {
@@ -540,6 +552,20 @@
       document.getElementById('pending-student-code').textContent = `#${newStudent.code}`;
       document.getElementById('pending-student-name').textContent = `الطالب: ${newStudent.name}`;
       
+      // Real-time Cloud Listener: As soon as Admin approves on PC, student phone unlocks!
+      const approvalListener = () => {
+        const studentCheck = CenterStore.getStudentById(newStudent.id);
+        if (studentCheck && studentCheck.status === 'approved') {
+          CenterAudio.playSuccess();
+          localStorage.setItem('center_user_role', 'student');
+          localStorage.setItem('center_active_student_id', studentCheck.id);
+          window.removeEventListener('center_students_updated', approvalListener);
+          alert(`تهانينا يا ${studentCheck.name}! تم اعتماد وتفعيل حسابك من إدارة السنتر بنجاح ✅`);
+          window.location.href = 'student.html';
+        }
+      };
+      window.addEventListener('center_students_updated', approvalListener);
+
       feather.replace();
     }
 

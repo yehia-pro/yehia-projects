@@ -26,6 +26,7 @@ const files = [
   'icon.svg',
   ...fs.readdirSync(src).filter(f => f.endsWith('.png')),
   ...fs.readdirSync(src).filter(f => f.endsWith('.ico')),
+  ...fs.readdirSync(src).filter(f => f.endsWith('.bat')),
 ];
 
 // Dirs to copy

@@ -33,6 +33,10 @@
             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-sky-100 dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
               نسخة الكمبيوتر واللابتوب
             </span>
+            <div class="cloud-status-badge flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span>جارٍ المزامنة...</span>
+            </div>
           </div>
           <p class="text-xs text-slate-400 font-bold mt-1">التحضير السريع بالباركود • إدارة الحضور والتعويض • شؤون الطلاب</p>
         </div>
@@ -468,7 +472,10 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Firebase Cloud SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
   <script src="js/center-store.js"></script>
   <script>
     // Access Guard
@@ -487,6 +494,18 @@
       }
       feather.replace();
       loadAdminDashboard();
+
+      // Real-time Cloud Listeners (instant sync when students register or groups change)
+      window.addEventListener('center_students_updated', () => {
+        loadAdminDashboard();
+      });
+      window.addEventListener('center_groups_updated', () => {
+        loadAdminDashboard();
+        renderGroupsManagerList();
+      });
+      window.addEventListener('center_attendance_updated', () => {
+        renderStats();
+      });
     });
 
     function logoutAdmin() {

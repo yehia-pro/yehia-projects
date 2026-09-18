@@ -223,7 +223,10 @@
     </a>
   </nav>
 
-  <!-- Scripts -->
+  <!-- Firebase Cloud SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
   <script src="js/center-store.js"></script>
   <script>
     let currentStudent = null;
@@ -231,6 +234,14 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadStudentProfile();
       feather.replace();
+
+      // Real-time cloud sync listeners
+      window.addEventListener('center_students_updated', () => {
+        loadStudentProfile();
+      });
+      window.addEventListener('center_groups_updated', () => {
+        loadStudentProfile();
+      });
     });
 
     function loadStudentProfile() {
